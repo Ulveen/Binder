@@ -76,24 +76,6 @@ async function login(email: string, password: string) {
     try {
         await firebaseAuth.signInWithEmailAndPassword(email, password)
 
-        const to = `${BASE_URL}/login`
-        const headers = { 'Content-Type': 'application/json' }
-        const body = JSON.stringify({ email: email })
-
-        const result = await fetch(to, {
-            method: 'POST',
-            headers: headers,
-            body: body
-        })
-
-        if (!result.ok) {
-            throw new Error(await result.text())
-        }
-
-        const data = (await result.json()).data;
-
-        return data
-
     } catch (error: any) {
         if (error.code === 'auth/invalid-email') {
             throw new Error('Invalid email')
@@ -109,6 +91,26 @@ async function login(email: string, password: string) {
         }
         throw new Error(error.message)
     }
+
+    const to = `${BASE_URL}/login`
+        const headers = { 'Content-Type': 'application/json' }
+        const body = JSON.stringify({ email: email })
+
+        const result = await fetch(to, {
+            method: 'POST',
+            headers: headers,
+            body: body
+        })
+
+        if (!result.ok) {
+            throw new Error(await result.text())
+        }
+
+        const data = (await result.json()).data;
+
+        console.log(data);
+        
+        return data
 }
 
 async function verifyToken() {

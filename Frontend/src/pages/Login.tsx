@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { View, Text, StyleSheet, TextInput, Button } from "react-native";
 import AuthService from "../services/authService";
 import ToastService from "../services/toastService";
@@ -18,9 +18,11 @@ export default function Login({ navigation }: Props) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
+    const { user } = useAuth()
+
     async function handleLogin() {
         if (loading) return
-
+        
         setLoading(true)
         try {
             const data = await authService.login(email, password)
@@ -32,6 +34,8 @@ export default function Login({ navigation }: Props) {
         }
     }
 
+    if (user) navigation.navigate('Home')
+    
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Login</Text>

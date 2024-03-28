@@ -20,7 +20,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: { children: JSX.Element }) => {
 
-    const [user, setUser] = useState<User | undefined | null>()
+    const [user, setUser] = useState<User | undefined | null>(undefined)
 
     async function login(data: { user: User, token: string }) {
         setUser(data.user)

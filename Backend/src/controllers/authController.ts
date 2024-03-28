@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import firebaseAdmin from '../firebase/firebase';
 import EmailController from './emailController';
-import jwt from 'jsonwebtoken';
 import JwtController from './jwtController';
 
 export interface User {

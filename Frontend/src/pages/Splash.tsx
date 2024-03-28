@@ -1,3 +1,4 @@
+import { useAuth } from "../contexts/authContext";
 import { View, Text, StyleSheet, Button } from "react-native";
 
 interface Props {
@@ -5,6 +6,11 @@ interface Props {
 }
 
 export default function Splash( {navigation} : Props ) {
+
+    const { user } = useAuth()
+
+    if(user) navigation.navigate('Home')
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>BINDER</Text>
