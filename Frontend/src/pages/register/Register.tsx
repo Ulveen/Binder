@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { View, Text, StyleSheet, TextInput, Button } from "react-native";
+import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity } from "react-native";
 import AuthService from "../../services/authService";
 import ToastService from "../../services/toastService";
 import useCustomTheme from "../../contexts/ThemeContext";
@@ -7,6 +7,7 @@ import CustomButton from "../../components/CustomButton";
 import OtpPlaceholder from "./components/OtpPlaceholder";
 import DatePicker from "react-native-date-picker";
 import DropDownPicker from "react-native-dropdown-picker";
+import { launchImageLibrary } from "react-native-image-picker";
 
 interface Props {
     navigation: any;
@@ -17,12 +18,12 @@ const genderOptions = [
     { label: 'Female', value: 'Female' }
 ]
 
-export default function Register({ navigation }: Props) {
+const authService = AuthService()
+const toastService = ToastService()
+
+export default function Register({ navigation: { navigate } }: Props) {
     const { theme, colorScheme } = useCustomTheme()
     const styles = getStyles(colorScheme)
-
-    const authService = AuthService()
-    const toastService = ToastService()
 
     const otpInputRef = useRef<TextInput>(null)
 
@@ -31,8 +32,11 @@ export default function Register({ navigation }: Props) {
 
     const [email, setEmail] = useState('')
     const [otp, setOtp] = useState('')
-    const [password, setPassword] = useState('')
+
+    const [profileUri, setProfileUri] = useState('')
+    const [profileImage, setprofileImage] = useState('')
     const [name, setName] = useState('')
+    const [password, setPassword] = useState('')
     const [dob, setDob] = useState(new Date())
     const [binusian, setBinusian] = useState('')
     const [campus, setCampus] = useState('')
@@ -76,13 +80,21 @@ export default function Register({ navigation }: Props) {
         }
     }
 
+    async function handlePickImage() {
+        launchImageLibrary({ mediaType: 'photo', includeBase64: true }, (response) => {
+            if (response.didCancel) return
+            setProfileUri(response!.assets![0].uri!)
+            setprofileImage(response!.assets![0].base64!)
+        })
+    }
+
     async function handleRegister() {
         if (loading) return
         setLoading(true)
         try {
-            await authService.register(email, password, name, dob, binusian, campus, gender)
+            await authService.register(email, password, name, dob, binusian, campus, gender, profileImage)
             toastService.success('Success', 'You can now login')
-            navigation.navigate('Login')
+            navigate('Login')
         } catch (error: any) {
             toastService.error(error.message)
         } finally {
@@ -105,7 +117,7 @@ export default function Register({ navigation }: Props) {
                 />
                 <Text style={styles.redirectText}>
                     Already have an account?
-                    <Text style={{ color: 'blue' }} onPress={() => navigation.navigate('Login')}> Login</Text>
+                    <Text style={{ color: 'blue' }} onPress={() => navigate('Login')}> Login</Text>
                 </Text>
             </View>
         )
@@ -118,7 +130,7 @@ export default function Register({ navigation }: Props) {
                 <Text style={styles.description}>Enter 4 - digit code</Text>
                 <TextInput style={{ display: "none" }} placeholder="OTP" value={otp} onChangeText={handleOtpChange} ref={otpInputRef} />
                 <View style={styles.otpDiv}>
-                    {[0, 1, 2, 3].map((_, idx) => {
+                    {[0, 1, 2, 3].map(idx => {
                         return <OtpPlaceholder code={otp[idx]} openInput={openOtpInput} key={`OtpPlaceHolder${idx}`} />
                     })}
                 </View>
@@ -136,12 +148,16 @@ export default function Register({ navigation }: Props) {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Profile Details</Text>
-            <Text style={styles.emailLabel}>{email}</Text>
+            <TouchableOpacity onPress={handlePickImage}>
+                <Image style={styles.profileImage} source={authService.renderProfileImage(profileUri)} />
+            </TouchableOpacity>
             <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
             <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry={true} />
             <TextInput style={styles.input} placeholder="Binusian" value={binusian} onChangeText={setBinusian} />
             <TextInput style={styles.input} placeholder="Campus" value={campus} onChangeText={setCampus} />
             <DropDownPicker style={styles.genderPicker}
+                textStyle={styles.genderPickerText}
+                containerStyle={{ width: '80%' }}
                 value={gender}
                 setValue={setGender}
                 items={genderOptions}
@@ -151,6 +167,8 @@ export default function Register({ navigation }: Props) {
                 mode="date"
                 date={dob}
                 onDateChange={setDob}
+                title={'Date of Birth'}
+                minimumDate={new Date(1900, 0, 1)}
                 theme={theme === 'light' ? 'light' : 'dark'} />
             <CustomButton bgStyle={styles.continueBtn}
                 textStyle={styles.continueBtnText}
@@ -178,9 +196,14 @@ const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
         fontWeight: 'bold',
         color: colorScheme.primary
     },
+    profileImage: {
+        width: 150,
+        height: 150,
+        borderRadius: 75
+    },
     input: {
         width: '80%',
-        borderColor: 'gray',
+        borderColor: colorScheme.text,
         borderWidth: 1,
         borderRadius: 5,
         fontSize: 18,
@@ -218,9 +241,11 @@ const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
     },
     genderPicker: {
         alignSelf: 'center',
-        width: '80%',
+    },
+    genderPickerText: {
+        fontSize: 18
     },
     datePicker: {
-        height: 125
+        height: 110,
     }
 })

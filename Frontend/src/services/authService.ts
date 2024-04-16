@@ -5,6 +5,7 @@ const BASE_URL = `${process.env.BACKEND_URL}/auth`
 const firebaseAuth = auth()
 
 export interface User {
+    name: string,
     email: string,
     password: string,
     dob: Date,
@@ -12,7 +13,8 @@ export interface User {
     campus: string,
     gender: string,
     uid: string,
-    theme: string
+    theme: string,
+    profileImage: string
 }
 
 async function sendEmailOTP(email: string) {
@@ -51,11 +53,10 @@ async function verifyEmailOTP(email: string, otp: string) {
 
 }
 
-async function register(email: string, password: string, name: string, dob: Date, binusian: string, campus: string, gender: string) {
-
+async function register(email: string, password: string, name: string, dob: Date, binusian: string, campus: string, gender: string, profileImage: string) {
     const to = `${BASE_URL}/register`
     const headers = { 'Content-Type': 'application/json' }
-    const body = JSON.stringify({ email: email, password: password, name: name, dob: dob, binusian: binusian, campus: campus, gender: gender })
+    const body = JSON.stringify({ email: email, password: password, name: name, dob: dob, binusian: binusian, campus: campus, gender: gender, profileImage: profileImage })
 
     const result = await fetch(to, {
         method: 'POST',
@@ -147,6 +148,10 @@ async function verifyToken() {
     return (await result.json()).data as User
 }
 
+function renderProfileImage(profileImageUri: string | undefined) {
+    return profileImageUri ? { uri: profileImageUri } : require('../assets/Profile.jpg')
+}
+
 export default function AuthService() {
-    return { sendEmailOTP, verifyEmailOTP, register, login, verifyToken }
+    return { sendEmailOTP, verifyEmailOTP, register, login, verifyToken, renderProfileImage }
 }

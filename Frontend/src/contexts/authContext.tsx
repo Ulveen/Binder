@@ -35,7 +35,9 @@ export const AuthProvider = ({ children }: { children: JSX.Element }) => {
     async function verifyToken() {
         const authService = AuthService()
         try {
-            const user = await authService.verifyToken()
+            let user = await authService.verifyToken()
+            if (!user) return logout()
+            user.dob = new Date(user?.dob)
             setUser(user)
         } catch (error: any) {
             logout()

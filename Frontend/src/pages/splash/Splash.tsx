@@ -6,6 +6,26 @@ interface Props {
     navigation: any
 }
 
+export default function Splash({ navigation: { navigate } }: Props) {
+    const { colorScheme } = useCustomTheme()
+    const styles = getStyles(colorScheme)
+
+    return (
+        <View style={styles.container}>
+            <Image style={styles.logo} source={require("../../assets/Logo.jpg")} />
+            <CustomButton bgStyle={[styles.navBtnLogin, styles.navBtn]}
+                textStyle={styles.navBtnLoginText}
+                title="LOGIN"
+                onPress={() => navigate('Login')}
+            />
+            <CustomButton bgStyle={[styles.navBtnRegister, styles.navBtn]}
+                textStyle={styles.navBtnRegisterText}
+                title="REGISTER"
+                onPress={() => navigate('Register')} />
+        </View>
+    )
+}
+
 const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
     container: {
         flex: 1,
@@ -13,7 +33,7 @@ const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        backgroundColor: colorScheme.background
+        backgroundColor: colorScheme.background,
     },
     logo: {
         width: 200,
@@ -23,7 +43,7 @@ const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
     navBtn: {
         width: '75%',
         display: 'flex',
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     navBtnLogin: {
         backgroundColor: colorScheme.primary
@@ -38,23 +58,3 @@ const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
         color: colorScheme.primary
     }
 })
-
-export default function Splash({ navigation }: Props) {
-    const { colorScheme } = useCustomTheme()
-    const styles = getStyles(colorScheme)
-
-    return (
-        <View style={styles.container}>
-            <Image style={styles.logo} source={require("../../assets/Logo.jpg")} />
-            <CustomButton bgStyle={[styles.navBtnLogin, styles.navBtn]}
-                textStyle={styles.navBtnLoginText}
-                title="LOGIN"
-                onPress={() => { navigation.navigate('Login') }}
-            />
-            <CustomButton bgStyle={[styles.navBtnRegister, styles.navBtn]}
-                textStyle={styles.navBtnRegisterText}
-                title="REGISTER"
-                onPress={() => { navigation.navigate('Register') }} />
-        </View>
-    )
-}

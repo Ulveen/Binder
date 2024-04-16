@@ -20,7 +20,6 @@ const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
     buttonText: {
         textAlign: 'center',
         fontSize: 18,
-        color: colorScheme.text,
     }
 })
 

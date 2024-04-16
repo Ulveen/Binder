@@ -3,14 +3,17 @@ import JwtController from './jwtController';
 import EmailController from './emailController';
 import firebaseAdmin from '../firebase/firebase';
 
+
 export interface User {
+    name: string,
     email: string,
     password: string,
     dob: Date,
     binusian: string,
     campus: string,
     gender: string,
-    uid: string
+    uid: string,
+    profileImage: string
 }
 
 async function sendEmailOTP(req: Request, res: Response) {
@@ -85,9 +88,9 @@ async function verifyEmailOTP(req: Request, res: Response) {
 }
 
 async function register(req: Request, res: Response) {
-    const { email, password, dob, binusian, campus, gender }: User = req.body
+    const { email, password, dob, binusian, name, campus, gender, profileImage }: User = req.body
 
-    if (!email || !password || !dob || !binusian || !campus || !gender) {
+    if (!email || !password || !dob || !binusian || !campus || !gender || !profileImage) {
         res.status(400).send('All fields must not be empty')
         return
     }
@@ -98,6 +101,14 @@ async function register(req: Request, res: Response) {
     }
 
     try {
+        const profileImageRef = firebaseAdmin.storage.bucket().file(`profileImages/${email}.jpg`)
+        await profileImageRef.save(Buffer.from(profileImage, 'base64'))
+
+        const profileImageUrl = await profileImageRef.getSignedUrl({
+            action: 'read',
+            expires: '03-09-2491'
+        })
+
         const createUserPromise = firebaseAdmin.auth.createUser({
             email: email,
             password: password
@@ -105,9 +116,11 @@ async function register(req: Request, res: Response) {
 
         const insertUserDataPromise = firebaseAdmin.db.collection('users').doc(email).set({
             dob: dob,
+            name: name,
             binusian: binusian,
             campus: campus,
-            gender: gender
+            gender: gender,
+            profileImage: profileImageUrl[0]
         })
 
         await Promise.all([createUserPromise, insertUserDataPromise])
@@ -115,6 +128,8 @@ async function register(req: Request, res: Response) {
         res.status(200).json({ data: 'User registered' })
 
     } catch (error: any) {
+        console.log(error);
+        
         res.status(500).send(error.message)
     }
 }
