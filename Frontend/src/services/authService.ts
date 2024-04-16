@@ -11,10 +11,13 @@ export interface User {
     binusian: string,
     campus: string,
     gender: string,
-    uid: string
+    uid: string,
+    theme: string
 }
 
 async function sendEmailOTP(email: string) {
+    console.log('sendEmailOTP');
+    
     const to = `${BASE_URL}/sendEmailOTP`
     const headers = { 'Content-Type': 'application/json' }
     const body = JSON.stringify({ email: email })
@@ -48,18 +51,11 @@ async function verifyEmailOTP(email: string, otp: string) {
 
 }
 
-async function register(email: string, password: string, name: string, dob: string, binusian: string, campus: string, gender: string) {
-    let dobDate = new Date()
-
-    try {
-        dobDate = new Date(dob)
-    } catch (error: any) {
-        throw Error('Invalid date format')
-    }
+async function register(email: string, password: string, name: string, dob: Date, binusian: string, campus: string, gender: string) {
 
     const to = `${BASE_URL}/register`
     const headers = { 'Content-Type': 'application/json' }
-    const body = JSON.stringify({ email: email, password: password, name: name, dob: dobDate, binusian: binusian, campus: campus, gender: gender })
+    const body = JSON.stringify({ email: email, password: password, name: name, dob: dob, binusian: binusian, campus: campus, gender: gender })
 
     const result = await fetch(to, {
         method: 'POST',
@@ -73,6 +69,16 @@ async function register(email: string, password: string, name: string, dob: stri
 }
 
 async function login(email: string, password: string) {
+    console.log('login');
+
+    if (!email || !password) {
+        throw new Error('Email and password are required')
+    }
+
+    if (!email.endsWith('@binus.ac.id')) {
+        throw new Error('Please use your binus.ac.id email')
+    }
+    
     try {
         await firebaseAuth.signInWithEmailAndPassword(email, password)
 
@@ -114,7 +120,15 @@ async function login(email: string, password: string) {
 }
 
 async function verifyToken() {
+    console.log('verifyToken');
+    
     const token = await AsyncStorage.getItem('authorization')
+
+    console.log('token', token);
+    
+    if(!token) {
+        return null
+    }
 
     const to = `${BASE_URL}/verifyToken`
     const headers = { 'Content-Type': 'application/json' }

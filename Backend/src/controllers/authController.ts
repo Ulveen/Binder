@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import firebaseAdmin from '../firebase/firebase';
-import EmailController from './emailController';
 import JwtController from './jwtController';
+import EmailController from './emailController';
+import firebaseAdmin from '../firebase/firebase';
 
 export interface User {
     email: string,
@@ -42,7 +42,7 @@ async function sendEmailOTP(req: Request, res: Response) {
     }
 
     try {
-        const code = Math.floor(100000 + Math.random() * 900000).toString()
+        const code = Math.floor(1000 + Math.random() * 9000).toString()
 
         const otpPromise = firebaseAdmin.db.collection('otp').doc(email).set({ code: code })
         const emailPromise = EmailController.sendEmail(email, 'BINDER Verification OTP Code', code)

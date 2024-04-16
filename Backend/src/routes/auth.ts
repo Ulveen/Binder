@@ -1,12 +1,12 @@
 import express from 'express';
-import authController from '../controllers/authController';
+import AuthController from '../controllers/authController';
 
-const authRouter = express.Router();
+const AuthRouter = express.Router();
 
-authRouter.post('/sendEmailOTP', authController.sendEmailOTP);
-authRouter.post('/verifyEmailOTP', authController.verifyEmailOTP);
-authRouter.post('/login', authController.login);
-authRouter.post('/register', authController.register);
-authRouter.post('/verifyToken', authController.verifyToken)
+AuthRouter.post('/sendEmailOTP', AuthController.sendEmailOTP);
+AuthRouter.post('/verifyEmailOTP', AuthController.verifyEmailOTP);
+AuthRouter.post('/login', AuthController.login);
+AuthRouter.post('/register', AuthController.register);
+AuthRouter.post('/verifyToken', AuthController.verifyToken)
 
-export default authRouter;
+export default AuthRouter;

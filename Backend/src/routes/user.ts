@@ -1,9 +1,9 @@
-import userController from 'controllers/userController';
 import express from 'express';
-import verifyToken from 'middleware/authMiddleware';
+import userController from '../controllers/userController';
+import verifyToken from '../middlewares/authMiddleware';
 
-const userRouter = express.Router();
+const UserRouter = express.Router();
 
-userRouter.post('/updateProfile', verifyToken, userController.updateProfile);
+UserRouter.post('/updateProfile', verifyToken, userController.updateProfile);
 
-export default userRouter;
+export default UserRouter;

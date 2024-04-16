@@ -1,7 +1,7 @@
+import { Response } from "express";
 import { User } from "./authController";
 import firebaseAdmin from "../firebase/firebase";
-import e, { Response } from "express";
-import { AuthRequest } from "middleware/authMiddleware";
+import { AuthRequest } from "../middlewares/authMiddleware";
 
 async function updateProfile(req: AuthRequest, res: Response) {
     const { email, dob, binusian, campus, gender }: User = req.body
