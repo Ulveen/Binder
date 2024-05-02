@@ -5,11 +5,11 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AuthProvider, useAuth } from "./src/contexts/AuthContext";
 import useCustomTheme, { ThemeProvider } from "./src/contexts/ThemeContext";
-import Home from "./src/pages/home";
-import Login from "./src/pages/login";
-import Splash from "./src/pages/splash";
+import Home from "./src/pages/home/Home";
+import Login from "./src/pages/login/Login";
+import Splash from "./src/pages/splash/Splash";
 import Chat from "./src/pages/chat/Chat";
-import Register from "./src/pages/register";
+import Register from "./src/pages/register/Register";
 import Match from "./src/pages/match/Match";
 import Profile from "./src/pages/profile/Profile";
 import VideoCall from "./src/pages/videoCall/VideoCall";
@@ -41,7 +41,8 @@ const UnauthorizedRoutes = () => {
   const Stack = createNativeStackNavigator()
   return (
     <Stack.Navigator initialRouteName="Splash">
-      <Stack.Screen name="Splash" component={Splash} options={{ headerShown: false }} />
+      {/* <Stack.Screen name="Splash" component={Splash} options={{ headerShown: false }} /> */}
+      <Stack.Screen name="Splash" component={Match} options={{ headerShown: false }} />
       <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
       <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
     </Stack.Navigator>
