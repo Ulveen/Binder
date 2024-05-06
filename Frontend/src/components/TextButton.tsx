@@ -15,15 +15,17 @@ const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
         justifyContent: 'center',
         width: '100%',
         borderRadius: 15,
-        padding: 20
+        padding: 20,
+        backgroundColor: colorScheme.primary
     },
     buttonText: {
         textAlign: 'center',
         fontSize: 18,
+        color: 'white'
     }
 })
 
-export default function CustomButton({ title, onPress, bgStyle, textStyle }: Props) {
+export default function TextButton({ title, onPress, bgStyle, textStyle }: Props) {
     const { colorScheme } = useCustomTheme()
     const styles = getStyles(colorScheme)
 

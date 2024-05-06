@@ -1,4 +1,4 @@
-import CustomButton from "../../components/CustomButton";
+import TextButton from "../../components/TextButton";
 import useCustomTheme from "../../contexts/ThemeContext";
 import { View, StyleSheet, Image } from "react-native";
 
@@ -13,12 +13,12 @@ export default function Splash({ navigation: { navigate } }: Props) {
     return (
         <View style={styles.container}>
             <Image style={styles.logo} source={require("../../assets/Logo.jpg")} />
-            <CustomButton bgStyle={[styles.navBtnLogin, styles.navBtn]}
+            <TextButton bgStyle={[styles.navBtnLogin, styles.navBtn]}
                 textStyle={styles.navBtnLoginText}
                 title="LOGIN"
                 onPress={() => navigate('Login')}
             />
-            <CustomButton bgStyle={[styles.navBtnRegister, styles.navBtn]}
+            <TextButton bgStyle={[styles.navBtnRegister, styles.navBtn]}
                 textStyle={styles.navBtnRegisterText}
                 title="REGISTER"
                 onPress={() => navigate('Register')} />

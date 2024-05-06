@@ -4,7 +4,7 @@ import AuthService from "../../services/authService";
 import ToastService from "../../services/toastService";
 import { useAuth } from "../../contexts/AuthContext";
 import useCustomTheme from "../../contexts/ThemeContext";
-import CustomButton from "../../components/CustomButton";
+import TextButton from "../../components/TextButton";
 
 interface Props {
     navigation: any
@@ -48,7 +48,7 @@ export default function Login({ navigation: { navigate } }: Props) {
                 <Text style={styles.inputLabel}>Password</Text>
                 <TextInput style={styles.input} value={password} onChangeText={setPassword} secureTextEntry={true} />
             </View>
-            <CustomButton bgStyle={styles.loginBtn}
+            <TextButton bgStyle={styles.loginBtn}
                 textStyle={styles.loginBtnText}
                 title="Continue"
                 onPress={handleLogin} />

@@ -1,11 +1,11 @@
 import useCustomTheme from "../../contexts/ThemeContext";
-import CustomButton from "../../components/CustomButton";
+import TextButton from "../../components/TextButton";
 import { useAuth } from "../../contexts/AuthContext";
 import { Image, StyleSheet, Text, View } from "react-native";
-import AuthService from "../../services/authService";
 import TimeService from "../../services/timeService";
+import UserService from "../../services/userService";
 
-const authService = AuthService()
+const userService = UserService()
 const timeService = TimeService()
 
 export default function Profile() {
@@ -17,12 +17,12 @@ export default function Profile() {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Profile</Text>
-            <Image style={styles.profileImage} source={authService.renderProfileImage(user?.profileImage)} />
+            <Image style={styles.profileImage} source={userService.renderProfileImage(user?.profileImage)} />
             <Text style={styles.profileDetail}>{user?.name}</Text>
             <Text style={styles.profileDetail}>{timeService.getTimeDiffYear(user?.dob)}</Text>
             <Text style={styles.profileDetail}>{user?.binusian}</Text>
             <Text style={styles.profileDetail}>{user?.campus}</Text>
-            <CustomButton title="Logout" onPress={logout} />
+            <TextButton title="Logout" onPress={logout} />
         </View>
     )
 }

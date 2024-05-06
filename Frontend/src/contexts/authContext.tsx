@@ -23,7 +23,9 @@ export const AuthProvider = ({ children }: { children: JSX.Element }) => {
     const [user, setUser] = useState<User | undefined | null>(undefined)
 
     async function login(data: { user: User, token: string }) {
-        setUser(data.user)
+        let tempUser = data.user
+        tempUser.dob = new Date(tempUser.dob)
+        setUser(tempUser)
         await AsyncStorage.setItem("authorization", data.token)
     }
 

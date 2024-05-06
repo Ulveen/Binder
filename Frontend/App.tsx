@@ -8,11 +8,11 @@ import useCustomTheme, { ThemeProvider } from "./src/contexts/ThemeContext";
 import Home from "./src/pages/home";
 import Login from "./src/pages/login";
 import Splash from "./src/pages/splash";
-import Chat from "./src/pages/chat/Chat";
+import Chat from "./src/pages/chat";
 import Register from "./src/pages/register";
-import Match from "./src/pages/match/Match";
-import Profile from "./src/pages/profile/Profile";
-import VideoCall from "./src/pages/videoCall/VideoCall";
+import Match from "./src/pages/match";
+import Profile from "./src/pages/profile";
+import VideoCall from "./src/pages/videoCall";
 
 const AuthorizedRoutes = () => {
   const Tab = createBottomTabNavigator()

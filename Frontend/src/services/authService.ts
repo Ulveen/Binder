@@ -148,10 +148,6 @@ async function verifyToken() {
     return (await result.json()).data as User
 }
 
-function renderProfileImage(profileImageUri: string | undefined) {
-    return profileImageUri ? { uri: profileImageUri } : require('../assets/Profile.jpg')
-}
-
 export default function AuthService() {
-    return { sendEmailOTP, verifyEmailOTP, register, login, verifyToken, renderProfileImage }
+    return { sendEmailOTP, verifyEmailOTP, register, login, verifyToken }
 }
