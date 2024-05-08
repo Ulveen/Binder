@@ -1,5 +1,5 @@
 import TextButton from "../../components/TextButton";
-import useCustomTheme from "../../contexts/ThemeContext";
+import useCustomTheme, { Theme } from "../../contexts/ThemeContext";
 import { View, StyleSheet, Image } from "react-native";
 
 interface Props {
@@ -7,8 +7,8 @@ interface Props {
 }
 
 export default function Splash({ navigation: { navigate } }: Props) {
-    const { colorScheme } = useCustomTheme()
-    const styles = getStyles(colorScheme)
+    const { theme } = useCustomTheme()
+    const styles = getStyles(theme)
 
     return (
         <View style={styles.container}>
@@ -26,14 +26,14 @@ export default function Splash({ navigation: { navigate } }: Props) {
     )
 }
 
-const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
+const getStyles = (theme: Theme) => StyleSheet.create({
     container: {
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        backgroundColor: colorScheme.background,
+        backgroundColor: theme.background,
     },
     logo: {
         width: 200,
@@ -46,15 +46,15 @@ const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
         justifyContent: 'center',
     },
     navBtnLogin: {
-        backgroundColor: colorScheme.primary
+        backgroundColor: theme.primary
     },
     navBtnLoginText: {
         color: 'white'
     },
     navBtnRegister: {
-        backgroundColor: colorScheme.background
+        backgroundColor: theme.background
     },
     navBtnRegisterText: {
-        color: colorScheme.primary
+        color: theme.primary
     }
 })

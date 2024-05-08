@@ -1,11 +1,16 @@
 import { createContext, useContext, useState } from "react";
 import { useAuth } from "./AuthContext";
-import { useColorScheme } from "react-native";
+
+export interface Theme {
+    background: string;
+    text: string;
+    primary: string;
+}
 
 interface ThemeContextProps {
-    theme: string
+    userTheme: string
     toggleTheme: () => void
-    colorScheme: { [key: string]: any }
+    theme: Theme
 }
 
 const ThemeContext = createContext<ThemeContextProps | undefined>(undefined)
@@ -18,33 +23,39 @@ function useCustomTheme() {
     return context
 }
 
-const darkTheme = {
-    primary: '#E94057',
-    background: '#000000',
-    text: '#FFFFFF'
-}
-
-const lightTheme = {
-    primary: '#E94057',
-    background: '#FFFFFF',
-    text: '#000000'
-}
-
 function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const { user } = useAuth()
-    const [theme, setTheme] = useState(user?.theme || useColorScheme() || 'light')
+    const { user } = useAuth();
+    const [userTheme, setUserTheme] = useState(user?.theme || 'light');
 
     function toggleTheme() {
-        setTheme(theme === 'light' ? 'dark' : 'light')
-    }
+        if(!user) return;
+        user.theme = userTheme === 'light' ? 'dark' : 'light';
+        setUserTheme(userTheme === 'light' ? 'dark' : 'light');
+    };
 
-    const colorScheme = theme === 'light' ? lightTheme : darkTheme
+    const baseTheme = {
+        primary: '#E94057',
+    };
+
+    const darkTheme = {
+        ...baseTheme,
+        background: '#000000',
+        text: '#FFFFFF'
+    };
+
+    const lightTheme = {
+        ...baseTheme,
+        background: '#FFFFFF',
+        text: '#000000'
+    };
+
+    const theme = userTheme === 'light' ? lightTheme : darkTheme;
 
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme, colorScheme }}>
+        <ThemeContext.Provider value={{ toggleTheme, theme, userTheme }}>
             {children}
         </ThemeContext.Provider>
-    )
+    );
 }
 
 export default useCustomTheme;

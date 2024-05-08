@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput } from "react-native";
 import AuthService from "../../services/authService";
 import ToastService from "../../services/toastService";
 import { useAuth } from "../../contexts/AuthContext";
-import useCustomTheme from "../../contexts/ThemeContext";
+import useCustomTheme, { Theme } from "../../contexts/ThemeContext";
 import TextButton from "../../components/TextButton";
 
 interface Props {
@@ -15,9 +15,9 @@ const authService = AuthService()
 
 export default function Login({ navigation: { navigate } }: Props) {
     const { login } = useAuth()
-    const { colorScheme } = useCustomTheme()
+    const { theme } = useCustomTheme()
 
-    const styles = getStyles(colorScheme)
+    const styles = getStyles(theme)
 
     const [loading, setLoading] = useState(false)
     const [email, setEmail] = useState('')
@@ -61,19 +61,19 @@ export default function Login({ navigation: { navigate } }: Props) {
 }
 
 
-const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
+const getStyles = (theme: Theme) => StyleSheet.create({
     container: {
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        backgroundColor: colorScheme.background
+        backgroundColor: theme.background
     },
     title: {
         fontSize: 36,
         fontWeight: 'bold',
-        color: colorScheme.primary
+        color: theme.primary
     },
     inputDiv: {
         display: 'flex',
@@ -83,7 +83,7 @@ const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
     },
     inputLabel: {
         fontSize: 20,
-        color: colorScheme.text,
+        color: theme.text,
         fontStyle: 'italic'
     },
     input: {
@@ -93,18 +93,18 @@ const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
         borderRadius: 5,
         fontSize: 18,
         padding: 10,
-        color: colorScheme.text,
-        backgroundColor: colorScheme.background
+        color: theme.text,
+        backgroundColor: theme.background
     },
     loginBtn: {
         width: '80%',
-        backgroundColor: colorScheme.primary,
+        backgroundColor: theme.primary,
     },
     loginBtnText: {
         color: 'white',
     },
     redirectText: {
-        color: colorScheme.text,
+        color: theme.text,
         fontSize: 16
     }
 })

@@ -1,4 +1,4 @@
-import useCustomTheme from "../../contexts/ThemeContext";
+import useCustomTheme, { Theme } from "../../contexts/ThemeContext";
 import TextButton from "../../components/TextButton";
 import { useAuth } from "../../contexts/AuthContext";
 import { Image, StyleSheet, Text, View } from "react-native";
@@ -10,9 +10,9 @@ const timeService = TimeService()
 
 export default function Profile() {
     const { user, logout } = useAuth()
-    const { colorScheme } = useCustomTheme()
+    const { theme } = useCustomTheme()
 
-    const styles = getStyles(colorScheme)
+    const styles = getStyles(theme)
     
     return (
         <View style={styles.container}>
@@ -27,22 +27,22 @@ export default function Profile() {
     )
 }
 
-const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
+const getStyles = (theme: Theme) => StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'column',
-        backgroundColor: colorScheme.background,
+        backgroundColor: theme.background,
         justifyContent: 'space-evenly',
         alignItems: 'center'
     },
     title: {
         fontSize: 36,
         fontWeight: 'bold',
-        color: colorScheme.primary
+        color: theme.primary
     },
     profileDetail: {
         fontSize: 24,
-        color: colorScheme.text
+        color: theme.text
     },
     profileImage: {
         width: 200,

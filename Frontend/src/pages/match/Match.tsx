@@ -1,11 +1,11 @@
-import { ScrollView, StyleSheet, Text, View, useColorScheme } from "react-native";
-import useCustomTheme from "../../contexts/ThemeContext";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import useCustomTheme, { Theme } from "../../contexts/ThemeContext";
 import ProfileCards from "./components/ProfileCards";
 import { useState } from "react";
 
 export default function Match() {
-    const {colorScheme} = useCustomTheme()
-    const styles = getStyles(colorScheme)
+    const {theme} = useCustomTheme()
+    const styles = getStyles(theme)
     return (
         <ScrollView contentContainerStyle={styles.scrollAblePage}>
             <View style={styles.page}>
@@ -19,13 +19,13 @@ export default function Match() {
     )
 }
 
-const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
+const getStyles = (theme: Theme) => StyleSheet.create({
     scrollAblePage: {
         flexGrow: 1,
     },
     page: {
         flex: 1,
-        backgroundColor: colorScheme.background,
+        backgroundColor: theme.background,
         alignItems: "center",
     },
     container: {
@@ -38,7 +38,7 @@ const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
     pageTitle: {
         alignSelf: 'flex-start',
         marginLeft : '10%',
-        color: colorScheme.text,
+        color: theme.text,
         fontSize: 37,
         fontFamily: "ABeeZee",
         marginTop: 15

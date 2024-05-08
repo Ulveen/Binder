@@ -1,4 +1,4 @@
-import useCustomTheme from "../contexts/ThemeContext";
+import useCustomTheme, { Theme } from "../contexts/ThemeContext";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
     textStyle?: { [key: string]: any }
 }
 
-const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
+const getStyles = (theme: Theme) => StyleSheet.create({
     buttonContainer: {
         display: 'flex',
         flexDirection: 'row',
@@ -16,7 +16,7 @@ const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
         width: '100%',
         borderRadius: 15,
         padding: 20,
-        backgroundColor: colorScheme.primary
+        backgroundColor: theme.primary
     },
     buttonText: {
         textAlign: 'center',
@@ -26,8 +26,8 @@ const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
 })
 
 export default function TextButton({ title, onPress, bgStyle, textStyle }: Props) {
-    const { colorScheme } = useCustomTheme()
-    const styles = getStyles(colorScheme)
+    const { theme } = useCustomTheme()
+    const styles = getStyles(theme)
 
     return (
         <TouchableOpacity style={[styles.buttonContainer, bgStyle]} onPress={onPress}>

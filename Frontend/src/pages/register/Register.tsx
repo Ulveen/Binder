@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity } from "reac
 import AuthService from "../../services/authService";
 import UserService from "../../services/userService";
 import ToastService from "../../services/toastService";
-import useCustomTheme from "../../contexts/ThemeContext";
+import useCustomTheme, { Theme } from "../../contexts/ThemeContext";
 import TextButton from "../../components/TextButton";
 import OtpPlaceholder from "./components/OtpPlaceholder";
 import DatePicker from "react-native-date-picker";
@@ -24,8 +24,8 @@ const userService = UserService()
 const toastService = ToastService()
 
 export default function Register({ navigation: { navigate } }: Props) {
-    const { theme, colorScheme } = useCustomTheme()
-    const styles = getStyles(colorScheme)
+    const { theme, userTheme } = useCustomTheme()
+    const styles = getStyles(theme)
 
     const otpInputRef = useRef<TextInput>(null)
 
@@ -171,7 +171,7 @@ export default function Register({ navigation: { navigate } }: Props) {
                 onDateChange={setDob}
                 title={'Date of Birth'}
                 minimumDate={new Date(1900, 0, 1)}
-                theme={theme === 'light' ? 'light' : 'dark'} />
+                theme={userTheme === 'light' ? 'light' : 'dark'} />
             <TextButton bgStyle={styles.continueBtn}
                 textStyle={styles.continueBtnText}
                 title="Register"
@@ -180,9 +180,9 @@ export default function Register({ navigation: { navigate } }: Props) {
     )
 }
 
-const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
+const getStyles = (theme: Theme) => StyleSheet.create({
     container: {
-        backgroundColor: colorScheme.background,
+        backgroundColor: theme.background,
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'space-evenly',
@@ -191,12 +191,12 @@ const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
     description: {
         width: '80%',
         fontSize: 16,
-        color: colorScheme.text
+        color: theme.text
     },
     title: {
         fontSize: 36,
         fontWeight: 'bold',
-        color: colorScheme.primary
+        color: theme.primary
     },
     profileImage: {
         width: 150,
@@ -205,35 +205,35 @@ const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
     },
     input: {
         width: '80%',
-        borderColor: colorScheme.text,
+        borderColor: theme.text,
         borderWidth: 1,
         borderRadius: 5,
         fontSize: 18,
         padding: 10,
-        color: colorScheme.text,
-        backgroundColor: colorScheme.background
+        color: theme.text,
+        backgroundColor: theme.background
     },
     redirectText: {
-        color: colorScheme.text,
+        color: theme.text,
         fontSize: 16
     },
     continueBtn: {
-        backgroundColor: colorScheme.primary,
+        backgroundColor: theme.primary,
         width: '80%',
     },
     continueBtnText: {
         color: 'white',
     },
     resendBtn: {
-        backgroundColor: colorScheme.background,
+        backgroundColor: theme.background,
         width: '80%',
     },
     resendBtnText: {
-        color: colorScheme.primary,
+        color: theme.primary,
     },
     emailLabel: {
         fontSize: 18,
-        color: colorScheme.text
+        color: theme.text
     },
     otpDiv: {
         display: 'flex',
