@@ -5,7 +5,6 @@ import verifyToken from '../middlewares/authMiddleware';
 const UserRouter = express.Router();
 
 UserRouter.post('/updateProfile', verifyToken, userController.updateProfile);
-// NOTES : NANTI TAMBAHIN VERIFY TOKEN
 UserRouter.get('/getParthner' , verifyToken, userController.getParthnerList);
 UserRouter.post('/requestPeople', verifyToken , userController.requestParthnerData);
 
