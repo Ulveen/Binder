@@ -28,9 +28,8 @@ async function updateProfile(req: AuthRequest, res: Response) {
 }
 
 async function getParthnerList(req: AuthRequest, res: Response) {
-    // const { email }: User = req.body
-    // Sementara pake email gw
-    const email = "frederick.chandra@binus.ac.id"
+    const { email }: User = req.body
+
     try {
         const userDocument = await firebaseAdmin.db.collection('users').doc(email).get()
         if (!userDocument.exists) {
@@ -48,7 +47,6 @@ async function getParthnerList(req: AuthRequest, res: Response) {
 }
 
 async function requestParthnerData(req: AuthRequest, res: Response) {
-    // Buat nyari match sama favorite soalnya sama aja functionya
     const { peopleList } = req.body
     try {
         if ( !peopleList || peopleList.length < 1 ) {
