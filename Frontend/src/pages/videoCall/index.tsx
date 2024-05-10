@@ -1,1 +1,1 @@
-export {default} from './VideoCall.tsxF'
+export {default} from './VideoCall.tsx'

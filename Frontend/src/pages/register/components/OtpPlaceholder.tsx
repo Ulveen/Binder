@@ -1,4 +1,4 @@
-import useCustomTheme from "../../../contexts/ThemeContext"
+import useCustomTheme, { Theme } from "../../../contexts/ThemeContext"
 import { StyleSheet, Text } from "react-native"
 
 interface Props {
@@ -6,24 +6,10 @@ interface Props {
     openInput: () => void
 }
 
-const getStyles = (colorScheme: {[key: string]: any}) => StyleSheet.create({
-    container: {
-        borderColor: colorScheme.text,
-        borderWidth: 1,
-        borderRadius: 5,
-        width: 70,
-        height: 70,
-        fontSize: 24,
-        textAlign: 'center',
-        textAlignVertical: 'center',
-        color: colorScheme.text
-    }
-})
-
 export default function OtpPlaceholder({ code, openInput }: Props) {
-    const { colorScheme } = useCustomTheme()
+    const { theme } = useCustomTheme()
 
-    const styles = getStyles(colorScheme)
+    const styles = getStyles(theme)
 
     return (
         <Text style={styles.container} onPress={openInput}>
@@ -31,3 +17,17 @@ export default function OtpPlaceholder({ code, openInput }: Props) {
         </Text>
     )
 }
+
+const getStyles = (theme: Theme) => StyleSheet.create({
+    container: {
+        borderColor: theme.text,
+        borderWidth: 1,
+        borderRadius: 5,
+        width: 70,
+        height: 70,
+        fontSize: 24,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        color: theme.text
+    }
+})

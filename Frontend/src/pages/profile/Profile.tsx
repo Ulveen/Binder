@@ -1,48 +1,48 @@
-import useCustomTheme from "../../contexts/ThemeContext";
-import CustomButton from "../../components/CustomButton";
+import useCustomTheme, { Theme } from "../../contexts/ThemeContext";
+import TextButton from "../../components/TextButton";
 import { useAuth } from "../../contexts/AuthContext";
 import { Image, StyleSheet, Text, View } from "react-native";
-import AuthService from "../../services/authService";
 import TimeService from "../../services/timeService";
+import UserService from "../../services/userService";
 
-const authService = AuthService()
+const userService = UserService()
 const timeService = TimeService()
 
 export default function Profile() {
     const { user, logout } = useAuth()
-    const { colorScheme } = useCustomTheme()
+    const { theme } = useCustomTheme()
 
-    const styles = getStyles(colorScheme)
+    const styles = getStyles(theme)
     
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Profile</Text>
-            <Image style={styles.profileImage} source={authService.renderProfileImage(user?.profileImage)} />
+            <Image style={styles.profileImage} source={userService.renderProfileImage(user?.profileImage)} />
             <Text style={styles.profileDetail}>{user?.name}</Text>
             <Text style={styles.profileDetail}>{timeService.getTimeDiffYear(user?.dob)}</Text>
             <Text style={styles.profileDetail}>{user?.binusian}</Text>
             <Text style={styles.profileDetail}>{user?.campus}</Text>
-            <CustomButton title="Logout" onPress={logout} />
+            <TextButton title="Logout" onPress={logout} />
         </View>
     )
 }
 
-const getStyles = (colorScheme: { [key: string]: any }) => StyleSheet.create({
+const getStyles = (theme: Theme) => StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'column',
-        backgroundColor: colorScheme.background,
+        backgroundColor: theme.background,
         justifyContent: 'space-evenly',
         alignItems: 'center'
     },
     title: {
         fontSize: 36,
         fontWeight: 'bold',
-        color: colorScheme.primary
+        color: theme.primary
     },
     profileDetail: {
         fontSize: 24,
-        color: colorScheme.text
+        color: theme.text
     },
     profileImage: {
         width: 200,

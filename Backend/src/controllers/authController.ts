@@ -156,7 +156,7 @@ async function login(req: Request, res: Response) {
             return
         }
 
-        const user: User = userData.data()! as User
+        let user: User = userData.data()! as User
         user.email = email
         user.uid = userRecord.uid
 

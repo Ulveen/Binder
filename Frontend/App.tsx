@@ -5,23 +5,23 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AuthProvider, useAuth } from "./src/contexts/AuthContext";
 import useCustomTheme, { ThemeProvider } from "./src/contexts/ThemeContext";
-import Home from "./src/pages/home/Home";
-import Login from "./src/pages/login/Login";
-import Splash from "./src/pages/splash/Splash";
-import Chat from "./src/pages/chat/Chat";
-import Register from "./src/pages/register/Register";
-import Match from "./src/pages/match/Match";
-import Profile from "./src/pages/profile/Profile";
-import VideoCall from "./src/pages/videoCall/VideoCall";
+import Home from "./src/pages/home";
+import Login from "./src/pages/login";
+import Splash from "./src/pages/splash";
+import Register from "./src/pages/register";
+import Match from "./src/pages/match";
+import Profile from "./src/pages/profile";
+import VideoCall from "./src/pages/videoCall";
+import messages from "./src/pages/messages";
 
 const AuthorizedRoutes = () => {
   const Tab = createBottomTabNavigator()
-  const { colorScheme } = useCustomTheme()
+  const { theme } = useCustomTheme()
   return (
     <Tab.Navigator screenOptions={({ route }) => ({
       tabBarIcon: ({ focused, color, size }) => {
         if (focused) {
-          return <Text style={{ color: colorScheme.primary }}>{route.name}</Text>
+          return <Text style={{ color: theme.primary }}>{route.name}</Text>
         }
         return <Text> {route.name} </Text>
       },
@@ -31,7 +31,7 @@ const AuthorizedRoutes = () => {
       <Tab.Screen name="Home" component={Home} options={{ headerShown: false }} />
       <Tab.Screen name="Match" component={Match} options={{ headerShown: false }} />
       <Tab.Screen name="Video" component={VideoCall} options={{ headerShown: false }} />
-      <Tab.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
+      <Tab.Screen name="Messages" component={messages} options={{ headerShown: false }} />
       <Tab.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
     </Tab.Navigator>
   )
@@ -41,7 +41,12 @@ const UnauthorizedRoutes = () => {
   const Stack = createNativeStackNavigator()
   return (
     <Stack.Navigator initialRouteName="Splash">
+<<<<<<< HEAD
       <Stack.Screen name="Splash" component={Match} options={{ headerShown: false }} />
+=======
+      <Stack.Screen name="Splash" component={Splash} options={{ headerShown: false }} />
+      <Stack.Screen name="Match" component={Match} options={{ headerShown: false }} />
+>>>>>>> 68dc7fdffb2a96dc54aade539fb6f2812c1ac909
       <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
       <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
     </Stack.Navigator>
