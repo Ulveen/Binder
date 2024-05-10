@@ -1,10 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import auth from '@react-native-firebase/auth'
 
-<<<<<<< HEAD
-=======
-    const BASE_URL = `${process.env.BACKEND_URL}/auth`
->>>>>>> 68dc7fdffb2a96dc54aade539fb6f2812c1ac909
 const firebaseAuth = auth()
 
 export interface User {
