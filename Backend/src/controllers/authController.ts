@@ -18,7 +18,7 @@ export interface User {
 
 async function sendEmailOTP(req: Request, res: Response) {
     const { email }: { email: string } = req.body
-
+    console.log(email)
     if (!email) {
         res.status(400).send('Email is required')
         return
@@ -120,7 +120,11 @@ async function register(req: Request, res: Response) {
             binusian: binusian,
             campus: campus,
             gender: gender,
-            profileImage: profileImageUrl[0]
+            profileImage: profileImageUrl[0],
+            match: [],
+            request: [],
+            premium: false,
+            favorite: []
         })
 
         await Promise.all([createUserPromise, insertUserDataPromise])

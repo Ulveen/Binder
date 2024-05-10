@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import auth from '@react-native-firebase/auth'
 
-const BASE_URL = `${process.env.BACKEND_URL}/auth`
 const firebaseAuth = auth()
 
 export interface User {
@@ -18,9 +17,9 @@ export interface User {
 }
 
 async function sendEmailOTP(email: string) {
-    console.log('sendEmailOTP');
-    
-    const to = `${BASE_URL}/sendEmailOTP`
+    console.log(process.env.BACKEND_URL);
+   
+    const to = `${process.env.BACKEND_URL}/auth/sendEmailOTP`
     const headers = { 'Content-Type': 'application/json' }
     const body = JSON.stringify({ email: email })
 
@@ -29,7 +28,7 @@ async function sendEmailOTP(email: string) {
         headers: headers,
         body: body
     })
-
+    
     if (!result.ok) {
         throw Error(await result.text())
     }
@@ -37,7 +36,7 @@ async function sendEmailOTP(email: string) {
 }
 
 async function verifyEmailOTP(email: string, otp: string) {
-    const to = `${BASE_URL}/verifyEmailOTP`
+    const to = `${process.env.BACKEND_URL}/auth/verifyEmailOTP`
     const headers = { 'Content-Type': 'application/json' }
     const body = JSON.stringify({ email: email, otp: otp })
 
@@ -54,7 +53,7 @@ async function verifyEmailOTP(email: string, otp: string) {
 }
 
 async function register(email: string, password: string, name: string, dob: Date, binusian: string, campus: string, gender: string, profileImage: string) {
-    const to = `${BASE_URL}/register`
+    const to = `${process.env.BACKEND_URL}/auth/register`
     const headers = { 'Content-Type': 'application/json' }
     const body = JSON.stringify({ email: email, password: password, name: name, dob: dob, binusian: binusian, campus: campus, gender: gender, profileImage: profileImage })
 
@@ -99,7 +98,7 @@ async function login(email: string, password: string) {
         throw new Error(error.message)
     }
 
-    const to = `${BASE_URL}/login`
+    const to = `${process.env.BACKEND_URL}/auth/login`
         const headers = { 'Content-Type': 'application/json' }
         const body = JSON.stringify({ email: email })
 
@@ -131,7 +130,7 @@ async function verifyToken() {
         return null
     }
 
-    const to = `${BASE_URL}/verifyToken`
+    const to = `${process.env.BACKEND_URL}/auth/verifyToken`
     const headers = { 'Content-Type': 'application/json' }
     const body = JSON.stringify({ token: token })
 
