@@ -1,5 +1,6 @@
-import useCustomTheme, { Theme } from "../../../contexts/ThemeContext"
 import { StyleSheet, Text } from "react-native"
+import useCustomTheme from "../../../hooks/useCustomTheme"
+import CustomTheme from "../../../models/CustomTheme"
 
 interface Props {
     code: string,
@@ -18,7 +19,7 @@ export default function OtpPlaceholder({ code, openInput }: Props) {
     )
 }
 
-const getStyles = (theme: Theme) => StyleSheet.create({
+const getStyles = (theme: CustomTheme) => StyleSheet.create({
     container: {
         borderColor: theme.text,
         borderWidth: 1,

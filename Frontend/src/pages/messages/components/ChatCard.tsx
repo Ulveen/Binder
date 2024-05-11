@@ -1,8 +1,9 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import useCustomTheme, { Theme } from "../../../contexts/ThemeContext";
 import UserService from "../../../services/userService";
 import TimeService from "../../../services/timeService";
 import Chat from "../../../models/Chat";
+import useCustomTheme from "../../../hooks/useCustomTheme";
+import CustomTheme from "../../../models/CustomTheme";
 
 interface Props {
     chatDoc: Chat,
@@ -35,7 +36,7 @@ export default function ChatCard({ chatDoc, setChatId }: Props) {
     )
 }
 
-const getStyles = (theme: Theme) => StyleSheet.create({
+const getStyles = (theme: CustomTheme) => StyleSheet.create({
     container: {
         display: 'flex',
         flexDirection: 'row',

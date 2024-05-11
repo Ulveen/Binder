@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { View, Text, StyleSheet, TextInput } from "react-native";
 import AuthService from "../../services/authService";
-import ToastService from "../../services/toastService";
-import { useAuth } from "../../contexts/AuthContext";
-import useCustomTheme, { Theme } from "../../contexts/ThemeContext";
 import TextButton from "../../components/TextButton";
+import useAuth from "../../hooks/useAuth";
+import useCustomTheme from "../../hooks/useCustomTheme";
+import useAsyncHandler from "../../hooks/useAsyncHandler";
+import CustomTheme from "../../models/CustomTheme";
 
 interface Props {
     navigation: any
 }
 
-const toastService = ToastService()
 const authService = AuthService()
 
 export default function Login({ navigation: { navigate } }: Props) {
@@ -19,23 +19,15 @@ export default function Login({ navigation: { navigate } }: Props) {
 
     const styles = getStyles(theme)
 
-    const [loading, setLoading] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    async function handleLogin() {
-        if (loading) return
-
-        setLoading(true)
-        try {
+    const {executeAsync: handleLogin} = useAsyncHandler(
+        async function () {
             const data = await authService.login(email, password)
             login(data)
-        } catch (error: any) {
-            toastService.error(error.message)
-        } finally {
-            setLoading(false)
         }
-    }
+    )
 
     return (
         <View style={styles.container}>
@@ -61,7 +53,7 @@ export default function Login({ navigation: { navigate } }: Props) {
 }
 
 
-const getStyles = (theme: Theme) => StyleSheet.create({
+const getStyles = (theme: CustomTheme) => StyleSheet.create({
     container: {
         flex: 1,
         display: 'flex',

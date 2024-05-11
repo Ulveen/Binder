@@ -1,6 +1,7 @@
 import TextButton from "../../components/TextButton";
-import useCustomTheme, { Theme } from "../../contexts/ThemeContext";
 import { View, StyleSheet, Image } from "react-native";
+import useCustomTheme from "../../hooks/useCustomTheme";
+import CustomTheme from "../../models/CustomTheme";
 
 interface Props {
     navigation: any
@@ -26,7 +27,7 @@ export default function Splash({ navigation: { navigate } }: Props) {
     )
 }
 
-const getStyles = (theme: Theme) => StyleSheet.create({
+const getStyles = (theme: CustomTheme) => StyleSheet.create({
     container: {
         flex: 1,
         display: 'flex',

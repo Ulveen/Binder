@@ -1,5 +1,6 @@
-import useCustomTheme, { Theme } from "../contexts/ThemeContext";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import useCustomTheme from "../hooks/useCustomTheme"; 
+import CustomTheme from "../models/CustomTheme";
 
 interface Props {
     title: string
@@ -8,7 +9,7 @@ interface Props {
     textStyle?: { [key: string]: any }
 }
 
-const getStyles = (theme: Theme) => StyleSheet.create({
+const getStyles = (theme: CustomTheme) => StyleSheet.create({
     buttonContainer: {
         display: 'flex',
         flexDirection: 'row',

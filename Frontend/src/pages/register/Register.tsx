@@ -2,13 +2,14 @@ import { useRef, useState } from "react";
 import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity } from "react-native";
 import AuthService from "../../services/authService";
 import UserService from "../../services/userService";
-import ToastService from "../../services/toastService";
-import useCustomTheme, { Theme } from "../../contexts/ThemeContext";
 import TextButton from "../../components/TextButton";
 import OtpPlaceholder from "./components/OtpPlaceholder";
 import DatePicker from "react-native-date-picker";
 import DropDownPicker from "react-native-dropdown-picker";
 import { launchImageLibrary } from "react-native-image-picker";
+import useCustomTheme from "../../hooks/useCustomTheme";
+import useAsyncHandler from "../../hooks/useAsyncHandler";
+import CustomTheme from "../../models/CustomTheme";
 
 interface Props {
     navigation: any;
@@ -21,7 +22,6 @@ const genderOptions = [
 
 const authService = AuthService()
 const userService = UserService()
-const toastService = ToastService()
 
 export default function Register({ navigation: { navigate } }: Props) {
     const { theme, userTheme } = useCustomTheme()
@@ -29,7 +29,6 @@ export default function Register({ navigation: { navigate } }: Props) {
 
     const otpInputRef = useRef<TextInput>(null)
 
-    const [loading, setLoading] = useState(false)
     const [step, setStep] = useState(0)
 
     const [email, setEmail] = useState('')
@@ -45,19 +44,28 @@ export default function Register({ navigation: { navigate } }: Props) {
     const [isOpenGenderPicker, setIsOpenGenderPicker] = useState(false)
     const [gender, setGender] = useState('Male')
 
-    async function handleSendEmailOTP() {
-        if (loading) return
-        setLoading(true)
-        try {
+    const { executeAsync: handleSendEmailOTP } = useAsyncHandler(
+        async function () {
             await authService.sendEmailOTP(email)
             setStep(1)
-            toastService.success('Email Sent', 'Check your email for the OTP code')
-        } catch (error: any) {
-            toastService.error(error.message)
-        } finally {
-            setLoading(false)
+        },
+        "Check your email for the OTP code."
+    )
+
+    const { executeAsync: handleVerifyEmailOTP } = useAsyncHandler(
+        async function () {
+            await authService.verifyEmailOTP(email, otp)
+            setStep(2)
         }
-    }
+    )
+
+    const { executeAsync: handleRegister } = useAsyncHandler(
+        async function () {
+            await authService.register(email, password, name, dob, binusian, campus, gender, profileImage)
+            navigate('Login')
+        },
+        "Account registered successfully."
+    )
 
     function openOtpInput() {
         otpInputRef.current?.focus()
@@ -69,39 +77,12 @@ export default function Register({ navigation: { navigate } }: Props) {
         setOtp(otp)
     }
 
-    async function handleVerifyEmailOTP() {
-        if (loading) return
-        setLoading(true)
-        try {
-            await authService.verifyEmailOTP(email, otp)
-            setStep(2)
-        } catch (error: any) {
-            toastService.error(error.message)
-        } finally {
-            setLoading(false)
-        }
-    }
-
     async function handlePickImage() {
         launchImageLibrary({ mediaType: 'photo', includeBase64: true }, (response) => {
             if (response.didCancel) return
             setProfileUri(response!.assets![0].uri!)
             setprofileImage(response!.assets![0].base64!)
         })
-    }
-
-    async function handleRegister() {
-        if (loading) return
-        setLoading(true)
-        try {
-            await authService.register(email, password, name, dob, binusian, campus, gender, profileImage)
-            toastService.success('Success', 'You can now login')
-            navigate('Login')
-        } catch (error: any) {
-            toastService.error(error.message)
-        } finally {
-            setLoading(false)
-        }
     }
 
     if (step == 0)
@@ -180,7 +161,7 @@ export default function Register({ navigation: { navigate } }: Props) {
     )
 }
 
-const getStyles = (theme: Theme) => StyleSheet.create({
+const getStyles = (theme: CustomTheme) => StyleSheet.create({
     container: {
         backgroundColor: theme.background,
         flex: 1,

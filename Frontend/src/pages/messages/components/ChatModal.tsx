@@ -1,7 +1,11 @@
 import { Modal, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
-import useCustomTheme, { Theme } from "../../../contexts/ThemeContext";
 import Chat from "../../../models/Chat";
-import { useAuth } from "../../../contexts/AuthContext";
+import useAuth from "../../../hooks/useAuth";
+import useCustomTheme from "../../../hooks/useCustomTheme";
+import CustomTheme from "../../../models/CustomTheme";
+import useAsyncHandler from "../../../hooks/useAsyncHandler";
+import MessageService from "../../../services/messageService";
+import { useState } from "react";
 
 interface Props {
     chatDoc: Chat
@@ -9,10 +13,21 @@ interface Props {
     setcurrChatId: React.Dispatch<React.SetStateAction<string>>
 }
 
+const messageService = MessageService()
+
 export default function ChatModal({ chatDoc, currChatId, setcurrChatId }: Props) {
     const { user } = useAuth()
     const { theme } = useCustomTheme()
     const styles = getStyles(theme)
+
+    const [message, setMessage] = useState('')
+    
+    const {executeAsync: handleSendMessage} = useAsyncHandler(
+        async function() {
+            if(message === '' || !user) return
+            await messageService.sendMessage(user.email, message, chatDoc.chatRef)
+        }
+    )
 
     return (
         <Modal animationType="slide"
@@ -32,7 +47,7 @@ export default function ChatModal({ chatDoc, currChatId, setcurrChatId }: Props)
     )
 }
 
-function getStyles(theme: Theme) {
+function getStyles(theme: CustomTheme) {
     return StyleSheet.create({
         modalContainer: {
             flex: 1,

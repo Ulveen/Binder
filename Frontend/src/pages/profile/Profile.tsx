@@ -1,9 +1,10 @@
-import useCustomTheme, { Theme } from "../../contexts/ThemeContext";
 import TextButton from "../../components/TextButton";
-import { useAuth } from "../../contexts/AuthContext";
 import { Image, StyleSheet, Text, View } from "react-native";
 import TimeService from "../../services/timeService";
 import UserService from "../../services/userService";
+import useAuth from "../../hooks/useAuth";
+import useCustomTheme from "../../hooks/useCustomTheme";
+import CustomTheme from "../../models/CustomTheme";
 
 const userService = UserService()
 const timeService = TimeService()
@@ -27,7 +28,7 @@ export default function Profile() {
     )
 }
 
-const getStyles = (theme: Theme) => StyleSheet.create({
+const getStyles = (theme: CustomTheme) => StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'column',

@@ -1,12 +1,13 @@
 import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import firestore from '@react-native-firebase/firestore';
 import { useEffect, useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
 import Chat from "../../models/Chat";
 import ChatCard from "./components/ChatCard";
-import useCustomTheme, { Theme } from "../../contexts/ThemeContext";
 import ChatModal from "./components/ChatModal";
 import User from "../../models/User";
+import useAuth from "../../hooks/useAuth";
+import useCustomTheme from "../../hooks/useCustomTheme";
+import CustomTheme from "../../models/CustomTheme";
 
 export default function Messages() {
     const { theme } = useCustomTheme()
@@ -14,53 +15,45 @@ export default function Messages() {
 
     const { user } = useAuth()
 
-    const messageCollectionRef = firestore()
-        .collection('messages')
-        .where('users', 'array-contains', user?.email)
-
     const [search, setSearch] = useState('')
     const [chatDocs, setChatDocs] = useState<Chat[]>([])
     const [currChatId, setCurrChatId] = useState<string>('')
 
     useEffect(() => {
-        const subscriber = messageCollectionRef.onSnapshot(
-            async (querySnapshot) => {
-                const promises: Promise<Chat | undefined>[] = [];
-
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const toEmail = data.users[0] === user?.email ? data.users[1] : data.users[0];
-
-                    async function fetchUser() {
-                        const userDoc = await firestore().collection('users').doc(toEmail).get();
-                        if (userDoc.exists) {
-                            return {
-                                chatId: doc.id,
-                                chatRef: doc.ref,
-                                to: userDoc.data() as User,
-                                messages: data.messages,
-                                lastMessage: {
-                                    message: data.lastMessage.message,
-                                    from: data.lastMessage.from,
-                                    timestamp: data.lastMessage.timestamp.toDate()
-                                }
-                            } as Chat
-                        }
-                    };
-
-                    promises.push(fetchUser());
-                });
-
-                const resolvedChatDocs = await Promise.all(promises);
-                const chats = resolvedChatDocs.filter((chatDoc) => chatDoc !== undefined) as Chat[];
-                setChatDocs(chats
-                    .sort((a, b) => a.lastMessage.timestamp.getTime() - b.lastMessage.timestamp.getTime())
-                );
-            }
-
-        )
+        const subscriber = firestore()
+            .collection('messages')
+            .where('users', 'array-contains', user?.email)
+            .onSnapshot(
+                async (querySnapshot) => {
+                    const promises: Promise<Chat | undefined>[] = [];
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const toEmail = data.users[0] === user?.email ? data.users[1] : data.users[0];
+                        async function fetchUser() {
+                            const userDoc = await firestore().collection('users').doc(toEmail).get();
+                            if (userDoc.exists) {
+                                return {
+                                    chatId: doc.id,
+                                    chatRef: doc.ref,
+                                    to: userDoc.data() as User,
+                                    messages: data.messages,
+                                    lastMessage: {
+                                        message: data.lastMessage.message,
+                                        from: data.lastMessage.from,
+                                        timestamp: data.lastMessage.timestamp.toDate()
+                                    }
+                                } as Chat
+                            }
+                        };
+                        promises.push(fetchUser());
+                    });
+                    const resolvedChatDocs = await Promise.all(promises);
+                    const chats = resolvedChatDocs.filter((chatDoc) => chatDoc !== undefined) as Chat[];
+                    setChatDocs(chats.sort((a, b) => a.lastMessage.timestamp.getTime() - b.lastMessage.timestamp.getTime()));
+                }
+            )
         return () => subscriber();
-    }, [])
+    }, [user?.email])
 
     return (
         <View style={styles.container}>
@@ -86,7 +79,7 @@ export default function Messages() {
     )
 }
 
-const getStyles = (theme: Theme) => StyleSheet.create({
+const getStyles = (theme: CustomTheme) => StyleSheet.create({
     container: {
         backgroundColor: theme.background,
         flex: 1,

@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import AuthService from "../services/authService";
 import User from "../models/User";
 
@@ -9,17 +9,9 @@ interface AuthContextProps {
     logout: () => void
 }
 
-const AuthContext = createContext({} as AuthContextProps)
+export const AuthContext = createContext({} as AuthContextProps)
 
-export const useAuth = () => {
-    const context = useContext(AuthContext)
-    if (!context) {
-        throw new Error("authContext must be used within an AuthProvider");
-    }
-    return context
-}
-
-export const AuthProvider = ({ children }: { children: JSX.Element }) => {
+export default function AuthProvider({ children }: { children: JSX.Element }) {
 
     const [user, setUser] = useState<User | undefined | null>(undefined)
 

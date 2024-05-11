@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import useCustomTheme, { Theme } from "../../contexts/ThemeContext";
 import ProfileCards from "./components/ProfileCards";
+import useCustomTheme from "../../hooks/useCustomTheme";
+import CustomTheme from "../../models/CustomTheme";
 
 export default function Match() {
     const {theme} = useCustomTheme()
@@ -18,7 +19,7 @@ export default function Match() {
     )
 }
 
-const getStyles = (theme: Theme) => StyleSheet.create({
+const getStyles = (theme: CustomTheme) => StyleSheet.create({
     scrollAblePage: {
         flexGrow: 1,
     },
