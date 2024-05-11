@@ -1,24 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-<<<<<<< Updated upstream
-import auth from '@react-native-firebase/auth'
-
-const firebaseAuth = auth()
-
-export interface User {
-    name: string,
-    email: string,
-    password: string,
-    dob: Date,
-    binusian: string,
-    campus: string,
-    gender: string,
-    uid: string,
-    theme: string,
-    profileImage: string
-}
-=======
 import User from '../models/User';
->>>>>>> Stashed changes
 
 async function sendEmailOTP(email: string) {
     const to = `${process.env.BACKEND_URL}/auth/sendEmailOTP`
