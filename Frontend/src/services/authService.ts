@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+<<<<<<< Updated upstream
 import auth from '@react-native-firebase/auth'
 
 const firebaseAuth = auth()
@@ -15,10 +16,11 @@ export interface User {
     theme: string,
     profileImage: string
 }
+=======
+import User from '../models/User';
+>>>>>>> Stashed changes
 
 async function sendEmailOTP(email: string) {
-    console.log(process.env.BACKEND_URL);
-   
     const to = `${process.env.BACKEND_URL}/auth/sendEmailOTP`
     const headers = { 'Content-Type': 'application/json' }
     const body = JSON.stringify({ email: email })
@@ -28,7 +30,7 @@ async function sendEmailOTP(email: string) {
         headers: headers,
         body: body
     })
-    
+
     if (!result.ok) {
         throw Error(await result.text())
     }
@@ -69,64 +71,32 @@ async function register(email: string, password: string, name: string, dob: Date
 }
 
 async function login(email: string, password: string) {
-    console.log('login');
-
-    if (!email || !password) {
-        throw new Error('Email and password are required')
-    }
-
-    if (!email.endsWith('@binus.ac.id')) {
-        throw new Error('Please use your binus.ac.id email')
-    }
-    
-    try {
-        await firebaseAuth.signInWithEmailAndPassword(email, password)
-
-    } catch (error: any) {
-        if (error.code === 'auth/invalid-email') {
-            throw new Error('Invalid email')
-        }
-        if (error.code === 'auth/user-disabled') {
-            throw new Error('User is disabled')
-        }
-        if (error.code === 'auth/user-not-found') {
-            throw new Error('User not found')
-        }
-        if (error.code === 'auth/wrong-password') {
-            throw new Error('Wrong password')
-        }
-        throw new Error(error.message)
-    }
-
     const to = `${process.env.BACKEND_URL}/auth/login`
-        const headers = { 'Content-Type': 'application/json' }
-        const body = JSON.stringify({ email: email })
+    const headers = { 'Content-Type': 'application/json' }
+    const body = JSON.stringify({ email: email, password: password})
 
-        const result = await fetch(to, {
-            method: 'POST',
-            headers: headers,
-            body: body
-        })
+    const result = await fetch(to, {
+        method: 'POST',
+        headers: headers,
+        body: body
+    })
 
-        if (!result.ok) {
-            throw new Error(await result.text())
-        }
+    if (!result.ok) {
+        throw new Error(await result.text())
+    }
 
-        const data = (await result.json()).data;
+    const data = (await result.json()).data;
+    console.log(data);
+    return data
 
-        console.log(data);
-        
-        return data
 }
 
 async function verifyToken() {
-    console.log('verifyToken');
-    
     const token = await AsyncStorage.getItem('authorization')
 
     console.log('token', token);
-    
-    if(!token) {
+
+    if (!token) {
         return null
     }
 
