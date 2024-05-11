@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express"
-import { User } from "../controllers/authController"; 
+import User from "../models/User";
 import JwtController from "../controllers/jwtController"
 
 export interface AuthRequest extends Request {

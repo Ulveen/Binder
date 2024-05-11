@@ -41,12 +41,7 @@ const UnauthorizedRoutes = () => {
   const Stack = createNativeStackNavigator()
   return (
     <Stack.Navigator initialRouteName="Splash">
-<<<<<<< HEAD
-      <Stack.Screen name="Splash" component={Match} options={{ headerShown: false }} />
-=======
       <Stack.Screen name="Splash" component={Splash} options={{ headerShown: false }} />
-      <Stack.Screen name="Match" component={Match} options={{ headerShown: false }} />
->>>>>>> 68dc7fdffb2a96dc54aade539fb6f2812c1ac909
       <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
       <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
     </Stack.Navigator>

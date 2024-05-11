@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { User } from "./authController";
+import User from "../models/User";
 import firebaseAdmin from "../firebase/firebase";
 import { AuthRequest } from "../middlewares/authMiddleware";
 

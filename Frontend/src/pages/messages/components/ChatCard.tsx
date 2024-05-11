@@ -2,7 +2,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import useCustomTheme, { Theme } from "../../../contexts/ThemeContext";
 import UserService from "../../../services/userService";
 import TimeService from "../../../services/timeService";
-import { Chat } from "../../../services/messageService";
+import Chat from "../../../models/Chat";
 
 interface Props {
     chatDoc: Chat,

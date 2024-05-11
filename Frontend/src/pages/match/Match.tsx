@@ -1,7 +1,6 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import useCustomTheme, { Theme } from "../../contexts/ThemeContext";
 import ProfileCards from "./components/ProfileCards";
-import { useState } from "react";
 
 export default function Match() {
     const {theme} = useCustomTheme()

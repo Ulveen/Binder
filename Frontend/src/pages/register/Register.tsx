@@ -140,7 +140,7 @@ export default function Register({ navigation: { navigate } }: Props) {
                     textStyle={styles.continueBtnText}
                     title="Verify"
                     onPress={handleVerifyEmailOTP} />
-                <TextButton bgStyle={styles.resendBtnText}
+                <TextButton bgStyle={styles.resendBtn}
                     textStyle={styles.resendBtnText}
                     title="Resend Code"
                     onPress={handleSendEmailOTP} />

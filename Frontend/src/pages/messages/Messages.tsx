@@ -2,11 +2,11 @@ import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import firestore from '@react-native-firebase/firestore';
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { Chat } from "../../services/messageService";
-import { User } from "../../services/authService";
+import Chat from "../../models/Chat";
 import ChatCard from "./components/ChatCard";
 import useCustomTheme, { Theme } from "../../contexts/ThemeContext";
 import ChatModal from "./components/ChatModal";
+import User from "../../models/User";
 
 export default function Messages() {
     const { theme } = useCustomTheme()
@@ -22,14 +22,13 @@ export default function Messages() {
     const [chatDocs, setChatDocs] = useState<Chat[]>([])
     const [currChatId, setCurrChatId] = useState<string>('')
 
-    async function getChats() {
-        try {
-            messageCollectionRef.onSnapshot(async (querySnapshot) => {
+    useEffect(() => {
+        const subscriber = messageCollectionRef.onSnapshot(
+            async (querySnapshot) => {
                 const promises: Promise<Chat | undefined>[] = [];
 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
-
                     const toEmail = data.users[0] === user?.email ? data.users[1] : data.users[0];
 
                     async function fetchUser() {
@@ -57,14 +56,10 @@ export default function Messages() {
                 setChatDocs(chats
                     .sort((a, b) => a.lastMessage.timestamp.getTime() - b.lastMessage.timestamp.getTime())
                 );
-            })
-        } catch (error) {
-            console.error("Error fetching messages:", error);
-        }
-    }
+            }
 
-    useEffect(() => {
-        getChats()
+        )
+        return () => subscriber();
     }, [])
 
     return (

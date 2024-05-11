@@ -1,6 +1,6 @@
 import { Modal, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 import useCustomTheme, { Theme } from "../../../contexts/ThemeContext";
-import { Chat } from "../../../services/messageService";
+import Chat from "../../../models/Chat";
 import { useAuth } from "../../../contexts/AuthContext";
 
 interface Props {

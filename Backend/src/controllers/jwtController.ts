@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import { User } from "./authController"
+import User from "../models/User"
 
 function generateToken(user: User) {
     return jwt.sign(user, process.env.SECRET_KEY!, { expiresIn: '24h' })
