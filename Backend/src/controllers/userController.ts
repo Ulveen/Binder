@@ -68,7 +68,10 @@ async function requestParthnerData(req: AuthRequest, res: Response) {
     
 }
 
+async function getUserMatchOption(req: AuthRequest, res: Response) {
+    console.log("Alvin jelek")
+}
 
-const userController = { updateProfile, getParthnerList, requestParthnerData }
+const userController = { updateProfile, getParthnerList, requestParthnerData, getUserMatchOption }
 
 export default userController;

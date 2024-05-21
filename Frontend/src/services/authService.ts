@@ -33,6 +33,7 @@ async function register(email: string, password: string, name: string, dob: Date
 }
 
 async function login(email: string, password: string) {
+    console.log('ahahdasbhdabidshk')
     const url = '/auth/login'
     const body = {
         email: email,
