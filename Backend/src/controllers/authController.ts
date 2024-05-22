@@ -129,7 +129,7 @@ async function register(req: Request, res: Response) {
 }
 
 async function login(req: Request, res: Response) {
-
+    console.log("Backend login")
     const { email, password }: { email: string, password: string } = req.body
 
     if (!email || !password) {
