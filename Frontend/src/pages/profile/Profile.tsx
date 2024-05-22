@@ -5,6 +5,7 @@ import UserService from "../../services/userService";
 import useAuth from "../../hooks/useAuth";
 import useCustomTheme from "../../hooks/useCustomTheme";
 import CustomTheme from "../../models/CustomTheme";
+import CustomButton from "../../components/CustomButton";
 
 const userService = UserService()
 const timeService = TimeService()
@@ -23,7 +24,9 @@ export default function Profile() {
             <Text style={styles.profileDetail}>{timeService.getTimeDiffYear(user?.dob)}</Text>
             <Text style={styles.profileDetail}>{user?.binusian}</Text>
             <Text style={styles.profileDetail}>{user?.campus}</Text>
-            <TextButton title="Logout" onPress={logout} />
+            <CustomButton onPress={logout}>
+                <Text>Logout</Text>
+            </CustomButton>
         </View>
     )
 }
