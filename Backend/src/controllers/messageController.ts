@@ -1,23 +1,56 @@
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/authMiddleware";
+import firebaseAdmin from "../firebase/firebase";
+
+async function createMessageChannel(req: AuthRequest, res: Response) {
+    const { to }: { to: string } = req.body()
+    const user = req.user
+
+    const collectionRef = firebaseAdmin.db.collection('messages')
+
+    const result = await collectionRef.add({
+        users: [to, user?.email],
+        lastMessage: {
+            from: user?.email,
+            message: '',
+            timeStamp: new Date()
+        },
+    })
+
+    await result
+        .collection('messages')
+        .doc('init')
+        .set({})
+}
 
 async function sendMessage(req: AuthRequest, res: Response) {
-    const { message, from, ref }: { message: string, from: string, ref: FirebaseFirestore.CollectionReference<FirebaseFirestore.DocumentData, FirebaseFirestore.DocumentData> } = req.body
+    const { message, chatId }: { message: string, chatId: string } = req.body
 
-    if (!message || !from) {
-        res.status(400).send('Message is required')
+    if (!message || !chatId) {
+        res.status(400).send('Message and chat id is required')
         return
     }
+    
+    const chatMessagesRef = firebaseAdmin.db.collection('messages').doc(chatId).collection('messages')
 
     try {
-        await ref.add({
+        const sendMessagePromise = chatMessagesRef.add({
             message: message,
-            from: from,
+            from: req.user?.email,
             timestamp: Date.now()
         })
 
-        res.status(200).send('Message sent')
+        const updateLastMessagePromise = firebaseAdmin.db.collection('messages').doc(chatId).update({
+            lastMessage: {
+                from: req.user?.email,
+                message: message,
+                timestamp: Date.now()
+            }
+        })
 
+        await Promise.all([sendMessagePromise, updateLastMessagePromise])
+
+        res.status(200).send('Message sent')
     } catch (error: any) {
         res.status(500).send(error.message)
     }
@@ -25,7 +58,7 @@ async function sendMessage(req: AuthRequest, res: Response) {
 }
 
 const messageController = {
-    sendMessage
+    sendMessage, createMessageChannel
 }
 
 export default messageController;

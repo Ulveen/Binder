@@ -1,5 +1,5 @@
 import User from "../models/User"
-import createRequest from "./fetchService"
+import { createRequest } from "../utils/requestUtils";
 
 function renderProfileImage(profileImageUri: string | undefined) {
     return profileImageUri ? { uri: profileImageUri } : require('../assets/Profile.jpg')

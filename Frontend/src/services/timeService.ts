@@ -16,7 +16,7 @@ function getTimeDiffFormatted(date: Date) {
     const years = days / 365;
 
     if (minutes < 60) {
-        return `${Math.floor(minutes)} min`;
+        return `${Math.max(Math.floor(minutes), 1)} min`;
     } else if (hours < 24) {
         return `${Math.floor(hours)} hour`;
     } else if (days < 7) {

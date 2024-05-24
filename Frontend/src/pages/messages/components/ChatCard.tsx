@@ -7,21 +7,21 @@ import CustomTheme from "../../../models/CustomTheme";
 
 interface Props {
     chatDoc: Chat,
-    setChatId: React.Dispatch<React.SetStateAction<string>>
+    handleSelectChat: (chatId: string) => void
 }
 
 const userService = UserService()
 const timeService = TimeService()
 
 
-export default function ChatCard({ chatDoc, setChatId }: Props) {
+export default function ChatCard({ chatDoc, handleSelectChat }: Props) {
     const { theme } = useCustomTheme()
     const to = chatDoc.to
     const lastMessage = chatDoc.lastMessage
     const styles = getStyles(theme)
 
     return (
-        <TouchableOpacity style={styles.container} onPress={() => setChatId(chatDoc.chatId)}>
+        <TouchableOpacity style={styles.container} onPress={() => handleSelectChat(chatDoc.chatId)}>
             <Image style={styles.profileImage} source={userService.renderProfileImage(to.profileImage)} />
             <View style={styles.chatContent}>
                 <View style={styles.chatHeader}>
@@ -50,6 +50,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
     },
     chatContent: {
         flex: 1,
+        paddingBottom: 5,
         flexDirection: 'column',
         borderBottomColor: 'gray',
         borderBottomWidth: 0.5,

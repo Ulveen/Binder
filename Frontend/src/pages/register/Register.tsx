@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity } from "react-native";
 import AuthService from "../../services/authService";
 import UserService from "../../services/userService";
-import TextButton from "../../components/TextButton";
+import CustomButton from "../../components/CustomButton";
 import OtpPlaceholder from "./components/OtpPlaceholder";
 import DatePicker from "react-native-date-picker";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -93,11 +93,9 @@ export default function Register({ navigation: { navigate } }: Props) {
                     Please enter your valid email. We will send you a 4-digit code to verify your account.
                 </Text>
                 <TextInput style={styles.input} value={email} onChangeText={setEmail} />
-                <TextButton bgStyle={styles.continueBtn}
-                    textStyle={styles.continueBtnText}
-                    onPress={handleSendEmailOTP}
-                    title="Continue"
-                />
+                <CustomButton style={styles.continueBtn} onPress={handleSendEmailOTP}>
+                    <Text style={styles.continueBtnText}>Continue</Text>
+                </CustomButton>
                 <Text style={styles.redirectText}>
                     Already have an account?
                     <Text style={{ color: 'blue' }} onPress={() => navigate('Login')}> Login</Text>
@@ -117,14 +115,12 @@ export default function Register({ navigation: { navigate } }: Props) {
                         return <OtpPlaceholder code={otp[idx]} openInput={openOtpInput} key={`OtpPlaceHolder${idx}`} />
                     })}
                 </View>
-                <TextButton bgStyle={styles.continueBtn}
-                    textStyle={styles.continueBtnText}
-                    title="Verify"
-                    onPress={handleVerifyEmailOTP} />
-                <TextButton bgStyle={styles.resendBtn}
-                    textStyle={styles.resendBtnText}
-                    title="Resend Code"
-                    onPress={handleSendEmailOTP} />
+                <CustomButton style={styles.continueBtn} onPress={handleVerifyEmailOTP}>
+                    <Text style={styles.continueBtnText}>Verify</Text>
+                </CustomButton>
+                <CustomButton style={styles.resendBtn} onPress={handleSendEmailOTP}>
+                    <Text style={styles.resendBtnText}>Resend Code</Text>
+                </CustomButton>
             </View>
         )
 
@@ -153,10 +149,9 @@ export default function Register({ navigation: { navigate } }: Props) {
                 title={'Date of Birth'}
                 minimumDate={new Date(1900, 0, 1)}
                 theme={userTheme === 'light' ? 'light' : 'dark'} />
-            <TextButton bgStyle={styles.continueBtn}
-                textStyle={styles.continueBtnText}
-                title="Register"
-                onPress={handleRegister} />
+            <CustomButton style={styles.continueBtn} onPress={handleRegister}>
+                <Text style={styles.continueBtnText}>Register</Text>
+            </CustomButton>
         </View>
     )
 }

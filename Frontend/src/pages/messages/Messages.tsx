@@ -17,7 +17,15 @@ export default function Messages() {
 
     const [search, setSearch] = useState('')
     const [chatDocs, setChatDocs] = useState<Chat[]>([])
-    const [currChatId, setCurrChatId] = useState<string>('')
+    const [currChatDoc, setCurrChatDoc] = useState<Chat | null>(null)
+
+    function handleSelectChat(chatId: string) {
+        if (chatId === '') {
+            setCurrChatDoc(null)
+            return
+        }
+        setCurrChatDoc(chatDocs.filter(cd => cd.chatId === chatId)[0])
+    }
 
     useEffect(() => {
         const subscriber = firestore()
@@ -31,19 +39,19 @@ export default function Messages() {
                         const toEmail = data.users[0] === user?.email ? data.users[1] : data.users[0];
                         async function fetchUser() {
                             const userDoc = await firestore().collection('users').doc(toEmail).get();
-                            if (userDoc.exists) {
-                                return {
-                                    chatId: doc.id,
-                                    chatRef: doc.ref,
-                                    to: userDoc.data() as User,
-                                    messages: data.messages,
-                                    lastMessage: {
-                                        message: data.lastMessage.message,
-                                        from: data.lastMessage.from,
-                                        timestamp: data.lastMessage.timestamp.toDate()
-                                    }
-                                } as Chat
+                            if (!userDoc || !userDoc.data()) {
+                                return
                             }
+                            return {
+                                chatId: doc.id,
+                                chatRef: doc.ref,
+                                to: userDoc.data() as User,
+                                messages: data.messages,
+                                lastMessage: {
+                                    ...data.lastMessage,
+                                    timestamp: new Date(data.lastMessage.timestamp)
+                                }
+                            } as Chat
                         };
                         promises.push(fetchUser());
                     });
@@ -63,18 +71,19 @@ export default function Messages() {
 
                 </TextInput>
             </View>
-
             <View style={styles.chatList}>
                 <Text style={styles.subtitle}>Messages</Text>
                 <ScrollView style={styles.chatScrollView}>
                     {chatDocs.filter(chat => chat.to.name.includes(search)).map((chatDoc) => {
                         return (
-                            <ChatCard chatDoc={chatDoc} setChatId={setCurrChatId} key={chatDoc.chatId} />
+                            <ChatCard chatDoc={chatDoc} handleSelectChat={handleSelectChat} key={chatDoc.chatId} />
                         )
                     })}
                 </ScrollView>
             </View>
-            <ChatModal chatDoc={chatDocs.find(chat => chat.chatId === currChatId)!} currChatId={currChatId} setcurrChatId={setCurrChatId} />
+            {currChatDoc &&
+                <ChatModal chatDoc={currChatDoc!} handleSelectChat={handleSelectChat} />
+            }
         </View>
     )
 }
@@ -84,12 +93,6 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         backgroundColor: theme.background,
         flex: 1,
         flexDirection: 'column',
-    },
-    title: {
-        fontSize: 36,
-        fontWeight: 'bold',
-        fontStyle: 'italic',
-        color: theme.text
     },
     topBar: {
         display: 'flex',
@@ -108,7 +111,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
     subtitle: {
         fontSize: 24,
         fontWeight: 'bold',
-        fontStyle: 'italic',
+        fontFamily: 'ABeeZee',
         color: theme.text
     },
     chatList: {

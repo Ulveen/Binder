@@ -1,11 +1,17 @@
 import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore"
-import createRequest from "./fetchService"
+import { createRequestWithToken } from "../utils/requestUtils"
 
-async function sendMessage(from: string, message: string, chatRef: FirebaseFirestoreTypes.DocumentReference<FirebaseFirestoreTypes.DocumentData>) {
-    const url = '/messages/sendEmailOTP'
-    const body = { from: from, message: message, chatRef: chatRef}
+async function sendMessage(message: string, chatRef: FirebaseFirestoreTypes.DocumentReference<FirebaseFirestoreTypes.DocumentData>) {
+    const url = '/message/sendMessage'
+    console.log(message);
+    console.log(chatRef.path.split('/')[1]);
 
-    await createRequest(url, body)
+    const body = {
+        message: message,
+        chatId: chatRef.path.split('/')[1]
+    }
+
+    await createRequestWithToken(url, body)
 }
 
 export default function MessageService() {
