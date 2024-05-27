@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View, Text, StyleSheet, TextInput } from "react-native";
 import AuthService from "../../services/authService";
-import TextButton from "../../components/TextButton";
+import CustomButton from "../../components/CustomButton";
 import useAuth from "../../hooks/useAuth";
 import useCustomTheme from "../../hooks/useCustomTheme";
 import useAsyncHandler from "../../hooks/useAsyncHandler";
@@ -22,7 +22,7 @@ export default function Login({ navigation: { navigate } }: Props) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    const {executeAsync: handleLogin} = useAsyncHandler(
+    const { executeAsync: handleLogin } = useAsyncHandler(
         async function () {
             const data = await authService.login(email, password)
             login(data)
@@ -40,10 +40,9 @@ export default function Login({ navigation: { navigate } }: Props) {
                 <Text style={styles.inputLabel}>Password</Text>
                 <TextInput style={styles.input} value={password} onChangeText={setPassword} secureTextEntry={true} />
             </View>
-            <TextButton bgStyle={styles.loginBtn}
-                textStyle={styles.loginBtnText}
-                title="Continue"
-                onPress={handleLogin} />
+            <CustomButton style={styles.loginBtn} onPress={handleLogin}>
+                <Text style={styles.loginBtnText}>LOGIN</Text>
+            </CustomButton>
             <Text style={styles.redirectText}>
                 Don't have an account?
                 <Text style={{ color: 'blue' }} onPress={() => navigate('Register')}> Register</Text>

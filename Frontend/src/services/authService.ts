@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import User from '../models/User';
-import createRequest from './fetchService';
+import { createRequest } from '../utils/requestUtils';
 
 async function sendEmailOTP(email: string) {
     const url = '/auth/sendEmailOTP'
@@ -33,7 +33,6 @@ async function register(email: string, password: string, name: string, dob: Date
 }
 
 async function login(email: string, password: string) {
-    console.log('ahahdasbhdabidshk')
     const url = '/auth/login'
     const body = {
         email: email,

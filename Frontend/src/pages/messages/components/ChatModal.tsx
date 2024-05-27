@@ -1,43 +1,107 @@
-import { Modal, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
+import { Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from "react-native";
 import Chat from "../../../models/Chat";
-import useAuth from "../../../hooks/useAuth";
 import useCustomTheme from "../../../hooks/useCustomTheme";
 import CustomTheme from "../../../models/CustomTheme";
 import useAsyncHandler from "../../../hooks/useAsyncHandler";
 import MessageService from "../../../services/messageService";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import UserService from "../../../services/userService";
+import Message from "../../../models/Message";
+import Feather from 'react-native-vector-icons/Feather';
+import CustomButton from "../../../components/CustomButton";
+import ChatBubble from "./ChatBubble";
 
 interface Props {
     chatDoc: Chat
-    currChatId: string
-    setcurrChatId: React.Dispatch<React.SetStateAction<string>>
+    handleSelectChat: (chatId: string) => void
 }
 
 const messageService = MessageService()
+const userService = UserService()
 
-export default function ChatModal({ chatDoc, currChatId, setcurrChatId }: Props) {
-    const { user } = useAuth()
+export default function ChatModal({ chatDoc, handleSelectChat }: Props) {
+    const to = chatDoc.to
     const { theme } = useCustomTheme()
     const styles = getStyles(theme)
+    const [messages, setMessages] = useState<Message[]>([])
 
-    const [message, setMessage] = useState('')
-    
-    const {executeAsync: handleSendMessage} = useAsyncHandler(
-        async function() {
-            if(message === '' || !user) return
-            await messageService.sendMessage(user.email, message, chatDoc.chatRef)
+    const [textMessage, setTextMessage] = useState('')
+
+    const scrollViewRef = useRef<ScrollView>(null);
+    const [isUserScrolling, setIsUserScrolling] = useState(false);
+
+    useEffect(() => {
+        if (scrollViewRef.current && !isUserScrolling) {
+            scrollViewRef.current.scrollToEnd({ animated: false });
         }
+    }, [messages]);
+
+    const handleScroll = (val: boolean) => {
+        setIsUserScrolling(val);
+    };
+
+    const { executeAsync: handleSendMessage } = useAsyncHandler(
+        async function () {
+            if (textMessage !== '') {
+                await messageService.sendMessage(textMessage, chatDoc.chatRef)
+                setTextMessage('')
+            }
+        },
     )
+
+    useEffect(() => {
+        const subscribe = chatDoc.chatRef
+            .collection('messages')
+            .onSnapshot(querySnapshot => {
+                const newMessages: Message[] = []
+                querySnapshot.forEach(doc => {
+                    const data = doc.data()
+                    newMessages.push({
+                        id: doc.id,
+                        from: data.from,
+                        message: data.message,
+                        timestamp: new Date(data.timestamp)
+                    })
+                })
+                setMessages(newMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime()))
+            })
+        return () => subscribe()
+    }, [chatDoc.chatRef])
 
     return (
         <Modal animationType="slide"
             transparent={true}
-            visible={currChatId !== ''}
-            onRequestClose={() => setcurrChatId('')}>
-            <TouchableWithoutFeedback onPress={() => setcurrChatId('')}>
+            visible={true}
+            onRequestClose={() => handleSelectChat('')}>
+            <TouchableWithoutFeedback onPress={() => handleSelectChat('')}>
                 <View style={styles.modalContainer}>
                     <TouchableWithoutFeedback>
                         <View style={styles.modalContent}>
+
+                            <View style={styles.profileInformation}>
+                                <Image style={styles.profileImage} source={userService.renderProfileImage(to.profileImage)} />
+                                <View style={styles.profileDetail}>
+                                    <Text style={styles.displayName}>{to.name}</Text>
+                                </View>
+                            </View>
+
+                            <ScrollView style={styles.chatBubbleList}
+                                ref={scrollViewRef}
+                                onScrollBeginDrag={() => handleScroll(true)}
+                                onScrollEndDrag={() => handleScroll(false)}>
+                                {[...messages.values()].map((message) => (
+                                    <ChatBubble key={message.id} message={message} to={chatDoc.to} />
+                                ))}
+                            </ScrollView>
+
+                            <View style={styles.messageControlContainer}>
+                                <View style={styles.messageControlContent}>
+                                    <TextInput value={textMessage} onChangeText={setTextMessage} style={styles.textMessageInputBox} placeholder="Your Message" multiline={true} />
+                                    <CustomButton style={styles.sendBtn} onPress={handleSendMessage}>
+                                        <Feather name="send" size={30} />
+                                    </CustomButton>
+                                </View>
+                            </View>
 
                         </View>
                     </TouchableWithoutFeedback>
@@ -57,14 +121,83 @@ function getStyles(theme: CustomTheme) {
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
         },
         modalContent: {
+            position: 'relative',
             flex: 1,
             backgroundColor: theme.background,
-            padding: 20,
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
             alignItems: 'center',
             elevation: 5,
             width: '100%',
+        },
+        profileInformation: {
+            display: 'flex',
+            flexDirection: 'row',
+            paddingVertical: 30,
+            paddingHorizontal: 10,
+            gap: 10,
+            width: '90%',
+            justifyContent: 'flex-start',
+            borderBottomColor: 'gray',
+            borderBottomWidth: 0.5,
+        },
+        profileImage: {
+            width: 75,
+            height: 75,
+            borderRadius: 50
+        },
+        profileDetail: {
+            flex: 1,
+            padding: 10,
+            justifyContent: 'flex-start',
+        },
+        displayName: {
+            width: 'auto',
+            color: theme.text,
+            fontSize: 24,
+            fontFamily: 'ABeeZee',
+            // fontStyle: 'italic'
+        },
+        chatBubbleList: {
+            height: '100%',
+            width: '100%',
+            marginBottom: 100,
+        },
+        messageControlContainer: {
+            position: 'absolute',
+            width: '100%',
+            height: 100,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: theme.background
+        },
+        messageControlContent: {
+            width: '80%',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 10
+        },
+        textMessageInputBox: {
+            flex: 1,
+            borderWidth: 0.5,
+            borderColor: 'gray',
+            borderRadius: 15,
+            paddingHorizontal: 15,
+            paddingVertical: 15,
+            fontSize: 18,
+            fontFamily: 'ABeeZee',
+            color: theme.text,
+        },
+        sendBtn: {
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'lightgrey',
+            width: 50,
+            height: 50,
+            padding: 5
         },
     })
 }

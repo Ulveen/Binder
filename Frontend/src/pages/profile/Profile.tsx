@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import React, { useEffect } from 'react';
 import { BackHandler, Image, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+=======
+import { Image, StyleSheet, Text, View } from "react-native";
+>>>>>>> e442f369a8320077654431c3c85f6d9be8ee7265
 import TimeService from "../../services/timeService";
 import UserService from "../../services/userService";
 import useAuth from "../../hooks/useAuth";
