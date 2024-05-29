@@ -1,8 +1,7 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import useAuth from "../../hooks/useAuth";
 import UserService from "../../services/userService";
-import TimeService from "../../services/timeService";
-import { useEffect } from "react";
+import { getTimeDiffYear } from "../../utils/dateUtils";
 
 interface Props {
     navigation: any;
@@ -12,7 +11,6 @@ const userService = UserService();
 
 export default function Home({ navigation }: Props) {
     const { user } = useAuth();
-    const timeService = TimeService();
 
     async function getUserMatchOption() {
         await userService.getUserMatchOption(user!);
@@ -48,7 +46,7 @@ export default function Home({ navigation }: Props) {
             <View style={styles.listUser}>
                 <Image style={styles.profileImage} source={{ uri: user?.profileImage }}/>
                 <View style={styles.textContainer}>
-                    <Text style={styles.topText}> {user?.name}, {timeService.getTimeDiffYear(user?.dob)} </Text>
+                    <Text style={styles.topText}> {user?.name}, {getTimeDiffYear(user?.dob)} </Text>
                     <Text style={styles.botText}> {user?.campus}, Binusian {user?.binusian} </Text>
                 </View>
             </View>

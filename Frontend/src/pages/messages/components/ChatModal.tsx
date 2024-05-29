@@ -5,11 +5,11 @@ import CustomTheme from "../../../models/CustomTheme";
 import useAsyncHandler from "../../../hooks/useAsyncHandler";
 import MessageService from "../../../services/messageService";
 import { useEffect, useRef, useState } from "react";
-import UserService from "../../../services/userService";
 import Message from "../../../models/Message";
 import Feather from 'react-native-vector-icons/Feather';
 import CustomButton from "../../../components/CustomButton";
 import ChatBubble from "./ChatBubble";
+import { renderProfileImage } from "../../../utils/imageUtils";
 
 interface Props {
     chatDoc: Chat
@@ -17,7 +17,6 @@ interface Props {
 }
 
 const messageService = MessageService()
-const userService = UserService()
 
 export default function ChatModal({ chatDoc, handleSelectChat }: Props) {
     const to = chatDoc.to
@@ -28,6 +27,8 @@ export default function ChatModal({ chatDoc, handleSelectChat }: Props) {
     const [textMessage, setTextMessage] = useState('')
 
     const scrollViewRef = useRef<ScrollView>(null);
+    const textInputRef = useRef<TextInput>(null)
+
     const [isUserScrolling, setIsUserScrolling] = useState(false);
 
     useEffect(() => {
@@ -44,7 +45,8 @@ export default function ChatModal({ chatDoc, handleSelectChat }: Props) {
         async function () {
             if (textMessage !== '') {
                 await messageService.sendMessage(textMessage, chatDoc.chatRef)
-                setTextMessage('')
+                textInputRef.current?.clear()
+                textInputRef.current?.blur()
             }
         },
     )
@@ -52,6 +54,8 @@ export default function ChatModal({ chatDoc, handleSelectChat }: Props) {
     useEffect(() => {
         const subscribe = chatDoc.chatRef
             .collection('messages')
+            .orderBy('timestamp')
+            .limitToLast(100)
             .onSnapshot(querySnapshot => {
                 const newMessages: Message[] = []
                 querySnapshot.forEach(doc => {
@@ -63,10 +67,10 @@ export default function ChatModal({ chatDoc, handleSelectChat }: Props) {
                         timestamp: new Date(data.timestamp)
                     })
                 })
-                setMessages(newMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime()))
+                setMessages(newMessages)
             })
         return () => subscribe()
-    }, [chatDoc.chatRef])
+    }, [])
 
     return (
         <Modal animationType="slide"
@@ -79,7 +83,7 @@ export default function ChatModal({ chatDoc, handleSelectChat }: Props) {
                         <View style={styles.modalContent}>
 
                             <View style={styles.profileInformation}>
-                                <Image style={styles.profileImage} source={userService.renderProfileImage(to.profileImage)} />
+                                <Image style={styles.profileImage} source={renderProfileImage(to.profileImage)} />
                                 <View style={styles.profileDetail}>
                                     <Text style={styles.displayName}>{to.name}</Text>
                                 </View>
@@ -96,7 +100,7 @@ export default function ChatModal({ chatDoc, handleSelectChat }: Props) {
 
                             <View style={styles.messageControlContainer}>
                                 <View style={styles.messageControlContent}>
-                                    <TextInput value={textMessage} onChangeText={setTextMessage} style={styles.textMessageInputBox} placeholder="Your Message" multiline={true} />
+                                    <TextInput value={textMessage} onChangeText={setTextMessage} style={styles.textMessageInputBox} placeholder="Your Message" multiline={true} ref={textInputRef} />
                                     <CustomButton style={styles.sendBtn} onPress={handleSendMessage}>
                                         <Feather name="send" size={30} />
                                     </CustomButton>

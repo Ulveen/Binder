@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { CustomTheme } from '../../models/CustomTheme';
+import CustomTheme from '../../models/CustomTheme';
 
 interface ProfileDetailProps {
     title: string;

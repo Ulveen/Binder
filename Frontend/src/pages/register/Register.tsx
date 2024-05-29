@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity } from "react-native";
 import AuthService from "../../services/authService";
-import UserService from "../../services/userService";
 import CustomButton from "../../components/CustomButton";
 import OtpPlaceholder from "./components/OtpPlaceholder";
 import DatePicker from "react-native-date-picker";
@@ -10,6 +9,7 @@ import { launchImageLibrary } from "react-native-image-picker";
 import useCustomTheme from "../../hooks/useCustomTheme";
 import useAsyncHandler from "../../hooks/useAsyncHandler";
 import CustomTheme from "../../models/CustomTheme";
+import { openImageGallery, renderProfileImage } from "../../utils/imageUtils";
 
 interface Props {
     navigation: any;
@@ -21,7 +21,6 @@ const genderOptions = [
 ]
 
 const authService = AuthService()
-const userService = UserService()
 
 export default function Register({ navigation: { navigate } }: Props) {
     const { theme, userTheme } = useCustomTheme()
@@ -78,11 +77,11 @@ export default function Register({ navigation: { navigate } }: Props) {
     }
 
     async function handlePickImage() {
-        launchImageLibrary({ mediaType: 'photo', includeBase64: true }, (response) => {
-            if (response.didCancel) return
-            setProfileUri(response!.assets![0].uri!)
-            setprofileImage(response!.assets![0].base64!)
-        })
+        const assets = await openImageGallery('photo')
+        if (assets) {
+            setProfileUri(assets![0].uri!)
+            setprofileImage(assets![0].base64!)
+        }
     }
 
     if (step == 0)
@@ -128,7 +127,7 @@ export default function Register({ navigation: { navigate } }: Props) {
         <View style={styles.container}>
             <Text style={styles.title}>Profile Details</Text>
             <TouchableOpacity onPress={handlePickImage}>
-                <Image style={styles.profileImage} source={userService.renderProfileImage(profileUri)} />
+                <Image style={styles.profileImage} source={renderProfileImage(profileUri)} />
             </TouchableOpacity>
             <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
             <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry={true} />

@@ -1,10 +1,10 @@
-function getTimeDiffYear(date: Date | undefined) {
+export function getTimeDiffYear(date: Date | undefined) {
     if (!date) return 0;
     const now = new Date();
     return now.getFullYear() - date.getFullYear();
 }
 
-function getTimeDiffFormatted(date: Date) {
+export function getTimeDiffFormatted(date: Date) {
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const seconds = diff / 1000;
@@ -29,8 +29,4 @@ function getTimeDiffFormatted(date: Date) {
         return `${Math.floor(years)} year`;
     }
 
-}
-
-export default function TimeService() {
-    return { getTimeDiffYear, getTimeDiffFormatted }
 }

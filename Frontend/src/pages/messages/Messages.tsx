@@ -61,7 +61,7 @@ export default function Messages() {
                 }
             )
         return () => subscriber();
-    }, [user?.email])
+    }, [])
 
     return (
         <View style={styles.container}>

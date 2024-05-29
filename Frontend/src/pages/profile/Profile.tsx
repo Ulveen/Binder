@@ -1,25 +1,15 @@
-<<<<<<< HEAD
-import React, { useEffect } from 'react';
-import { BackHandler, Image, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-=======
-import { Image, StyleSheet, Text, View } from "react-native";
->>>>>>> e442f369a8320077654431c3c85f6d9be8ee7265
-import TimeService from "../../services/timeService";
-import UserService from "../../services/userService";
+import { useEffect } from "react";
+import { BackHandler, View, TouchableOpacity, Image, Text, StyleSheet } from "react-native";
+import CustomButton from "../../components/CustomButton";
 import useAuth from "../../hooks/useAuth";
 import useCustomTheme from "../../hooks/useCustomTheme";
-import CustomButton from "../../components/CustomButton";
 import CustomTheme from "../../models/CustomTheme";
-import TextHolder from './components/TextHolder';
+import TextHolder from "./components/TextHolder";
+import { renderProfileImage } from "../../utils/imageUtils";
 
 interface Props {
     navigation: any;
 }
-
-const userService = UserService();
-const timeService = TimeService();
-
-
 
 export default function Profile({ navigation }: Props) {
     const { user, logout } = useAuth();
@@ -51,7 +41,6 @@ export default function Profile({ navigation }: Props) {
 
     const formattedDob = user?.dob ? new Date(user.dob).toLocaleDateString() : 'Date of Birth not available';
 
-
     return (
         <View style={styles.container}>
             <TouchableOpacity style={styles.backContainer} onPress={handleBackImgPress}>
@@ -61,7 +50,7 @@ export default function Profile({ navigation }: Props) {
                 <Text style={styles.editButtonText}>Edit</Text>
             </TouchableOpacity>
             <Text style={styles.title}>Profile</Text>
-            <Image style={styles.profileImage} source={userService.renderProfileImage(user?.profileImage)} />
+            <Image style={styles.profileImage} source={renderProfileImage(user?.profileImage)} />
             <TextHolder UserInfo={user?.name} TextLabel={"Name"}></TextHolder>
             <TextHolder UserInfo={formattedDob} TextLabel={"Date of Birth"} />
             <TextHolder UserInfo={user?.binusian} TextLabel={"Binusian"}></TextHolder>

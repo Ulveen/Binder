@@ -1,10 +1,6 @@
 import User from "../models/User"
 import { createRequest } from "../utils/requestUtils";
 
-function renderProfileImage(profileImageUri: string | undefined) {
-    return profileImageUri ? { uri: profileImageUri } : require('../assets/Profile.jpg')
-}
-
 function updateUserData(user: User) {
     
 }
@@ -16,5 +12,5 @@ async function getUserMatchOption(user: User) {
 }
 
 export default function UserService() {
-    return { renderProfileImage, getUserMatchOption }
+    return { getUserMatchOption }
 }

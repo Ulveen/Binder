@@ -4,14 +4,12 @@ import User from "../../../models/User";
 import CustomTheme from "../../../models/CustomTheme";
 import useCustomTheme from "../../../hooks/useCustomTheme";
 import useAuth from "../../../hooks/useAuth";
-import UserService from "../../../services/userService";
+import { renderProfileImage } from "../../../utils/imageUtils";
 
 interface Props {
     message: Message,
     to: User
 }
-
-const userService = UserService()
 
 export default function ChatBubble({ message, to }: Props) {
     const { user } = useAuth()
@@ -41,7 +39,7 @@ export default function ChatBubble({ message, to }: Props) {
 
     return (
         <View style={styles.container}>
-            <Image style={styles.profileImage} source={userService.renderProfileImage(to.profileImage)} />
+            <Image style={styles.profileImage} source={renderProfileImage(to.profileImage)} />
             <Text style={styles.text}>
                 {message.message}
             </Text>
