@@ -107,7 +107,7 @@ async function register(req: Request, res: Response) {
             binusian: binusian,
             campus: campus,
             gender: gender,
-            profileImage: profileImageUrl[0],
+            profileImage: profileImageUrl,
             match: [],
             request: [],
             premium: false,
