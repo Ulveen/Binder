@@ -2,6 +2,9 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import useAuth from "../../hooks/useAuth";
 import UserService from "../../services/userService";
 import { getTimeDiffYear } from "../../utils/dateUtils";
+import { useEffect, useState } from "react";
+import { firebase } from "@react-native-firebase/firestore";
+import Notification from "../../models/Notification";
 
 interface Props {
     navigation: any;
@@ -11,14 +14,34 @@ const userService = UserService();
 
 export default function Home({ navigation }: Props) {
     const { user } = useAuth();
+    const [notifications, setNotifications] = useState<Notification[]>([]);
 
     async function getUserMatchOption() {
         await userService.getUserMatchOption(user!);
     }
 
-    // useEffect(() => {
-    //     getUserMatchOption();
-    // }, [])
+    useEffect(() => {
+        const subscriber = firebase
+            .firestore()
+            .collection('users')
+            .doc(user?.email)
+            .collection('notifications')
+            .where('read', '==', false)
+            .onSnapshot((snapshot) => {
+                const notifications: Notification[] = [];
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    notifications.push({
+                        id: doc.id,
+                        message: data.message,
+                        timestamp: data.timestamp,
+                        read: data.read,
+                    } as Notification);
+                });
+                setNotifications(notifications);
+            })
+        return () => subscriber();
+    }, [])
 
     const handleDislike = () => {
         console.log('Disliked');
@@ -33,18 +56,18 @@ export default function Home({ navigation }: Props) {
     };
 
     return (
-        <View style={styles.container}>     
+        <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.notifContainer}>
-                    <Image source={require("../../assets/Notification.png")} style={styles.leftImg}/>
+                    <Image source={require("../../assets/Notification.png")} style={styles.leftImg} />
                 </View>
                 <View style={styles.filterContainer}>
-                    <Image source={require("../../assets/Filter.png")} style={styles.rightImg}/>
+                    <Image source={require("../../assets/Filter.png")} style={styles.rightImg} />
                 </View>
             </View>
 
             <View style={styles.listUser}>
-                <Image style={styles.profileImage} source={{ uri: user?.profileImage }}/>
+                <Image style={styles.profileImage} source={{ uri: user?.profileImage }} />
                 <View style={styles.textContainer}>
                     <Text style={styles.topText}> {user?.name}, {getTimeDiffYear(user?.dob)} </Text>
                     <Text style={styles.botText}> {user?.campus}, Binusian {user?.binusian} </Text>
@@ -53,13 +76,13 @@ export default function Home({ navigation }: Props) {
 
             <View style={styles.buttonRow}>
                 <TouchableOpacity onPress={handleDislike}>
-                    <Image source={require("../../assets/dislike.png")} style={styles.circleImage}/>
+                    <Image source={require("../../assets/dislike.png")} style={styles.circleImage} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleLike}>
-                    <Image source={require("../../assets/like.png")} style={styles.circleImage}/>
+                    <Image source={require("../../assets/like.png")} style={styles.circleImage} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleFavorite}>
-                    <Image source={require("../../assets/stars.png")} style={styles.circleImage}/>
+                    <Image source={require("../../assets/stars.png")} style={styles.circleImage} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -112,8 +135,8 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
     },
-    textContainer:{
-        width: 340, 
+    textContainer: {
+        width: 340,
         height: 80,
         backgroundColor: 'black',
         borderBottomLeftRadius: 10,
@@ -121,13 +144,13 @@ const styles = StyleSheet.create({
     },
     topText: {
         paddingTop: 15,
-        paddingLeft : 20,
+        paddingLeft: 20,
         color: 'white',
         fontWeight: 'bold',
     },
     botText: {
         paddingTop: 5,
-        paddingLeft : 20,
+        paddingLeft: 20,
         color: 'white',
         fontSize: 14,
     },

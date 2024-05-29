@@ -45,7 +45,10 @@ export default function Messages() {
                             return {
                                 chatId: doc.id,
                                 chatRef: doc.ref,
-                                to: userDoc.data() as User,
+                                to: {
+                                    ...userDoc.data(),
+                                    email: userDoc.id
+                                } as User,
                                 messages: data.messages,
                                 lastMessage: {
                                     ...data.lastMessage,

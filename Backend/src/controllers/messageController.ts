@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/authMiddleware";
 import firebaseAdmin from "../firebase/firebase";
+import { addNotification } from "../utils/notificationUtils";
 
 async function createMessageChannel(req: AuthRequest, res: Response) {
     const { to }: { to: string } = req.body()
@@ -24,13 +25,13 @@ async function createMessageChannel(req: AuthRequest, res: Response) {
 }
 
 async function sendMessage(req: AuthRequest, res: Response) {
-    const { message, chatId }: { message: string, chatId: string } = req.body
+    const { to, message, chatId }: { to: string, message: string, chatId: string } = req.body
 
     if (!message || !chatId) {
         res.status(400).send('Message and chat id is required')
         return
     }
-    
+
     const chatMessagesRef = firebaseAdmin.db.collection('messages').doc(chatId).collection('messages')
 
     try {
@@ -48,7 +49,9 @@ async function sendMessage(req: AuthRequest, res: Response) {
             }
         })
 
-        await Promise.all([sendMessagePromise, updateLastMessagePromise])
+        await Promise.all([sendMessagePromise, updateLastMessagePromise]).then(() => {
+            addNotification(to, `New message from ${req.user?.email}`)
+        })
 
         res.status(200).send('Message sent')
     } catch (error: any) {
