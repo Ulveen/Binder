@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import User from "../models/User";
-import JwtController from "../controllers/jwtController"
+import { decodeJWTToken } from "../utils/jwtUtils";
 
 export interface AuthRequest extends Request {
     user?: User;
@@ -15,7 +15,7 @@ function verifyToken(req: AuthRequest, res: Response, next: NextFunction) {
     }
 
     try {
-        const user = JwtController.decodeToken(token)
+        const user = decodeJWTToken(token)
         req.user = user
         next()
     } catch (error: any) {

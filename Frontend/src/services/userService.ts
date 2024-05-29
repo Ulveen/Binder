@@ -1,8 +1,17 @@
 import User from "../models/User"
-import { createRequest } from "../utils/requestUtils";
+import { createRequest, createRequestWithToken } from "../utils/requestUtils";
 
-function updateUserData(user: User) {
-    
+async function updateUserData(params: Partial<User>) {
+    const to = "/user/updateUserData";
+    const body = {params};
+    const response = await createRequestWithToken(to, body);
+
+    if(response.status === 200) {
+        const data = (await response.json()).data;
+        return data;
+    }
+
+    throw new Error("Error updating user data");
 }
 
 async function getUserMatchOption(user: User) {
@@ -12,5 +21,5 @@ async function getUserMatchOption(user: User) {
 }
 
 export default function UserService() {
-    return { getUserMatchOption }
+    return { updateUserData, getUserMatchOption }
 }

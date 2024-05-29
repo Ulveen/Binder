@@ -6,6 +6,6 @@ export default interface User {
     binusian: string,
     campus: string,
     gender: string,
-    uid: string,
-    profileImage: string
+    profileImage: string,
+    premium: boolean
 }

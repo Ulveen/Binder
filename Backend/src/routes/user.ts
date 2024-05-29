@@ -4,9 +4,9 @@ import verifyToken from '../middlewares/authMiddleware';
 
 const UserRouter = express.Router();
 
-UserRouter.post('/updateProfile', verifyToken, userController.updateProfile);
-UserRouter.get('/getParthner' , verifyToken, userController.getParthnerList);
-UserRouter.post('/requestPeople', verifyToken , userController.requestParthnerData);
+UserRouter.get('/getParthner' , verifyToken, userController.getPartnerList);
+UserRouter.post('/requestPeople', verifyToken , userController.requestPartnerData);
 UserRouter.post('/getUserMatchOption', verifyToken, userController.getUserMatchOption);
+UserRouter.post('/updateUserData', verifyToken, userController.updateUserData)
 
 export default UserRouter;

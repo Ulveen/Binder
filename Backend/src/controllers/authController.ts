@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
-import JwtController from './jwtController';
 import EmailController from './emailController';
 import firebaseAdmin from '../firebase/firebase';
 import User from '../models/User';
-import bcrypt from 'bcrypt';
+import { comparePassword, encryptPassword } from '../utils/bcryptUtils';
+import { getImageDownloadUrl, uploadImage } from '../utils/imageUtils';
+import { decodeJWTToken, generateJWTToken } from '../utils/jwtUtils';
 
 async function sendEmailOTP(req: Request, res: Response) {
     const { email }: { email: string } = req.body
@@ -28,9 +29,7 @@ async function sendEmailOTP(req: Request, res: Response) {
     }
 
     try {
-
         const code = Math.floor(1000 + Math.random() * 9000).toString()
-
         const otpPromise = firebaseAdmin.db.collection('otp').doc(email).set({ code: code })
         const emailPromise = EmailController.sendEmail(email, 'BINDER Verification OTP Code', code)
 
@@ -94,16 +93,12 @@ async function register(req: Request, res: Response) {
         return
     }
 
-    const encryted_password = bcrypt.hashSync(password, 10)
+    const encryted_password = encryptPassword(password)
 
     try {
-        const profileImageRef = firebaseAdmin.storage.bucket().file(`profileImages/${email}.jpg`)
-        await profileImageRef.save(Buffer.from(profileImage, 'base64'))
+        const profileImageRef = await uploadImage(`profileImages/${email}.jpg`, profileImage)
 
-        const profileImageUrl = await profileImageRef.getSignedUrl({
-            action: 'read',
-            expires: '03-09-2491'
-        })
+        const profileImageUrl = await getImageDownloadUrl(profileImageRef)
 
         await firebaseAdmin.db.collection('users').doc(email).set({
             dob: dob,
@@ -129,7 +124,6 @@ async function register(req: Request, res: Response) {
 }
 
 async function login(req: Request, res: Response) {
-    console.log("Backend login")
     const { email, password }: { email: string, password: string } = req.body
 
     if (!email || !password) {
@@ -138,22 +132,22 @@ async function login(req: Request, res: Response) {
     }
 
     try {
-        const userData = await firebaseAdmin.db.collection('users').doc(email).get()
+        const userSnapshot = await firebaseAdmin.db.collection('users').doc(email).get()
 
-        if (!userData.exists || !userData.data()) {
+        if (!userSnapshot.exists || !userSnapshot.data()) {
             res.status(404).send('User does not exist')
             return
         }
 
-        const user: User = userData.data()! as User
+        const user = userSnapshot.data()! as User
         user.email = email
 
-        if(!bcrypt.compareSync(password, user.password)) {
+        if(!comparePassword(password, user.password)) {
             res.status(401).send('Invalid password')
             return
         }
 
-        const token = JwtController.generateToken(user)
+        const token = generateJWTToken(user)
 
         res.status(200).json({ data: { user: user, token: token } })
 
@@ -177,7 +171,7 @@ async function verifyToken(req: Request, res: Response) {
     }
 
     try {
-        const user = JwtController.decodeToken(token)
+        const user = decodeJWTToken(token)
         res.status(200).json({ data: user })
     } catch (error: any) {
         res.status(401).send(error.message)

@@ -2,32 +2,11 @@ import { Response } from "express";
 import User from "../models/User";
 import firebaseAdmin from "../firebase/firebase";
 import { AuthRequest } from "../middlewares/authMiddleware";
+import { encryptPassword } from "../utils/bcryptUtils";
+import { getImageDownloadUrl, uploadImage } from "../utils/imageUtils";
+import { generateJWTToken } from "../utils/jwtUtils";
 
-async function updateProfile(req: AuthRequest, res: Response) {
-    const { email, dob, binusian, campus, gender }: User = req.body
-
-    if (!email || !dob || !binusian || !campus || !gender) {
-        res.status(400).send('All fields must not be empty')
-        return
-    }
-
-    try {
-        await firebaseAdmin.db.collection('users').doc(email).set({
-            dob: dob,
-            binusian: binusian,
-            campus: campus,
-            gender: gender
-        })
-
-        res.status(200).json({ data: 'Profile updated' })
-
-    } catch (error: any) {
-        res.status(500).send(error.message)
-    }
-
-}
-
-async function getParthnerList(req: AuthRequest, res: Response) {
+async function getPartnerList(req: AuthRequest, res: Response) {
     const { email }: User = req.body
 
     try {
@@ -40,38 +19,91 @@ async function getParthnerList(req: AuthRequest, res: Response) {
         res.status(200).json({
             match: userData.match,
             favorite: userData.favorite
-         })
-    } catch (error : any) {
+        })
+    } catch (error: any) {
         res.status(500).send(error.message)
     }
 }
 
-async function requestParthnerData(req: AuthRequest, res: Response) {
+async function requestPartnerData(req: AuthRequest, res: Response) {
     const { peopleList } = req.body
     try {
-        if ( !peopleList || peopleList.length < 1 ) {
+        if (!peopleList || peopleList.length < 1) {
             return res.status(404).send('There are no favorites');
         }
         const matchedUser = await Promise.all(peopleList.map(async (mathEmails: string) => {
-            const parthnerData = await firebaseAdmin.db.collection('users').doc(mathEmails).get()
-            if (!parthnerData.exists) {
+            const partnerData = await firebaseAdmin.db.collection('users').doc(mathEmails).get()
+            if (!partnerData.exists) {
                 return null
             }
-            return parthnerData.data()
+            return partnerData.data()
         }))
         res.status(200).json({
             favoriteDatas: matchedUser
-         })
-    } catch (error : any) {
-         res.status(500).send(error.message)
+        })
+    } catch (error: any) {
+        res.status(500).send(error.message)
     }
-    
+
+}
+
+async function updateUserData(req: AuthRequest, res: Response) {
+    const user = req.user as User
+    const { name, dob, binusian, campus, gender, profileImage, premium, password } = req.body
+    const updatedData = {} as any
+
+    if (name) {
+        updatedData['name'] = name
+    }
+    if (dob) {
+        updatedData['dob'] = dob
+    }
+    if (binusian) {
+        updatedData['binusian'] = binusian
+    }
+    if (campus) {
+        updatedData['campus'] = campus
+    }
+    if (gender) {
+        updatedData['gender'] = gender
+    }
+    if (premium) {
+        updatedData['premium'] = premium
+    }
+    if (password) {
+        updatedData['password'] = encryptPassword(password)
+    }
+    if (profileImage) {
+        const profileImageUrl = await uploadImage(`profileImages/${user.email}`, profileImage)
+        updatedData['profileImage'] = await getImageDownloadUrl(profileImageUrl)
+    }
+
+    await firebaseAdmin.db
+        .collection('users')
+        .doc(user.email!)
+        .update({
+            ...updatedData
+        })
+
+    const updatedUser = {
+        ...user,
+        ...updatedData
+    }
+
+    const token = generateJWTToken(updatedUser)
+
+    return res.status(200).json({
+        data: {
+            user: updateUserData,
+            token: token
+        }
+    })
 }
 
 async function getUserMatchOption(req: AuthRequest, res: Response) {
-    console.log("Alvin jelek")
+
 }
 
-const userController = { updateProfile, getParthnerList, requestParthnerData, getUserMatchOption }
+const userController = { getPartnerList, requestPartnerData, getUserMatchOption, updateUserData }
 
 export default userController;
