@@ -98,9 +98,9 @@ async function register(req: Request, res: Response) {
     try {
         const profileImageRef = await uploadImage(`profileImages/${email}.jpg`, profileImage)
 
-        const profileImageUrl = await getImageDownloadUrl(profileImageRef)
+        const profileImageUrl = (await getImageDownloadUrl(profileImageRef))[0]
 
-        await firebaseAdmin.db.collection('users').doc(email).set({
+        const userData = {
             dob: dob,
             name: name,
             password: encryted_password,
@@ -112,7 +112,14 @@ async function register(req: Request, res: Response) {
             request: [],
             premium: false,
             favorite: []
-        })
+        }
+
+        console.log(profileImageUrl);
+        
+
+        // console.log(userData);
+
+        await firebaseAdmin.db.collection('users').doc(email).set(userData)
 
         res.status(200).json({ data: 'User registered' })
 

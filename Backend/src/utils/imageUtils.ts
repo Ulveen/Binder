@@ -10,5 +10,5 @@ export async function getImageDownloadUrl(imageRef: any) {
     return await imageRef.getSignedUrl({
         action: 'read',
         expires: '03-09-2491'
-    })[0]
+    })
 }

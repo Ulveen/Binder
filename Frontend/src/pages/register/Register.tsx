@@ -34,7 +34,7 @@ export default function Register({ navigation: { navigate } }: Props) {
     const [otp, setOtp] = useState('')
 
     const [profileUri, setProfileUri] = useState('')
-    const [profileImage, setprofileImage] = useState('')
+    const [profileImage, setProfileImage] = useState('')
     const [name, setName] = useState('')
     const [password, setPassword] = useState('')
     const [dob, setDob] = useState(new Date())
@@ -61,6 +61,18 @@ export default function Register({ navigation: { navigate } }: Props) {
     const { executeAsync: handleRegister } = useAsyncHandler(
         async function () {
             await authService.register(email, password, name, dob, binusian, campus, gender, profileImage)
+            setStep(0);
+            setEmail('');
+            setOtp('');
+            setProfileUri('');
+            setProfileImage('');
+            setName('');
+            setPassword('');
+            setDob(new Date());
+            setBinusian('');
+            setCampus('');
+            setIsOpenGenderPicker(false);
+            setGender('Male');
             navigate('Login')
         },
         "Account registered successfully."
@@ -80,7 +92,7 @@ export default function Register({ navigation: { navigate } }: Props) {
         const assets = await openImageGallery('photo')
         if (assets) {
             setProfileUri(assets![0].uri!)
-            setprofileImage(assets![0].base64!)
+            setProfileImage(assets![0].base64!)
         }
     }
 

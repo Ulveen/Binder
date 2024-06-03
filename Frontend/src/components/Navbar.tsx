@@ -4,9 +4,21 @@ import Home from "../pages/home/Home";
 import Match from "../pages/match";
 import Profile from "../pages/profile";
 import VideoCall from "../pages/videoCall";
-import messages from "../pages/messages";
+import Messages from "../pages/messages";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import UpdateProfile from "../pages/updateProfile/updateProfile";
 
 const BottomTab = createBottomTabNavigator();
+const ProfileNativeStack = createNativeStackNavigator();
+
+function ProfileStack() {
+    return (
+        <ProfileNativeStack.Navigator initialRouteName="Profile">
+            <ProfileNativeStack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
+            <ProfileNativeStack.Screen name="EditProfile" component={UpdateProfile} options={{ headerShown: false }} />
+        </ProfileNativeStack.Navigator>
+    )
+}
 
 export default function Navbar() {
     return (
@@ -35,7 +47,7 @@ export default function Navbar() {
                                 ? require('./../assets/chat-focus.png')
                                 : require('./../assets/chat.png');
                             break;
-                        case 'Profile':
+                        case 'UserProfile':
                             iconName = focused
                                 ? require('./../assets/profiles-focus.png')
                                 : require('./../assets/profiles.png');
@@ -49,8 +61,10 @@ export default function Navbar() {
             <BottomTab.Screen name="Home" component={Home} options={{ headerShown: false }} />
             <BottomTab.Screen name="Match" component={Match} options={{ headerShown: false }} />
             <BottomTab.Screen name="Video" component={VideoCall} options={{ headerShown: false }} />
-            <BottomTab.Screen name="Messages" component={messages} options={{ headerShown: false }} />
-            <BottomTab.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
+            <BottomTab.Screen name="Messages" component={Messages} options={{ headerShown: false }} />
+            <BottomTab.Screen name="UserProfile" component={
+                ProfileStack
+            } options={{ headerShown: false }} />
         </BottomTab.Navigator>
     );
 }

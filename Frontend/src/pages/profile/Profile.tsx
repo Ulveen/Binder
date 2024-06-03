@@ -31,22 +31,15 @@ export default function Profile({ navigation }: Props) {
         return () => backHandler.remove(); // Hapus listener saat komponen tidak lagi digunakan
     }, [navigation]);
 
-    const handleBackImgPress = () => {
-        navigation.navigate('Home'); // Navigasi kembali ke halaman Home
-    };
-
     const handleEdit = () => {
-
+        navigation.navigate('EditProfile');
     };
 
     const formattedDob = user?.dob ? new Date(user.dob).toLocaleDateString() : 'Date of Birth not available';
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.backContainer} onPress={handleBackImgPress}>
-                <Image source={require("../../assets/back.png")} style={styles.backImg}></Image>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.editButton} onPress={() => { /* Handle edit action */ }}>
+            <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
                 <Text style={styles.editButtonText}>Edit</Text>
             </TouchableOpacity>
             <Text style={styles.title}>Profile</Text>
