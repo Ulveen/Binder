@@ -114,10 +114,7 @@ async function register(req: Request, res: Response) {
             favorite: []
         }
 
-        console.log(profileImageUrl);
-        
-
-        // console.log(userData);
+        // console.log(profileImageUrl);
 
         await firebaseAdmin.db.collection('users').doc(email).set(userData)
 

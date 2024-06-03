@@ -5,8 +5,8 @@ import Match from "../pages/match";
 import Profile from "../pages/profile";
 import VideoCall from "../pages/videoCall";
 import Messages from "../pages/messages";
+import EditProfile from "../pages/editprofile";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import UpdateProfile from "../pages/updateProfile/updateProfile";
 
 const BottomTab = createBottomTabNavigator();
 const ProfileNativeStack = createNativeStackNavigator();
@@ -15,7 +15,7 @@ function ProfileStack() {
     return (
         <ProfileNativeStack.Navigator initialRouteName="Profile">
             <ProfileNativeStack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
-            <ProfileNativeStack.Screen name="EditProfile" component={UpdateProfile} options={{ headerShown: false }} />
+            <ProfileNativeStack.Screen name="EditProfile" component={EditProfile} options={{ headerShown: false }} />
         </ProfileNativeStack.Navigator>
     )
 }

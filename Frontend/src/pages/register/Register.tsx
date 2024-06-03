@@ -45,6 +45,7 @@ export default function Register({ navigation: { navigate } }: Props) {
     const { executeAsync: handleSendEmailOTP } = useAsyncHandler(
         async function () {
             await authService.sendEmailOTP(email)
+            // console.log("AAA")
             setStep(1)
         },
         "Check your email for the OTP code."
@@ -173,7 +174,7 @@ export default function Register({ navigation: { navigate } }: Props) {
                 title={'Date of Birth'}
                 minimumDate={new Date(1900, 0, 1)}
                 theme={userTheme === 'dark' ? 'dark' : 'light'}
-            />
+                />
             }
             <CustomButton style={styles.continueBtn} onPress={handleRegister}>
                 <Text style={styles.continueBtnText}>Register</Text>

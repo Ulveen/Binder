@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export async function createRequest(url: string, body: Object, method?: string) {
     const to = `${process.env.BACKEND_URL}${url}`
+    // console.log(process.env.BACKEND_URL)
     const headers = { 'Content-Type': 'application/json' }
     const result = await fetch(to, {
         method: method || 'POST',
