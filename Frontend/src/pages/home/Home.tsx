@@ -60,6 +60,9 @@ export default function Home({ navigation }: Props) {
             <View style={styles.header}>
                 <View style={styles.notifContainer}>
                     <Image source={require("../../assets/Notification.png")} style={styles.leftImg} />
+                    {notifications.length > 0 &&
+                        <Text>{notifications.length}</Text>
+                    }
                 </View>
                 <View style={styles.filterContainer}>
                     <Image source={require("../../assets/Filter.png")} style={styles.rightImg} />

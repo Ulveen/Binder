@@ -48,7 +48,7 @@ export default function Profile({ navigation }: Props) {
             <TextHolder UserInfo={formattedDob} TextLabel={"Date of Birth"} />
             <TextHolder UserInfo={user?.binusian} TextLabel={"Binusian"}></TextHolder>
             <TextHolder UserInfo={user?.campus} TextLabel={"Campus Area"}></TextHolder>
-            <TextHolder UserInfo TextLabel={"Interested in"}></TextHolder>
+            {/* <TextHolder UserInfo TextLabel={"Interested in"}></TextHolder> */}
             <CustomButton style={[styles.button]} onPress={logout}>
                 <Text style={[styles.buttonText, { color: 'white' }]}>Logout</Text>
             </CustomButton>

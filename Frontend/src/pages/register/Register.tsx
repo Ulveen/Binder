@@ -1,11 +1,10 @@
 import { useRef, useState } from "react";
-import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity, ScrollView } from "react-native";
 import AuthService from "../../services/authService";
 import CustomButton from "../../components/CustomButton";
 import OtpPlaceholder from "./components/OtpPlaceholder";
 import DatePicker from "react-native-date-picker";
 import DropDownPicker from "react-native-dropdown-picker";
-import { launchImageLibrary } from "react-native-image-picker";
 import useCustomTheme from "../../hooks/useCustomTheme";
 import useAsyncHandler from "../../hooks/useAsyncHandler";
 import CustomTheme from "../../models/CustomTheme";
@@ -27,12 +26,12 @@ export default function Register({ navigation: { navigate } }: Props) {
     const styles = getStyles(theme)
 
     const otpInputRef = useRef<TextInput>(null)
+    const [datePickerVisible, setDatePickerVisibile] = useState(false)
 
     const [step, setStep] = useState(0)
 
     const [email, setEmail] = useState('')
     const [otp, setOtp] = useState('')
-
     const [profileUri, setProfileUri] = useState('')
     const [profileImage, setProfileImage] = useState('')
     const [name, setName] = useState('')
@@ -80,6 +79,10 @@ export default function Register({ navigation: { navigate } }: Props) {
 
     function openOtpInput() {
         otpInputRef.current?.focus()
+    }
+
+    function toggleDatePicker() {
+        setDatePickerVisibile(!datePickerVisible)
     }
 
     function handleOtpChange(text: string) {
@@ -145,21 +148,33 @@ export default function Register({ navigation: { navigate } }: Props) {
             <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry={true} />
             <TextInput style={styles.input} placeholder="Binusian" value={binusian} onChangeText={setBinusian} />
             <TextInput style={styles.input} placeholder="Campus" value={campus} onChangeText={setCampus} />
-            <DropDownPicker style={styles.genderPicker}
-                textStyle={styles.genderPickerText}
-                containerStyle={{ width: '80%' }}
-                value={gender}
-                setValue={setGender}
-                items={genderOptions}
-                open={isOpenGenderPicker}
-                setOpen={setIsOpenGenderPicker} />
-            <DatePicker style={styles.datePicker}
+            <View>
+                <DropDownPicker style={styles.genderPicker}
+                    textStyle={styles.genderPickerText}
+                    containerStyle={{ width: '80%' }}
+                    value={gender}
+                    setValue={setGender}
+                    items={genderOptions}
+                    open={isOpenGenderPicker}
+                    setOpen={setIsOpenGenderPicker} />
+            </View>
+            {!datePickerVisible &&
+                <TouchableOpacity style={styles.chooseDOBButtonContainer} onPress={toggleDatePicker}>
+                    <Text style={styles.DOBButtonContent}>
+                        Choose birthday date
+                    </Text>
+                </TouchableOpacity>
+            }
+            {datePickerVisible && <DatePicker
+                style={styles.datePicker}
                 mode="date"
                 date={dob}
                 onDateChange={setDob}
                 title={'Date of Birth'}
                 minimumDate={new Date(1900, 0, 1)}
-                theme={userTheme === 'light' ? 'light' : 'dark'} />
+                theme={userTheme === 'dark' ? 'dark' : 'light'}
+            />
+            }
             <CustomButton style={styles.continueBtn} onPress={handleRegister}>
                 <Text style={styles.continueBtnText}>Register</Text>
             </CustomButton>
@@ -171,17 +186,18 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
     container: {
         backgroundColor: theme.background,
         flex: 1,
-        flexDirection: 'column',
+        alignItems: 'center',
         justifyContent: 'space-evenly',
-        alignItems: 'center'
     },
     description: {
         width: '80%',
         fontSize: 16,
+        fontFamily: 'ABeeZee',
         color: theme.text
     },
     title: {
         fontSize: 36,
+        fontFamily: 'ABeeZee',
         fontWeight: 'bold',
         color: theme.primary
     },
@@ -196,13 +212,15 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         borderWidth: 1,
         borderRadius: 5,
         fontSize: 18,
+        fontFamily: 'ABeeZee',
         padding: 10,
         color: theme.text,
         backgroundColor: theme.background
     },
     redirectText: {
         color: theme.text,
-        fontSize: 16
+        fontSize: 16,
+        fontFamily: 'ABeeZee',
     },
     continueBtn: {
         backgroundColor: theme.primary,
@@ -220,6 +238,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
     },
     emailLabel: {
         fontSize: 18,
+        fontFamily: 'ABeeZee',
         color: theme.text
     },
     otpDiv: {
@@ -232,7 +251,21 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         alignSelf: 'center',
     },
     genderPickerText: {
-        fontSize: 18
+        fontSize: 18,
+        fontFamily: 'ABeeZee',
+    },
+    chooseDOBButtonContainer: {
+        width: '80%',
+        backgroundColor: 'rgba(233, 64, 87, 0.2)',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    DOBButtonContent: {
+        color: theme.primary,
+        fontSize: 16,
+        fontFamily: 'ABeeZee',
+        fontStyle: 'italic'
     },
     datePicker: {
         height: 110,

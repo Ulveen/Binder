@@ -25,7 +25,7 @@ async function createMessageChannel(req: AuthRequest, res: Response) {
 }
 
 async function sendMessage(req: AuthRequest, res: Response) {
-    const { to, message, chatId }: { to: string, message: string, chatId: string } = req.body
+    const { email, message, chatId }: { email: string, message: string, chatId: string } = req.body
 
     if (!message || !chatId) {
         res.status(400).send('Message and chat id is required')
@@ -49,9 +49,8 @@ async function sendMessage(req: AuthRequest, res: Response) {
             }
         })
 
-        await Promise.all([sendMessagePromise, updateLastMessagePromise]).then(() => {
-            addNotification(to, `New message from ${req.user?.email}`)
-        })
+        await Promise.all([sendMessagePromise, updateLastMessagePromise])
+        await addNotification(email, `New message from ${req.user?.name}`)
 
         res.status(200).send('Message sent')
     } catch (error: any) {

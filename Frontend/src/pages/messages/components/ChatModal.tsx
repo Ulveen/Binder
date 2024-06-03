@@ -44,7 +44,7 @@ export default function ChatModal({ chatDoc, handleSelectChat }: Props) {
     const { executeAsync: handleSendMessage } = useAsyncHandler(
         async function () {
             if (textMessage !== '') {
-                await messageService.sendMessage(to.name, textMessage, chatDoc.chatRef)
+                await messageService.sendMessage(to.email, textMessage, chatDoc.chatRef)
                 textInputRef.current?.clear()
                 textInputRef.current?.blur()
             }

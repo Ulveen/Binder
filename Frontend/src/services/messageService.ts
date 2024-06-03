@@ -1,11 +1,11 @@
 import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore"
 import { createRequestWithToken } from "../utils/requestUtils"
 
-async function sendMessage(to: string, message: string, chatRef: FirebaseFirestoreTypes.DocumentReference<FirebaseFirestoreTypes.DocumentData>) {
+async function sendMessage(email: string, message: string, chatRef: FirebaseFirestoreTypes.DocumentReference<FirebaseFirestoreTypes.DocumentData>) {
     const url = '/message/sendMessage'
 
     const body = {
-        to: to,
+        email: email,
         message: message,
         chatId: chatRef.path.split('/')[1]
     }
