@@ -17,20 +17,6 @@ export default function Profile({ navigation }: Props) {
 
     const styles = getStyles(theme);
 
-    useEffect(() => {
-        const backAction = () => {
-            navigation.navigate('Home'); // Navigasi kembali ke halaman Home
-            return true; // Kembalikan true untuk menonaktifkan default behavior
-        };
-
-        const backHandler = BackHandler.addEventListener(
-            'hardwareBackPress',
-            backAction
-        );
-
-        return () => backHandler.remove(); // Hapus listener saat komponen tidak lagi digunakan
-    }, [navigation]);
-
     const handleEdit = () => {
         navigation.navigate('EditProfile');
     };
