@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import useAuth from "../../hooks/useAuth";
 import UserService from "../../services/userService";
 import { getTimeDiffYear } from "../../utils/dateUtils";
@@ -11,6 +11,7 @@ import CustomTheme from "../../models/CustomTheme";
 import useCustomTheme from "../../hooks/useCustomTheme";
 import FilterModal from "./components/FilterModal";
 import SubscribePopup from "./components/SubscribePopup";
+import useAsyncHandler from "../../hooks/useAsyncHandler";
 
 interface Props {
     navigation: any;
@@ -28,7 +29,7 @@ export default function Home({ navigation }: Props) {
 
     const [filterModalOpen, setFilterModelOpen] = useState(false);
     const [filter, setFilter] = useState({
-        gender: user?.gender === 'male' ? 'female' : 'male',
+        gender: user?.gender === 'Male' ? 'Female' : 'Male',
         campus: user?.campus ? user.campus : 'Kemanggisan',
         binusian: user?.binusian ? user.binusian : '26',
         minAge: 17,
@@ -37,9 +38,10 @@ export default function Home({ navigation }: Props) {
 
     const [subscribePopupOpen, setSubscribePopupOpen] = useState(false);
 
-    async function getUserMatchOption() {
+    const { executeAsync: getUserMatchOption, loading: isUserMatchOptionsLoading } = useAsyncHandler(async function () {
         const matchOptions = await userService.getUserMatchOption(filter);
-    }
+
+    })
 
     function handleOpenFilterModal() {
         if (notificationModalOpen) return
@@ -57,6 +59,9 @@ export default function Home({ navigation }: Props) {
 
     useEffect(() => {
         getUserMatchOption();
+    }, [filter])
+
+    useEffect(() => {
         const subscriber = firebase
             .firestore()
             .collection('users')
@@ -114,13 +119,24 @@ export default function Home({ navigation }: Props) {
                 </TouchableOpacity>
             </View>
 
-            <View style={styles.listUser}>
-                <Image style={styles.profileImage} source={renderProfileImage(user?.profileImage)} />
-                <View style={styles.textContainer}>
-                    <Text style={styles.topText}> {user?.name}, {getTimeDiffYear(user?.dob)} </Text>
-                    <Text style={styles.botText}> {user?.campus}, Binusian {user?.binusian} </Text>
+            {isUserMatchOptionsLoading ?
+                <View style={styles.listUserLoading}>
+                    <View style={styles.profileImageLoading}>
+                        <ActivityIndicator size="large" color={'#E94057'} />
+                    </View>
+                    <View style={styles.textContainerLoading}>
+                        <Text style={styles.topTextLoading}></Text>
+                        <Text style={styles.botTextLoading}></Text>
+                    </View>
+                </View> :
+                <View style={styles.listUser}>
+                    <Image style={styles.profileImage} source={renderProfileImage(user?.profileImage)} />
+                    <View style={styles.textContainer}>
+                        <Text style={styles.topText}> {user?.name}, {getTimeDiffYear(user?.dob)} </Text>
+                        <Text style={styles.botText}> {user?.campus}, Binusian {user?.binusian} </Text>
+                    </View>
                 </View>
-            </View>
+            }
 
             <View style={styles.buttonRow}>
                 <TouchableOpacity onPress={handleDislike}>
@@ -189,6 +205,7 @@ function getStyles(theme: CustomTheme) {
         listUser: {
             flex: 1,
             alignItems: 'center',
+            marginBottom: 5
         },
         profileImage: {
             width: 340,
@@ -214,6 +231,42 @@ function getStyles(theme: CustomTheme) {
             paddingLeft: 20,
             color: 'white',
             fontSize: 14,
+        },
+        listUserLoading: {
+            flex: 1,
+            alignItems: 'center',
+            marginBottom: 5
+        },
+        profileImageLoading: {
+            width: 340,
+            height: 470,
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#ededed'
+        },
+        textContainerLoading: {
+            width: 340,
+            height: 80,
+            backgroundColor: 'black',
+            borderBottomLeftRadius: 10,
+            borderBottomRightRadius: 10,
+        },
+        topTextLoading: {
+            marginTop: 10,
+            marginLeft: 10,
+            backgroundColor: '#ededed',
+            width: '50%',
+            height: 30
+        },
+        botTextLoading: {
+            marginTop: 10,
+            marginLeft: 10,
+            backgroundColor: '#ededed',
+            width: '40%',
+            height: 20
         },
         buttonRow: {
             flexDirection: 'row',

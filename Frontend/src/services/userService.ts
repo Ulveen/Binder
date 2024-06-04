@@ -4,11 +4,11 @@ import { createRequest, createRequestWithToken } from "../utils/requestUtils";
 
 async function updateUserData(params: Partial<User>) {
     const to = "/user/updateUserData";
-    const body = {...params};
-    
+    const body = { ...params };
+
     const response = await createRequestWithToken(to, body);
 
-    if(response.status === 200) {
+    if (response.status === 200) {
         const data = (await response.json()).data;
         return data;
     }
@@ -21,7 +21,13 @@ async function getUserMatchOption(filter: MatchFilter) {
     const body = {
         ...filter
     }
-    // await createRequest(to, body);
+    const result = await createRequestWithToken(to, body);
+    if (result.ok) {
+        const data = await result.json()
+        return data;
+    } else {
+        throw new Error("Error getting user match option");
+    }
 }
 
 export default function UserService() {

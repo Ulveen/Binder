@@ -84,7 +84,7 @@ async function updateUserData(req: AuthRequest, res: Response) {
         .update({
             ...updatedData
         })
-    
+
     const { exp, iat, ...userWithoutExpIat } = user;
     const updatedUser = {
         ...userWithoutExpIat,
@@ -92,7 +92,7 @@ async function updateUserData(req: AuthRequest, res: Response) {
     };
 
     const expString = ((exp * 1000 - Date.now()) / 3600000).toPrecision(6).toString() + 'h';
-    
+
     const token = generateJWTToken({ ...updatedUser }, expString);
 
     return res.status(200).json({
@@ -105,8 +105,42 @@ async function updateUserData(req: AuthRequest, res: Response) {
 
 async function getUserMatchOption(req: AuthRequest, res: Response) {
     const user = req.user as User
+    const { gender, campus, binusian, minAge, maxAge } = req.body
 
-    
+    console.log(gender, campus, binusian, minAge, maxAge);
+
+
+    const collection = firebaseAdmin.db.collection('users')
+
+    const userMatchOptions = await collection
+        .limit(20)
+        .where('gender', '==', gender)
+        .get()
+
+    try {
+        const filteredMatchOptions = userMatchOptions.docs
+            .filter(doc => {
+                const data = doc.data() as any
+                const age = new Date().getFullYear() - new Date(data.dob).getFullYear()
+                data.email = doc.id
+
+                return data.email !== user.email &&
+                    data.campus === campus &&
+                    data.binusian === binusian &&
+                    age >= minAge &&
+                    age <= maxAge
+            })
+            .map(doc => doc.data())
+
+        console.log(filteredMatchOptions);
+
+        res.status(200).json({
+            userMatchOptions: filteredMatchOptions
+        })
+    } catch (error: any) {
+        res.status(500).send(error.message)
+    }
+
 }
 
 const userController = { getPartnerList, requestPartnerData, getUserMatchOption, updateUserData }
