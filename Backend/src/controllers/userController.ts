@@ -104,7 +104,9 @@ async function updateUserData(req: AuthRequest, res: Response) {
 }
 
 async function getUserMatchOption(req: AuthRequest, res: Response) {
+    const user = req.user as User
 
+    
 }
 
 const userController = { getPartnerList, requestPartnerData, getUserMatchOption, updateUserData }

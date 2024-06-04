@@ -1,3 +1,4 @@
+import MatchFilter from "../models/MatchFilter";
 import User from "../models/User"
 import { createRequest, createRequestWithToken } from "../utils/requestUtils";
 
@@ -15,10 +16,12 @@ async function updateUserData(params: Partial<User>) {
     throw new Error("Error updating user data");
 }
 
-async function getUserMatchOption(user: User) {
+async function getUserMatchOption(filter: MatchFilter) {
     const to = "/user/getUserMatchOption";
-    const body = {user: user};
-    createRequest(to, body);
+    const body = {
+        ...filter
+    }
+    // await createRequest(to, body);
 }
 
 export default function UserService() {

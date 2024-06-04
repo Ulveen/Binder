@@ -3,6 +3,7 @@ import cors from 'cors';
 import AuthRouter from './routes/auth';
 import UserRouter from './routes/user';
 import MessageRouter from './routes/message';
+import NotificationRouter from './routes/notification';
 
 const app = express();
 const port = 4001;
@@ -20,6 +21,7 @@ app.use(cors())
 app.use('/auth', AuthRouter)
 app.use('/user', UserRouter)
 app.use('/message', MessageRouter)
+app.use('/notification', NotificationRouter)
 
 app.get('/', (req, res) => {
   console.log('Hello from the server');
