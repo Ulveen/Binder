@@ -45,7 +45,6 @@ export default function Register({ navigation: { navigate } }: Props) {
     const { executeAsync: handleSendEmailOTP } = useAsyncHandler(
         async function () {
             await authService.sendEmailOTP(email)
-            // console.log("AAA")
             setStep(1)
         },
         "Check your email for the OTP code."

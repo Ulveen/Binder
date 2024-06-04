@@ -4,7 +4,7 @@ export default function ToastService() {
     const baseProps: ToastShowParams = {
         autoHide: true,
         visibilityTime: 2000,
-        position: 'bottom'
+        position: 'top'
     }
     const error = (title: string, detail?: string) => {
         Toast.show({
@@ -22,5 +22,13 @@ export default function ToastService() {
             ...baseProps
         })
     }
-    return { error, success }
+    const info = (title: string, detail?: string) => {
+        Toast.show({
+            type: 'info',
+            text1: title,
+            text2: detail,
+            ...baseProps
+        })
+    }
+    return { error, success, info }
 }

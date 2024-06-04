@@ -6,79 +6,108 @@ import CustomButton from "../../components/CustomButton";
 import CustomTheme from "../../models/CustomTheme";
 import EditBox from './components/EditBox';
 import { openImageGallery, renderProfileImage } from "../../utils/imageUtils";
+import { isSameDate } from '../../utils/dateUtils';
+import ToastService from '../../services/toastService';
+import useAsyncHandler from '../../hooks/useAsyncHandler';
+import UserService from '../../services/userService';
+import User from '../../models/User';
+import DatePicker from 'react-native-date-picker';
 
 
 interface Props {
     navigation: any;
 }
 
+const userService = UserService()
+const toastService = ToastService()
+
 export default function Profile({ navigation }: Props) {
-    const { user } = useAuth();
-    const { theme } = useCustomTheme();
+    const { user, login } = useAuth();
+    const { theme,  userTheme } = useCustomTheme();
 
     const styles = getStyles(theme);
-    const formattedDob = user?.dob ? new Date(user.dob).toLocaleDateString() : 'Date of Birth not available';
+    const [datePickerVisible, setDatePickerVisible] = useState(false);
 
     const [name, setName] = useState(user?.name || '');
-    const [dob, setDob] = useState(user?.dob ? new Date(user.dob).toLocaleDateString() : '');
+    const [dob, setDob] = useState(user?.dob ? user.dob : new Date());
     const [binusian, setBinusian] = useState(user?.binusian || '');
     const [campus, setCampus] = useState(user?.campus || '');
+    const [profileUri, setProfileUri] = useState('');
+    const [profileImage, setProfileImage] = useState('');
 
-    async function updateData(){
-        // try {
-        //     const updatedUser = { name, dob, binusian, campus };
-        //     const response = await fetch('https://your-backend-url.com/api/updateUserData', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             Authorization: `Bearer ${user.token}`
-        //         },
-        //         body: JSON.stringify(updatedUser)
-        //     });
+    const { executeAsync: updateData } = useAsyncHandler(
+        async function () {
+            const updatedData = {} as Partial<User>
 
-        //     if (response.ok) {
-        //         const data = await response.json();
-        //         setUser(data.user);
-        //         Alert.alert('Profile updated successfully');
-        //         navigation.navigate('Profile');
-        //     } else {
-        //         const errorData = await response.json();
-        //         Alert.alert('Error updating profile', errorData.message);
-        //     }
-        // } catch (error) {
-        //     Alert.alert('Error updating profile', error.message);
-        // }
+            if (name !== user?.name) updatedData.name = name
+            if (!isSameDate(dob, user?.dob!)) updatedData.dob = dob
+            if (binusian !== user?.binusian) updatedData.binusian = binusian
+            if (campus !== user?.campus) updatedData.campus = campus
+            if (profileImage !== '') updatedData.profileImage = profileImage
+
+            if (Object.keys(updatedData).length === 0) {
+                toastService.info('No changes detected')
+                return
+            }
+
+            const data = await userService.updateUserData(updatedData)
+
+            login(data)
+            
+            toastService.success('Profile updated')
+            navigation.navigate('Profile')
+        }
+    )
+
+    async function handlePickImage() {
+        const assets = await openImageGallery('photo')
+        if (assets) {
+            setProfileUri(assets![0].uri!)
+            setProfileImage(assets![0].base64!)
+        }
     }
-
-    // async function handlePickImage() {
-    //     const assets = await openImageGallery('photo')
-    //     if (assets) {
-    //         setProfileUri(assets![0].uri!)
-    //         setProfileImage(assets![0].base64!)
-    //     }
-    // }
 
     const handleBackImgPress = () => {
         navigation.navigate('Profile');
     };
 
+    function toggleDatePicker() {
+        setDatePickerVisible(!datePickerVisible);
+    }
+
     return (
         <View style={styles.container}>
-        <TouchableOpacity style={styles.backContainer} onPress={handleBackImgPress}>
-            <Image source={require("../../assets/back.png")} style={styles.backImg} />
-        </TouchableOpacity>
-        <Text style={styles.title}>Edit Profile</Text>
-        {/* <TouchableOpacity onPress={handleImagePress}> */}
-            <Image style={styles.profileImage} source={renderProfileImage(user?.profileImage)} />
-        {/* </TouchableOpacity> */}
-        <EditBox Label="Name" Info={user?.name} />
-        <EditBox Label="Age" Info={formattedDob} />
-        <EditBox Label="Binusian" Info={user?.binusian} />
-        <EditBox Label="Campus Area" Info={user?.campus} />
-        <CustomButton style={styles.button} onPress={updateData}>
-            <Text style={[styles.buttonText, { color: 'white' }]}>Done</Text>
-        </CustomButton>
-    </View>
+            <TouchableOpacity style={styles.backContainer} onPress={handleBackImgPress}>
+                <Image source={require("../../assets/back.png")} style={styles.backImg} />
+            </TouchableOpacity>
+            <Text style={styles.title}>Edit Profile</Text>
+            <TouchableOpacity onPress={handlePickImage}>
+                <Image style={styles.profileImage} source={renderProfileImage(profileUri !== '' ? profileUri : user?.profileImage)} />
+            </TouchableOpacity>
+            <EditBox label="Name" state={name} setState={setName}/>
+            <EditBox label="Binusian" state={binusian} setState={setBinusian}/>
+            <EditBox label="Campus Area" state={campus} setState={setCampus} />
+            {!datePickerVisible &&
+                <TouchableOpacity style={styles.chooseDOBButtonContainer} onPress={toggleDatePicker}>
+                    <Text style={styles.DOBButtonContent}>
+                        Choose birthday date
+                    </Text>
+                </TouchableOpacity>
+            }
+            {datePickerVisible && <DatePicker
+                style={styles.datePicker}
+                mode="date"
+                date={dob}
+                onDateChange={setDob}
+                title={'Date of Birth'}
+                minimumDate={new Date(1900, 0, 1)}
+                theme={userTheme === 'dark' ? 'dark' : 'light'}
+                />
+            }
+            <CustomButton style={styles.button} onPress={updateData}>
+                <Text style={[styles.buttonText, { color: 'white' }]}>Done</Text>
+            </CustomButton>
+        </View>
     );
 }
 
@@ -111,11 +140,12 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         color: theme.text,
         borderColor: '#E8E6EA',
         borderWidth: 1,
-        padding: 10,
+        padding: 15,
         borderRadius: 10,
         marginVertical: 3,
         alignItems: 'center',
         justifyContent: 'center',
+        marginTop: 40,
     },
     buttonText: {
         color: theme.text,
@@ -127,7 +157,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         left: 10,
     },
     backImg: {
-        
+
     },
     upgradeButton: {
         marginTop: 10,
@@ -135,4 +165,20 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
     upgradeText: {
         fontStyle: "italic",
     },
+    chooseDOBButtonContainer: {
+        width: '80%',
+        backgroundColor: 'rgba(233, 64, 87, 0.2)',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    DOBButtonContent: {
+        color: theme.primary,
+        fontSize: 16,
+        fontFamily: 'ABeeZee',
+        fontStyle: 'italic'
+    },
+    datePicker: {
+        height: 110,
+    }
 });

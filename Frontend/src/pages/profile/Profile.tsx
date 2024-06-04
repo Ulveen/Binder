@@ -6,6 +6,7 @@ import useCustomTheme from "../../hooks/useCustomTheme";
 import CustomTheme from "../../models/CustomTheme";
 import TextHolder from "./components/TextHolder";
 import { renderProfileImage } from "../../utils/imageUtils";
+import { formatDate } from "../../utils/dateUtils";
 
 interface Props {
     navigation: any;
@@ -21,8 +22,6 @@ export default function Profile({ navigation }: Props) {
         navigation.navigate('EditProfile');
     };
 
-    const formattedDob = user?.dob ? new Date(user.dob).toLocaleDateString() : 'Date of Birth not available';
-
     return (
         <View style={styles.container}>
             <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
@@ -31,10 +30,9 @@ export default function Profile({ navigation }: Props) {
             <Text style={styles.title}>Profile</Text>
             <Image style={styles.profileImage} source={renderProfileImage(user?.profileImage)} />
             <TextHolder UserInfo={user?.name} TextLabel={"Name"}></TextHolder>
-            <TextHolder UserInfo={formattedDob} TextLabel={"Date of Birth"} />
             <TextHolder UserInfo={user?.binusian} TextLabel={"Binusian"}></TextHolder>
             <TextHolder UserInfo={user?.campus} TextLabel={"Campus Area"}></TextHolder>
-            {/* <TextHolder UserInfo TextLabel={"Interested in"}></TextHolder> */}
+            <TextHolder UserInfo={formatDate(user?.dob!)} TextLabel={"Date of Birth"} />
             <CustomButton style={[styles.button]} onPress={logout}>
                 <Text style={[styles.buttonText, { color: 'white' }]}>Logout</Text>
             </CustomButton>
@@ -105,7 +103,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         left: 10,
     },
     backImg: {
-        
+
     },
     upgradeButton: {
         marginTop: 10,

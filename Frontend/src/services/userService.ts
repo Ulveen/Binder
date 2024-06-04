@@ -3,7 +3,8 @@ import { createRequest, createRequestWithToken } from "../utils/requestUtils";
 
 async function updateUserData(params: Partial<User>) {
     const to = "/user/updateUserData";
-    const body = {params};
+    const body = {...params};
+    
     const response = await createRequestWithToken(to, body);
 
     if(response.status === 200) {

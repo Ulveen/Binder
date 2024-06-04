@@ -33,6 +33,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
     viewHolder: {
         width: '80%',
         alignItems: 'flex-start',
+        gap: 5
     },
     label: {
         textAlign: 'left',

@@ -3,14 +3,20 @@ import { Dimensions, StyleSheet, Text, TextInput, View } from 'react-native';
 import useCustomTheme from "../../../hooks/useCustomTheme";
 import CustomTheme from "../../../models/CustomTheme";
 
-export default function editBox({ Label, Info }: any){
+interface Props {
+    label: string
+    state: string,
+    setState: (text: string) => void
+}
+
+export default function editBox({ label, state, setState }: Props) {
     const { theme } = useCustomTheme();
 
     const styles = getStyles(theme);
     return (
         <View style={styles.viewHolder}>
-            <Text style={styles.label}>{Label}</Text>
-            <TextInput style={styles.profileDetail}>{Info}</TextInput>
+            <Text style={styles.label}>{label}</Text>
+            <TextInput value={state} onChangeText={setState} style={styles.profileDetail} />
         </View>
     )
 }

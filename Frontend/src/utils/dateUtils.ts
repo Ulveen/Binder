@@ -4,6 +4,19 @@ export function getTimeDiffYear(date: Date | undefined) {
     return now.getFullYear() - date.getFullYear();
 }
 
+export function formatDate(date: Date): string {
+    const options: Intl.DateTimeFormatOptions = {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    };
+    return date.toLocaleDateString('en-GB', options);
+}
+
+export function isSameDate(a: Date, b: Date): boolean {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
 export function getTimeDiffFormatted(date: Date) {
     const now = new Date();
     const diff = now.getTime() - date.getTime();

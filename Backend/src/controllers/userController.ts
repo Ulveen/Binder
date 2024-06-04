@@ -48,7 +48,7 @@ async function requestPartnerData(req: AuthRequest, res: Response) {
 }
 
 async function updateUserData(req: AuthRequest, res: Response) {
-    const user = req.user as User
+    const user = req.user as User extends { exp: number, iat: number } ? User : User & { exp: number, iat: number }
     const { name, dob, binusian, campus, gender, profileImage, premium, password } = req.body
     const updatedData = {} as any
 
@@ -75,7 +75,7 @@ async function updateUserData(req: AuthRequest, res: Response) {
     }
     if (profileImage) {
         const profileImageUrl = await uploadImage(`profileImages/${user.email}`, profileImage)
-        updatedData['profileImage'] = await getImageDownloadUrl(profileImageUrl)
+        updatedData['profileImage'] = (await getImageDownloadUrl(profileImageUrl))[0]
     }
 
     await firebaseAdmin.db
@@ -84,17 +84,20 @@ async function updateUserData(req: AuthRequest, res: Response) {
         .update({
             ...updatedData
         })
-
+    
+    const { exp, iat, ...userWithoutExpIat } = user;
     const updatedUser = {
-        ...user,
-        ...updatedData
-    }
+        ...userWithoutExpIat,
+        ...updatedData,
+    };
 
-    const token = generateJWTToken(updatedUser)
+    const expString = ((exp * 1000 - Date.now()) / 3600000).toPrecision(6).toString() + 'h';
+    
+    const token = generateJWTToken({ ...updatedUser }, expString);
 
     return res.status(200).json({
         data: {
-            user: updateUserData,
+            user: updatedUser,
             token: token
         }
     })

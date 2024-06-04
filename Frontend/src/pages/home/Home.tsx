@@ -5,6 +5,7 @@ import { getTimeDiffYear } from "../../utils/dateUtils";
 import { useEffect, useState } from "react";
 import { firebase } from "@react-native-firebase/firestore";
 import Notification from "../../models/Notification";
+import { renderProfileImage } from "../../utils/imageUtils";
 
 interface Props {
     navigation: any;
@@ -70,7 +71,7 @@ export default function Home({ navigation }: Props) {
             </View>
 
             <View style={styles.listUser}>
-                <Image style={styles.profileImage} source={{ uri: user?.profileImage }} />
+                <Image style={styles.profileImage} source={renderProfileImage(user?.profileImage)} />
                 <View style={styles.textContainer}>
                     <Text style={styles.topText}> {user?.name}, {getTimeDiffYear(user?.dob)} </Text>
                     <Text style={styles.botText}> {user?.campus}, Binusian {user?.binusian} </Text>
