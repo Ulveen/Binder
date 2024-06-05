@@ -7,6 +7,7 @@ import { getImageDownloadUrl, uploadImage } from "../utils/imageUtils";
 import { generateJWTToken } from "../utils/jwtUtils";
 import { differenceInYears, parseISO } from "date-fns";
 
+import { match } from "assert";
 
 async function getPartnerList(req: AuthRequest, res: Response) {
     
@@ -69,7 +70,10 @@ async function getPartnerList(req: AuthRequest, res: Response) {
 
 
 async function updateUserData(req: AuthRequest, res: Response) {
-    const user = req.user as User extends { exp: number, iat: number } ? User : User & { exp: number, iat: number }
+    const user = req.user as User extends
+        { exp: number, iat: number } ? User :
+        User & { exp: number, iat: number }
+
     const { name, dob, binusian, campus, gender, profileImage, premium, password } = req.body
     const updatedData = {} as any
 
@@ -105,7 +109,7 @@ async function updateUserData(req: AuthRequest, res: Response) {
         .update({
             ...updatedData
         })
-    
+
     const { exp, iat, ...userWithoutExpIat } = user;
     const updatedUser = {
         ...userWithoutExpIat,
@@ -113,7 +117,7 @@ async function updateUserData(req: AuthRequest, res: Response) {
     };
 
     const expString = ((exp * 1000 - Date.now()) / 3600000).toPrecision(6).toString() + 'h';
-    
+
     const token = generateJWTToken({ ...updatedUser }, expString);
 
     return res.status(200).json({
@@ -159,6 +163,102 @@ async function removeParthner(req: AuthRequest, res: Response) {
 
 
 async function getUserMatchOption(req: AuthRequest, res: Response) {
+    const user = req.user as User
+    const { gender, campus, binusian, minAge, maxAge, offset = 0 } = req.body
+
+    const collection = firebaseAdmin.db.collection('users')
+
+    const userMatchOptions = await collection
+        .offset(offset * 20)
+        .limit(20)
+        .where('gender', '==', gender)
+        .get()
+
+    try {
+        const filteredMatchOptions = [] as User[]
+        userMatchOptions.docs.forEach(doc => {
+            const data = doc.data()
+            const age = new Date().getFullYear() - new Date(data.dob).getFullYear()
+
+            if (doc.id !== user.email &&
+                data.campus === campus &&
+                data.binusian === binusian &&
+                age >= minAge &&
+                age <= maxAge &&
+                !user.swipe.get(doc.id)
+            ) {
+                const { password, match, request, premium, ...filteredData } = data;
+
+                filteredMatchOptions.push({
+                    email: doc.id,
+                    ...filteredData
+                } as User)
+            }
+        })
+
+        res.status(200).json({
+            userMatchOptions: filteredMatchOptions
+        })
+
+    } catch (error: any) {
+        res.status(500).send(error.message)
+    }
+}
+
+async function handleLike(user: User, to: string) {
+    const toUser = (await firebaseAdmin.db.collection('users').doc(to).get()).data() as User
+    if (user.likedBy.includes(to)) {
+        user.match.push(to)
+        toUser.match.push(user.email)
+        await Promise.all([
+            firebaseAdmin.db.collection('users').doc(user.email).update({
+                match: user.match
+            }),
+            firebaseAdmin.db.collection('users').doc(to).update({
+                match: toUser.match
+            })
+        ])
+    } else {
+        toUser.likedBy.push(user.email)
+        await firebaseAdmin.db.collection('users').doc(to).update({
+            likedBy: toUser.likedBy
+        })
+    }
+}
+
+async function handleSwipeLeft(user: User, to: string) {
+
+
+}
+
+async function handleSwipeRight(user: User, to: string) {
+
+
+}
+
+async function swipe(req: AuthRequest, res: Response) {
+    const user = req.user as User
+    const { to, type } = req.body
+
+    user.swipe.set(to, true)
+    await firebaseAdmin.db.collection('users').doc(user.email).update({
+        swipe: user.swipe
+    })
+
+    switch (type) {
+        case 'like':
+            await handleLike(user, to)
+            break;
+        case 'left':
+            await handleSwipeLeft(user, to)
+            break;
+        case 'right':
+            await handleSwipeRight(user, to)
+            break;
+        default:
+            res.status(400).send('Invalid swipe type')
+            break;
+    }
 
 }
 

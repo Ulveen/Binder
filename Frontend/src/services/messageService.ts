@@ -10,9 +10,22 @@ async function sendMessage(email: string, message: string, chatRef: FirebaseFire
         chatId: chatRef.path.split('/')[1]
     }
 
-    await createRequestWithToken(url, body)
+    const response = await createRequestWithToken(url, body)
+    if(!response.ok) {
+        throw new Error('Failed to send message')
+    }
+}
+
+async function createMessageChannel(to: string) {
+    const url = '/message/createMessageChannel'
+
+    const body = {
+        to
+    }
+
+    const response = await createRequestWithToken(url, body)
 }
 
 export default function MessageService() {
-    return { sendMessage }
+    return { sendMessage, createMessageChannel }
 }

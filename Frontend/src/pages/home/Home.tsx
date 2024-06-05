@@ -1,11 +1,19 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import useAuth from "../../hooks/useAuth";
 import UserService from "../../services/userService";
-import { getTimeDiffYear } from "../../utils/dateUtils";
 import { useEffect, useState } from "react";
 import { firebase } from "@react-native-firebase/firestore";
 import Notification from "../../models/Notification";
-import { renderProfileImage } from "../../utils/imageUtils";
+import NotificationModal from "./components/NotificationModal";
+import CustomTheme from "../../models/CustomTheme";
+import useCustomTheme from "../../hooks/useCustomTheme";
+import FilterModal from "./components/FilterModal";
+import SubscribePopup from "./components/SubscribePopup";
+import useAsyncHandler from "../../hooks/useAsyncHandler";
+import MatchLoadingSkeleton from "./components/MatchLoadingSkeleton";
+import MatchProfileCard from "./components/MatchProfileCard";
+import User from "../../models/User";
+import EmptyProfileCard from "./components/EmptyProfileCard";
 
 interface Props {
     navigation: any;
@@ -15,10 +23,49 @@ const userService = UserService();
 
 export default function Home({ navigation }: Props) {
     const { user } = useAuth();
-    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const { theme } = useCustomTheme()
 
-    async function getUserMatchOption() {
-        await userService.getUserMatchOption(user!);
+    const [notificationModalOpen, setNotificationModelOpen] = useState(false);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [styles, setStyles] = useState(getStyles(theme));
+
+    const [filterModalOpen, setFilterModelOpen] = useState(false);
+    const [filter, setFilter] = useState({
+        gender: user?.gender === 'Male' ? 'Female' : 'Male',
+        campus: user?.campus ? user.campus : 'Kemanggisan',
+        binusian: user?.binusian ? user.binusian : '26',
+        minAge: 17,
+        maxAge: 21,
+        offset: 0
+    })
+
+    const [matchOptions, setMatchOptions] = useState<User[]>([])
+    const [subscribePopupOpen, setSubscribePopupOpen] = useState(false);
+
+    const { executeAsync: getUserMatchOption,
+        loading: isUserMatchOptionsLoading
+    } = useAsyncHandler(async function () {
+        const data = await userService.getUserMatchOption(filter);
+        setMatchOptions(data.userMatchOptions.map((user: User) => {
+            return {
+                ...user,
+                dob: new Date(user.dob)
+            }
+        }))
+    })
+
+    function handleOpenFilterModal() {
+        if (notificationModalOpen) return
+        setFilterModelOpen(true);
+    }
+
+    function handleOpenNotificationModal() {
+        if (filterModalOpen) return
+        setNotificationModelOpen(true);
+    }
+
+    function handleShowSubscribePopup() {
+        setSubscribePopupOpen(true);
     }
 
     useEffect(() => {
@@ -30,12 +77,12 @@ export default function Home({ navigation }: Props) {
             .where('read', '==', false)
             .onSnapshot((snapshot) => {
                 const notifications: Notification[] = [];
-                snapshot.forEach((doc) => {
+                snapshot.forEach(doc => {
                     const data = doc.data();
                     notifications.push({
                         id: doc.id,
                         message: data.message,
-                        timestamp: data.timestamp,
+                        timestamp: new Date(data.timestamp.seconds * 1000),
                         read: data.read,
                     } as Notification);
                 });
@@ -44,39 +91,54 @@ export default function Home({ navigation }: Props) {
         return () => subscriber();
     }, [])
 
+    useEffect(() => {
+        getUserMatchOption();
+    }, [filter])
+
+    useEffect(() => {
+        setStyles(getStyles(theme));
+    }, [theme])
+
     const handleDislike = () => {
-        console.log('Disliked');
+
     };
 
     const handleLike = () => {
-        console.log('Liked');
+
     };
 
     const handleFavorite = () => {
-        console.log('favvv');
+
     };
 
     return (
         <View style={styles.container}>
+            {subscribePopupOpen &&
+                <SubscribePopup />
+            }
+            {filterModalOpen &&
+                <FilterModal setFilterModalOpen={setFilterModelOpen} filter={filter} setFilter={setFilter} />
+            }
+            {notificationModalOpen &&
+                <NotificationModal setNotificationModelOpen={setNotificationModelOpen} notifications={notifications} />
+            }
             <View style={styles.header}>
-                <View style={styles.notifContainer}>
+                <TouchableOpacity style={styles.notifContainer} onPress={handleOpenNotificationModal}>
                     <Image source={require("../../assets/Notification.png")} style={styles.leftImg} />
                     {notifications.length > 0 &&
-                        <Text>{notifications.length}</Text>
+                        <Text style={styles.notificationIndicator}>{notifications.length}</Text>
                     }
-                </View>
-                <View style={styles.filterContainer}>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.filterContainer} onPress={handleOpenFilterModal}>
                     <Image source={require("../../assets/Filter.png")} style={styles.rightImg} />
-                </View>
+                </TouchableOpacity>
             </View>
 
-            <View style={styles.listUser}>
-                <Image style={styles.profileImage} source={renderProfileImage(user?.profileImage)} />
-                <View style={styles.textContainer}>
-                    <Text style={styles.topText}> {user?.name}, {getTimeDiffYear(user?.dob)} </Text>
-                    <Text style={styles.botText}> {user?.campus}, Binusian {user?.binusian} </Text>
-                </View>
-            </View>
+            {isUserMatchOptionsLoading ? <MatchLoadingSkeleton /> :
+                matchOptions.length === 0 ?
+                    <EmptyProfileCard /> :
+                    <MatchProfileCard match={matchOptions[0]} />
+            }
 
             <View style={styles.buttonRow}>
                 <TouchableOpacity onPress={handleDislike}>
@@ -93,79 +155,64 @@ export default function Home({ navigation }: Props) {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#fff",
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingHorizontal: 35,
-        paddingVertical: 30,
-    },
-    notifContainer: {
-        padding: 5,
-        borderWidth: 2,
-        borderRadius: 15,
-        borderColor: "#E8E6EA",
-    },
-    leftImg: {
-        width: 40,
-        height: 40,
-        borderRadius: 10,
-    },
-    filterContainer: {
-        padding: 10,
-        borderWidth: 2,
-        borderRadius: 15,
-        borderColor: "#E8E6EA",
-    },
-    rightImg: {
-        width: 30,
-        height: 30,
-    },
-    imageContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    listUser: {
-        flex: 1,
-        alignItems: 'center',
-    },
-    profileImage: {
-        width: 340,
-        height: 470,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-    },
-    textContainer: {
-        width: 340,
-        height: 80,
-        backgroundColor: 'black',
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
-    },
-    topText: {
-        paddingTop: 15,
-        paddingLeft: 20,
-        color: 'white',
-        fontWeight: 'bold',
-    },
-    botText: {
-        paddingTop: 5,
-        paddingLeft: 20,
-        color: 'white',
-        fontSize: 14,
-    },
-    buttonRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginBottom: 30,
-    },
-    circleImage: {
-        width: 80,
-        height: 80,
-        borderRadius: 30,
-    },
-});
+function getStyles(theme: CustomTheme) {
+    return StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: "#fff",
+        },
+        header: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingHorizontal: 35,
+            paddingVertical: 30,
+        },
+        notifContainer: {
+            position: 'relative',
+            padding: 5,
+            borderWidth: 2,
+            borderRadius: 15,
+            borderColor: "#E8E6EA",
+        },
+        notificationIndicator: {
+            position: 'absolute',
+            bottom: -5,
+            right: -5,
+            backgroundColor: theme.primary,
+            color: 'white',
+            borderRadius: 10,
+            width: 20,
+            height: 20,
+            textAlign: 'center',
+        },
+        leftImg: {
+            width: 40,
+            height: 40,
+            borderRadius: 10,
+        },
+        filterContainer: {
+            padding: 10,
+            borderWidth: 2,
+            borderRadius: 15,
+            borderColor: "#E8E6EA",
+        },
+        rightImg: {
+            width: 30,
+            height: 30,
+        },
+        imageContainer: {
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        buttonRow: {
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+            marginBottom: 30,
+        },
+        circleImage: {
+            width: 80,
+            height: 80,
+            borderRadius: 30,
+        },
+    })
+}

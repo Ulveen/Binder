@@ -7,5 +7,8 @@ export default interface User {
     gender: string,
     profileImage: string,
     premium: boolean,
-    theme: string
+    match: string[],
+    request: string[],
+    likedBy: string[],
+    swipe: Map<string, boolean>
 }

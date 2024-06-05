@@ -9,15 +9,12 @@ import useCustomTheme from "../../hooks/useCustomTheme";
 import useAsyncHandler from "../../hooks/useAsyncHandler";
 import CustomTheme from "../../models/CustomTheme";
 import { openImageGallery, renderProfileImage } from "../../utils/imageUtils";
+import { genderOptions } from "../../models/Gender";
+import { campusOptions } from "../../models/Campus";
 
 interface Props {
     navigation: any;
 }
-
-const genderOptions = [
-    { label: 'Male', value: 'Male' },
-    { label: 'Female', value: 'Female' }
-]
 
 const authService = AuthService()
 
@@ -38,7 +35,8 @@ export default function Register({ navigation: { navigate } }: Props) {
     const [password, setPassword] = useState('')
     const [dob, setDob] = useState(new Date())
     const [binusian, setBinusian] = useState('')
-    const [campus, setCampus] = useState('')
+    const [isOpenCampusPicker, setIsOpenCampusPicker] = useState(false)
+    const [campus, setCampus] = useState('Kemanggisan')
     const [isOpenGenderPicker, setIsOpenGenderPicker] = useState(false)
     const [gender, setGender] = useState('Male')
 
@@ -147,17 +145,22 @@ export default function Register({ navigation: { navigate } }: Props) {
             <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
             <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry={true} />
             <TextInput style={styles.input} placeholder="Binusian" value={binusian} onChangeText={setBinusian} />
-            <TextInput style={styles.input} placeholder="Campus" value={campus} onChangeText={setCampus} />
-            <View>
-                <DropDownPicker style={styles.genderPicker}
-                    textStyle={styles.genderPickerText}
-                    containerStyle={{ width: '80%' }}
-                    value={gender}
-                    setValue={setGender}
-                    items={genderOptions}
-                    open={isOpenGenderPicker}
-                    setOpen={setIsOpenGenderPicker} />
-            </View>
+            <DropDownPicker style={styles.dropDownPicker}
+                textStyle={styles.dropDownPickerText}
+                containerStyle={{ width: '80%' }}
+                value={gender}
+                setValue={setGender}
+                items={genderOptions}
+                open={isOpenGenderPicker}
+                setOpen={setIsOpenGenderPicker} />
+            <DropDownPicker style={styles.dropDownPicker}
+                textStyle={styles.dropDownPickerText}
+                containerStyle={{ width: '80%' }}
+                value={campus}
+                setValue={setCampus}
+                items={campusOptions}
+                open={isOpenCampusPicker}
+                setOpen={setIsOpenCampusPicker} />
             {!datePickerVisible &&
                 <TouchableOpacity style={styles.chooseDOBButtonContainer} onPress={toggleDatePicker}>
                     <Text style={styles.DOBButtonContent}>
@@ -173,7 +176,7 @@ export default function Register({ navigation: { navigate } }: Props) {
                 title={'Date of Birth'}
                 minimumDate={new Date(1900, 0, 1)}
                 theme={userTheme === 'dark' ? 'dark' : 'light'}
-                />
+            />
             }
             <CustomButton style={styles.continueBtn} onPress={handleRegister}>
                 <Text style={styles.continueBtnText}>Register</Text>
@@ -247,10 +250,10 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         justifyContent: 'space-evenly',
         width: '80%',
     },
-    genderPicker: {
+    dropDownPicker: {
         alignSelf: 'center',
     },
-    genderPickerText: {
+    dropDownPickerText: {
         fontSize: 18,
         fontFamily: 'ABeeZee',
     },

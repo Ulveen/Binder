@@ -9,6 +9,16 @@ async function createMessageChannel(req: AuthRequest, res: Response) {
 
     const collectionRef = firebaseAdmin.db.collection('messages')
 
+    const checkDoc = await collectionRef
+        .where('users', 'array-contains', req.user?.email)
+        .where('users', 'array-contains', to)
+        .get()
+
+    if(!checkDoc.empty) {
+        res.status(200).json({data: 'Chat already exists'})
+        return
+    }
+
     const result = await collectionRef.add({
         users: [to, user?.email],
         lastMessage: {
@@ -22,6 +32,8 @@ async function createMessageChannel(req: AuthRequest, res: Response) {
         .collection('messages')
         .doc('init')
         .set({})
+
+    res.status(200).json({data: 'Chat created'})
 }
 
 async function sendMessage(req: AuthRequest, res: Response) {

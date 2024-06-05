@@ -110,7 +110,9 @@ async function register(req: Request, res: Response) {
             profileImage: profileImageUrl,
             match: [],
             request: [],
-            premium: false
+            swipe: new Map<string, boolean>(),
+            premium: false,
+            favorite: [],
         }
 
 
