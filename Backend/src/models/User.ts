@@ -7,5 +7,7 @@ export default interface User {
     campus: string,
     gender: string,
     profileImage: string,
-    premium: boolean
+    premium: boolean,
+    match: string[],
+    request: string[]
 }

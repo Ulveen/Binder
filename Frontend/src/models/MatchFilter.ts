@@ -3,5 +3,6 @@ export default interface MatchFilter {
     campus: string,
     binusian: string,
     minAge: number,
-    maxAge: number
+    maxAge: number,
+    offset: number
 }

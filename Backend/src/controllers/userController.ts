@@ -105,38 +105,38 @@ async function updateUserData(req: AuthRequest, res: Response) {
 
 async function getUserMatchOption(req: AuthRequest, res: Response) {
     const user = req.user as User
-    const { gender, campus, binusian, minAge, maxAge } = req.body
+    const { gender, campus, binusian, minAge, maxAge, offset = 0 } = req.body
 
-    console.log(gender, campus, binusian, minAge, maxAge);
-
+    console.log(gender, campus, binusian, minAge, maxAge, offset);
 
     const collection = firebaseAdmin.db.collection('users')
 
     const userMatchOptions = await collection
+        .offset(offset * 20)
         .limit(20)
         .where('gender', '==', gender)
         .get()
 
     try {
-        const filteredMatchOptions = userMatchOptions.docs
-            .filter(doc => {
-                const data = doc.data() as any
-                const age = new Date().getFullYear() - new Date(data.dob).getFullYear()
-                data.email = doc.id
+        const filteredMatchOptions = [] as User[]
+        userMatchOptions.docs.forEach(doc => {
+            const data = doc.data()
+            const age = new Date().getFullYear() - new Date(data.dob).getFullYear()
 
-                return data.email !== user.email &&
-                    data.campus === campus &&
-                    data.binusian === binusian &&
-                    age >= minAge &&
-                    age <= maxAge
-            })
-            .map(doc => doc.data())
-
-        console.log(filteredMatchOptions);
+            if (doc.id !== user.email && data.campus === campus && data.binusian === binusian && age >= minAge && age <= maxAge) {
+                const { password, match, request, premium, ...filteredData } = data;
+                
+                filteredMatchOptions.push({
+                    email: doc.id,
+                    ...filteredData
+                } as User)
+            }
+        })
 
         res.status(200).json({
             userMatchOptions: filteredMatchOptions
         })
+        
     } catch (error: any) {
         res.status(500).send(error.message)
     }

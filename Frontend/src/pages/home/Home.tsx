@@ -12,6 +12,10 @@ import useCustomTheme from "../../hooks/useCustomTheme";
 import FilterModal from "./components/FilterModal";
 import SubscribePopup from "./components/SubscribePopup";
 import useAsyncHandler from "../../hooks/useAsyncHandler";
+import MatchLoadingSkeleton from "./components/MatchLoadingSkeleton";
+import MatchProfileCard from "./components/MatchProfileCard";
+import User from "../../models/User";
+import EmptyProfileCard from "./components/EmptyProfileCard";
 
 interface Props {
     navigation: any;
@@ -25,7 +29,7 @@ export default function Home({ navigation }: Props) {
 
     const [notificationModalOpen, setNotificationModelOpen] = useState(false);
     const [notifications, setNotifications] = useState<Notification[]>([]);
-    const styles = getStyles(theme);
+    const [styles, setStyles] = useState(getStyles(theme));
 
     const [filterModalOpen, setFilterModelOpen] = useState(false);
     const [filter, setFilter] = useState({
@@ -33,14 +37,23 @@ export default function Home({ navigation }: Props) {
         campus: user?.campus ? user.campus : 'Kemanggisan',
         binusian: user?.binusian ? user.binusian : '26',
         minAge: 17,
-        maxAge: 21
+        maxAge: 21,
+        offset: 0
     })
 
+    const [matchOptions, setMatchOptions] = useState<User[]>([])
     const [subscribePopupOpen, setSubscribePopupOpen] = useState(false);
 
-    const { executeAsync: getUserMatchOption, loading: isUserMatchOptionsLoading } = useAsyncHandler(async function () {
-        const matchOptions = await userService.getUserMatchOption(filter);
-
+    const { executeAsync: getUserMatchOption,
+        loading: isUserMatchOptionsLoading
+    } = useAsyncHandler(async function () {
+        const data = await userService.getUserMatchOption(filter);
+        setMatchOptions(data.userMatchOptions.map((user: User) => {
+            return {
+                ...user,
+                dob: new Date(user.dob)
+            }
+        }))
     })
 
     function handleOpenFilterModal() {
@@ -58,10 +71,6 @@ export default function Home({ navigation }: Props) {
     }
 
     useEffect(() => {
-        getUserMatchOption();
-    }, [filter])
-
-    useEffect(() => {
         const subscriber = firebase
             .firestore()
             .collection('users')
@@ -70,7 +79,7 @@ export default function Home({ navigation }: Props) {
             .where('read', '==', false)
             .onSnapshot((snapshot) => {
                 const notifications: Notification[] = [];
-                snapshot.forEach((doc) => {
+                snapshot.forEach(doc => {
                     const data = doc.data();
                     notifications.push({
                         id: doc.id,
@@ -83,6 +92,14 @@ export default function Home({ navigation }: Props) {
             })
         return () => subscriber();
     }, [])
+
+    useEffect(() => {
+        getUserMatchOption();
+    }, [filter])
+
+    useEffect(() => {
+        setStyles(getStyles(theme));
+    }, [theme])
 
     const handleDislike = () => {
 
@@ -119,23 +136,10 @@ export default function Home({ navigation }: Props) {
                 </TouchableOpacity>
             </View>
 
-            {isUserMatchOptionsLoading ?
-                <View style={styles.listUserLoading}>
-                    <View style={styles.profileImageLoading}>
-                        <ActivityIndicator size="large" color={'#E94057'} />
-                    </View>
-                    <View style={styles.textContainerLoading}>
-                        <Text style={styles.topTextLoading}></Text>
-                        <Text style={styles.botTextLoading}></Text>
-                    </View>
-                </View> :
-                <View style={styles.listUser}>
-                    <Image style={styles.profileImage} source={renderProfileImage(user?.profileImage)} />
-                    <View style={styles.textContainer}>
-                        <Text style={styles.topText}> {user?.name}, {getTimeDiffYear(user?.dob)} </Text>
-                        <Text style={styles.botText}> {user?.campus}, Binusian {user?.binusian} </Text>
-                    </View>
-                </View>
+            {isUserMatchOptionsLoading ? <MatchLoadingSkeleton /> :
+                matchOptions.length === 0 ?
+                    <EmptyProfileCard /> :
+                    <MatchProfileCard match={matchOptions[0]} />
             }
 
             <View style={styles.buttonRow}>
@@ -201,72 +205,6 @@ function getStyles(theme: CustomTheme) {
         imageContainer: {
             justifyContent: 'center',
             alignItems: 'center',
-        },
-        listUser: {
-            flex: 1,
-            alignItems: 'center',
-            marginBottom: 5
-        },
-        profileImage: {
-            width: 340,
-            height: 470,
-            borderTopLeftRadius: 10,
-            borderTopRightRadius: 10,
-        },
-        textContainer: {
-            width: 340,
-            height: 80,
-            backgroundColor: 'black',
-            borderBottomLeftRadius: 10,
-            borderBottomRightRadius: 10,
-        },
-        topText: {
-            paddingTop: 15,
-            paddingLeft: 20,
-            color: 'white',
-            fontWeight: 'bold',
-        },
-        botText: {
-            paddingTop: 5,
-            paddingLeft: 20,
-            color: 'white',
-            fontSize: 14,
-        },
-        listUserLoading: {
-            flex: 1,
-            alignItems: 'center',
-            marginBottom: 5
-        },
-        profileImageLoading: {
-            width: 340,
-            height: 470,
-            borderTopLeftRadius: 10,
-            borderTopRightRadius: 10,
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: '#ededed'
-        },
-        textContainerLoading: {
-            width: 340,
-            height: 80,
-            backgroundColor: 'black',
-            borderBottomLeftRadius: 10,
-            borderBottomRightRadius: 10,
-        },
-        topTextLoading: {
-            marginTop: 10,
-            marginLeft: 10,
-            backgroundColor: '#ededed',
-            width: '50%',
-            height: 30
-        },
-        botTextLoading: {
-            marginTop: 10,
-            marginLeft: 10,
-            backgroundColor: '#ededed',
-            width: '40%',
-            height: 20
         },
         buttonRow: {
             flexDirection: 'row',

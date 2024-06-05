@@ -33,7 +33,7 @@ function getStyles(theme: CustomTheme) {
             borderRadius: 10,
             marginVertical: 5,
             flexDirection: 'row',
-            borderBottomWidth: 1,
+            borderBottomWidth: 0.75,
             borderColor: 'lightgrey',
             width: '100%'
         },

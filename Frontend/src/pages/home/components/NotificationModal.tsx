@@ -36,11 +36,17 @@ export default function NotificationModal({ setNotificationModelOpen, notificati
                 <View style={styles.modalContainer}>
                     <TouchableWithoutFeedback>
                         <View style={styles.modalContent}>
-                            <CustomButton style={styles.markAllAsReadButton} onPress={handleMarkAllAsRead}>
-                                <Text style={styles.markAllAsReadText}>
-                                    Mark as read
+                            <View style={styles.notificationHeaderContainer}>
+                                <Text style={styles.notificationTitle}>
+                                    Notifications
                                 </Text>
-                            </CustomButton>
+                                <CustomButton style={styles.markAllAsReadButton} onPress={handleMarkAllAsRead}>
+                                    <Text style={styles.markAllAsReadText}>
+                                        Mark as read
+                                    </Text>
+                                </CustomButton>
+                            </View>
+                            <View style={styles.line} />
                             {notifications.length > 0 ?
                                 notifications.map(
                                     (notification, idx) => {
@@ -80,6 +86,23 @@ function getStyles(theme: CustomTheme) {
             elevation: 5,
             width: '100%',
             padding: 20,
+        },
+        notificationHeaderContainer: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            width: '100%',
+            alignItems: 'center'
+        },
+        notificationTitle: {
+            color: theme.text,
+            fontSize: 24,
+            fontFamily: 'ABeeZee',
+        },
+        line: {
+            width: '100%',
+            height: 1,
+            backgroundColor: 'gray',
+            marginVertical: 10
         },
         markAllAsReadButton: {
             backgroundColor: theme.primary,

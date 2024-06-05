@@ -36,7 +36,7 @@ export default function FilterModal({ setFilterModalOpen, filter, setFilter }: P
     }
 
     function handleConfirmUpdateFilter() {
-        setFilter({ gender, campus, binusian, minAge, maxAge })
+        setFilter({ gender, campus, binusian, minAge, maxAge, offset: 0 })
         setFilterModalOpen(false)
     }
 
@@ -161,9 +161,11 @@ function getStyles(theme: CustomTheme) {
         genderToggleContainer: {
             flexDirection: 'row',
             width: '95%',
-            borderColor: 'black',
+            borderColor: 'gray',
             borderWidth: 1,
-            marginBottom: 20
+            marginBottom: 20,
+            borderRadius: 20,
+            overflow: 'hidden'
         },
         genderToggleButton: {
             width: '50%',
