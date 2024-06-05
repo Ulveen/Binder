@@ -1,11 +1,9 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import useAuth from "../../hooks/useAuth";
 import UserService from "../../services/userService";
-import { getTimeDiffYear } from "../../utils/dateUtils";
 import { useEffect, useState } from "react";
 import { firebase } from "@react-native-firebase/firestore";
 import Notification from "../../models/Notification";
-import { renderProfileImage } from "../../utils/imageUtils";
 import NotificationModal from "./components/NotificationModal";
 import CustomTheme from "../../models/CustomTheme";
 import useCustomTheme from "../../hooks/useCustomTheme";

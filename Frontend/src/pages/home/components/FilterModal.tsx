@@ -2,7 +2,7 @@ import { Modal, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } fr
 import CustomTheme from "../../../models/CustomTheme";
 import useCustomTheme from "../../../hooks/useCustomTheme";
 import MatchFilter from "../../../models/MatchFilter";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CustomButton from "../../../components/CustomButton";
 import DropDownPicker from "react-native-dropdown-picker";
 import { campusOptions } from "../../../models/Campus";

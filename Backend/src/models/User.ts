@@ -9,5 +9,7 @@ export default interface User {
     profileImage: string,
     premium: boolean,
     match: string[],
-    request: string[]
+    request: string[],
+    likedBy: string[],
+    swipe: Map<string, boolean>
 }

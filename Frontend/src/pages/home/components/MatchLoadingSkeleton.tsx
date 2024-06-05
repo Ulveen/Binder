@@ -1,5 +1,4 @@
 import { ActivityIndicator, StyleSheet, View } from "react-native";
-import User from "../../../models/User";
 import useCustomTheme from "../../../hooks/useCustomTheme";
 import CustomTheme from "../../../models/CustomTheme";
 import { useEffect, useState } from "react";
