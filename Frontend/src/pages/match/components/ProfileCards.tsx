@@ -1,35 +1,29 @@
 import { BlurView } from "@react-native-community/blur";
-import { useState } from "react";
-import { Dimensions, Image, ImageBackground, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export default function MyComponent({ ImageLink , Name, FavoriteState}: any) {
-    const [State, setState] = useState(FavoriteState)
+export default function profileCards({ imageLink , name, navigation, show, userService,useEmail,targetEmail, refresh}: any) {
     return (
         <TouchableOpacity style={styles.container} activeOpacity={1} onPress={() => {
             // Function Sementara
             console.log("Bro memencet jodohnya")
         }}>
             <ImageBackground
-                source={{ uri: ImageLink }}
+                source={{ uri: imageLink }}
                 style={styles.card}>
-                <Text style={styles.nameTitle}>{Name}</Text>
+                <Text style={styles.nameTitle}>{name}</Text>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={[styles.toggleContainer, styles.borderRight]} activeOpacity={1} onPress={() => {
-                        console.log('Bro Menolak')
+                        userService.removeFromMatch(useEmail, targetEmail)
+                        refresh(true)
                     }}>
                         <Image style={[styles.icon, styles.crossStyle]} source={require('../../../assets/Cross.png')}/>
                         <BlurView style={styles.blur} blurType="dark" blurAmount={10}/>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.toggleContainer, styles.borderLeft]} activeOpacity={1} onPress={() => {
-                        if (State === true) {
-                            console.log('Bro Gajadi Favoritekan 💔')
-                            setState(false)
-                        } else if (State === false) {
-                            console.log('Bro Men Favoritekan ❤️')
-                            setState(true)
-                        }
+                        userService.addToMatch(useEmail, targetEmail)
+                        refresh(true)
                     }}>
-                        <Image style={[styles.icon, styles.starStyle, { tintColor: State ? 'yellow' : 'white' }]} source={require('../../../assets/Star.png')}/>
+                        <Image style={[styles.icon, styles.starStyle]} source={show === "match" ? require('../../../assets/chatIcon.png') :require('../../../assets/check.png') }/>
                         <BlurView style={styles.blur} blurType="dark" blurAmount={10}/>
                     </TouchableOpacity>
                 </View>
@@ -37,14 +31,15 @@ export default function MyComponent({ ImageLink , Name, FavoriteState}: any) {
         </TouchableOpacity>
     )
 }
-// ini kita pengen cari width nya, tujuannya pengen pake semacam vw
+
 const screenWidth = Dimensions.get('window').width
 const styles = StyleSheet.create({
     container: {
         width: screenWidth * 0.385,
         height: screenWidth * 0.55,
         overflow: 'hidden',
-        borderRadius: screenWidth * 0.055
+        borderRadius: screenWidth * 0.055,
+        marginTop: 12
     },
     buttonContainer: {
         width: '100%',
@@ -64,7 +59,6 @@ const styles = StyleSheet.create({
     card: {
         width: "100%",
         height: "100%",
-        backgroundColor: "red",
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-end'

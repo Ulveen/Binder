@@ -5,7 +5,6 @@ import { createRequest } from '../utils/requestUtils';
 async function sendEmailOTP(email: string) {
     const url = '/auth/sendEmailOTP'
     const body = { email: email }
-    // console.log("Anttt")
     await createRequest(url, body)
 }
 
@@ -39,6 +38,7 @@ async function login(email: string, password: string) {
         email: email,
         password: password
     }
+    
     const result = await createRequest(url, body)
     const data = (await result.json()).data;
     return data
