@@ -47,7 +47,7 @@ export default function Match({ navigation }: any) {
     useEffect(() => {
         async function fetchData(type : string) {
             try {
-                const parthnerData = await userService.getParthner(email, type);
+                const parthnerData = await userService.getPartner(email, type);
                 setData(parthnerData)
                 setLoading(false)
                 setRefresh(false)

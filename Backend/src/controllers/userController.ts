@@ -7,14 +7,12 @@ import { getImageDownloadUrl, uploadImage } from "../utils/imageUtils";
 import { generateJWTToken } from "../utils/jwtUtils";
 import { differenceInYears, parseISO } from "date-fns";
 
-import { match } from "assert";
-
 async function getPartnerList(req: AuthRequest, res: Response) {
-    
+
     interface ExtendedUser extends User {
-        type : string;
+        type: string;
     }
-   
+
     const { email, type }: ExtendedUser = req.body
 
     const calculateAge = (dob: string): number => {
@@ -23,7 +21,7 @@ async function getPartnerList(req: AuthRequest, res: Response) {
     };
 
     try {
-        let parthner = null
+        let partner = null
 
         const userDocument = await firebaseAdmin.db.collection('users').doc(email).get()
 
@@ -31,28 +29,28 @@ async function getPartnerList(req: AuthRequest, res: Response) {
             res.status(404).send('User not found');
             return;
         }
-        
+
         const userData = userDocument.data() ?? {}
         if (type == "match") {
-            parthner = userData.match
+            partner = userData.match
         } else if (type == "requested") {
-            parthner = userData.request
-        } else { 
+            partner = userData.request
+        } else {
             res.status(400).json({ message: 'Unknown request type' });
             return;
         }
 
-        const MatchList = async  () => {
-             const matchPromises = parthner.map(async (email: any) => {
-                 const partnerDocument = await firebaseAdmin.db.collection('users').doc(email).get();
-                 const data =  partnerDocument.data() ?? {}
-                 return {
-                     email : email,
-                     name: data.name,
-                     kampus: data.campus,
-                     binusian: data.binusian,
-                     profilePict: data.profileImage,
-                     age: calculateAge(data.dob)
+        const MatchList = async () => {
+            const matchPromises = partner.map(async (email: any) => {
+                const partnerDocument = await firebaseAdmin.db.collection('users').doc(email).get();
+                const data = partnerDocument.data() ?? {}
+                return {
+                    email: email,
+                    name: data.name,
+                    kampus: data.campus,
+                    binusian: data.binusian,
+                    profilePict: data.profileImage,
+                    age: calculateAge(data.dob)
                 };
             });
 
@@ -144,7 +142,7 @@ async function addToMatch(req: AuthRequest, res: Response) {
     }
 }
 
-async function removeParthner(req: AuthRequest, res: Response) {
+async function removePartner(req: AuthRequest, res: Response) {
     const { email, remove } = req.body
     const userRef = firebaseAdmin.db.collection('users').doc(email);
 
@@ -160,8 +158,6 @@ async function removeParthner(req: AuthRequest, res: Response) {
     }
 }
 
-
-
 async function getUserMatchOption(req: AuthRequest, res: Response) {
     const user = req.user as User
     const { gender, campus, binusian, minAge, maxAge, offset = 0 } = req.body
@@ -174,6 +170,10 @@ async function getUserMatchOption(req: AuthRequest, res: Response) {
         .where('gender', '==', gender)
         .get()
 
+    const userData = (
+        await collection.doc(user.email).get()
+    ).data() as User
+
     try {
         const filteredMatchOptions = [] as User[]
         userMatchOptions.docs.forEach(doc => {
@@ -185,7 +185,7 @@ async function getUserMatchOption(req: AuthRequest, res: Response) {
                 data.binusian === binusian &&
                 age >= minAge &&
                 age <= maxAge &&
-                !user.swipe.get(doc.id)
+                !userData.swipe[doc.id]
             ) {
                 const { password, match, request, premium, ...filteredData } = data;
 
@@ -205,63 +205,108 @@ async function getUserMatchOption(req: AuthRequest, res: Response) {
     }
 }
 
-async function handleLike(user: User, to: string) {
-    const toUser = (await firebaseAdmin.db.collection('users').doc(to).get()).data() as User
-    if (user.likedBy.includes(to)) {
-        user.match.push(to)
-        toUser.match.push(user.email)
-        await Promise.all([
-            firebaseAdmin.db.collection('users').doc(user.email).update({
-                match: user.match
-            }),
-            firebaseAdmin.db.collection('users').doc(to).update({
-                match: toUser.match
-            })
-        ])
-    } else {
-        toUser.likedBy.push(user.email)
-        await firebaseAdmin.db.collection('users').doc(to).update({
-            likedBy: toUser.likedBy
+async function handleLike(user: User, to: User) {
+    if (user.likedBy.includes(to.email) || user.request.includes(to.email)) {
+        await user.ref.update({
+            likedBy: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(to.email),
+            request: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(to.email),
+            match: firebaseAdmin.admin.firestore.FieldValue.arrayUnion(to.email)
+        })
+        await to.ref.update({
+            match: firebaseAdmin.admin.firestore.FieldValue.arrayUnion(user.email)
+        })
+        return true
+    }
+    await to.ref.update({
+        likedBy: firebaseAdmin.admin.firestore.FieldValue.arrayUnion(user.email)
+    })
+    return false
+}
+
+async function handleSwipeLeft(user: User, to: User) {
+    if (user.request.includes(to.email)) {
+        await user.ref.update({
+            request: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(to.email)
+        })
+    }
+    else if (user.likedBy.includes(to.email)) {
+        await user.ref.update({
+            likedBy: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(to.email)
         })
     }
 }
 
-async function handleSwipeLeft(user: User, to: string) {
-
-
-}
-
-async function handleSwipeRight(user: User, to: string) {
-
-
+async function handleSwipeRight(user: User, to: User) {
+    if (user.likedBy.includes(to.email) || user.request.includes(to.email)) {
+        await user.ref.update({
+            likedBy: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(to.email),
+            request: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(to.email),
+            match: firebaseAdmin.admin.firestore.FieldValue.arrayUnion(to.email)
+        })
+        await to.ref.update({
+            match: firebaseAdmin.admin.firestore.FieldValue.arrayUnion(user.email)
+        })
+        return true
+    }
+    await to.ref.update({
+        request: firebaseAdmin.admin.firestore.FieldValue.arrayUnion(user.email)
+    })
+    return false
 }
 
 async function swipe(req: AuthRequest, res: Response) {
     const user = req.user as User
     const { to, type } = req.body
 
-    user.swipe.set(to, true)
-    await firebaseAdmin.db.collection('users').doc(user.email).update({
-        swipe: user.swipe
-    })
+    if (!to || !type) return res.status(400).send('Invalid request')
 
-    switch (type) {
-        case 'like':
-            await handleLike(user, to)
-            break;
-        case 'left':
-            await handleSwipeLeft(user, to)
-            break;
-        case 'right':
-            await handleSwipeRight(user, to)
-            break;
-        default:
-            res.status(400).send('Invalid swipe type')
-            break;
+    try {
+        const userDoc = await firebaseAdmin.db.collection('users').doc(user.email).get()
+        const userData = {
+            ...userDoc.data(),
+            ref: userDoc.ref,
+            email: user.email
+        } as User
+
+        const toDoc = await firebaseAdmin.db.collection('users').doc(to).get()
+        const toData = {
+            ...toDoc.data(),
+            ref: toDoc.ref,
+            email: to
+        } as User
+
+        await userData.ref.update({
+            swipe: {
+                ...userData.swipe,
+                [to]: true
+            }
+        })
+        switch (type) {
+            case 'like':
+                const isMatchLike = await handleLike(userData, toData)
+                res.status(200).send(isMatchLike ? 'match' : '')
+
+                break;
+            case 'left':
+                await handleSwipeLeft(userData, toData)
+                res.status(200).send('')
+
+                break;
+            case 'right':
+                const isMatchRight = await handleSwipeRight(userData, toData)
+                res.status(200).send(isMatchRight ? 'match' : '')
+
+                break;
+            default:
+                res.status(400).send('Invalid swipe type')
+                break;
+        }
     }
-
+    catch (error: any) {
+        res.status(500).send(error.message)
+    }
 }
 
-const userController = { getPartnerList, getUserMatchOption, updateUserData, addToMatch , removeParthner}
+const userController = { getPartnerList, getUserMatchOption, updateUserData, addToMatch, removePartner, swipe }
 
 export default userController;
