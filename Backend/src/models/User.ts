@@ -11,5 +11,6 @@ export default interface User {
     match: string[],
     request: string[],
     likedBy: string[],
-    swipe: Map<string, boolean>
+    swipe: any
+    ref: FirebaseFirestore.DocumentReference
 }

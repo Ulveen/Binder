@@ -36,7 +36,14 @@ export default function FilterModal({ setFilterModalOpen, filter, setFilter }: P
     }
 
     function handleConfirmUpdateFilter() {
-        setFilter({ gender, campus, binusian, minAge, maxAge, offset: 0 })
+        if (gender !== filter.gender ||
+            campus !== filter.campus ||
+            binusian !== filter.binusian ||
+            minAge !== filter.minAge ||
+            maxAge !== filter.maxAge
+        ) {
+            setFilter({ gender, campus, binusian, minAge, maxAge, offset: 0 })
+        }
         setFilterModalOpen(false)
     }
 

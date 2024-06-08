@@ -54,6 +54,33 @@ export default function Home({ navigation }: Props) {
         }))
     })
 
+    const { executeAsync: handleSwipeLeft } = useAsyncHandler(
+        async function () {
+            await userService.swipe(matchOptions[0].email, 'left');
+            setMatchOptions(prev => prev.slice(1));
+        }
+    )
+
+    const { executeAsync: handleSwipeRight } = useAsyncHandler(
+        async function () {
+            const isMatch = await userService.swipe(matchOptions[0].email, 'right');
+            if (isMatch) {
+
+            }
+            setMatchOptions(prev => prev.slice(1));
+        }
+    )
+
+    const { executeAsync: handleLike } = useAsyncHandler(
+        async function () {
+            const isMatch = await userService.swipe(matchOptions[0].email, 'like');
+            if (isMatch) {
+                
+            }
+            setMatchOptions(prev => prev.slice(1));
+        }
+    )
+
     function handleOpenFilterModal() {
         if (notificationModalOpen) return
         setFilterModelOpen(true);
@@ -99,18 +126,6 @@ export default function Home({ navigation }: Props) {
         setStyles(getStyles(theme));
     }, [theme])
 
-    const handleDislike = () => {
-
-    };
-
-    const handleLike = () => {
-
-    };
-
-    const handleFavorite = () => {
-
-    };
-
     return (
         <View style={styles.container}>
             {subscribePopupOpen &&
@@ -141,13 +156,13 @@ export default function Home({ navigation }: Props) {
             }
 
             <View style={styles.buttonRow}>
-                <TouchableOpacity onPress={handleDislike}>
+                <TouchableOpacity onPress={handleSwipeLeft}>
                     <Image source={require("../../assets/dislike.png")} style={styles.circleImage} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleLike}>
                     <Image source={require("../../assets/like.png")} style={styles.circleImage} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={handleFavorite}>
+                <TouchableOpacity onPress={handleSwipeRight}>
                     <Image source={require("../../assets/stars.png")} style={styles.circleImage} />
                 </TouchableOpacity>
             </View>

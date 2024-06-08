@@ -30,8 +30,8 @@ async function getUserMatchOption(filter: MatchFilter) {
     }
 }
 
-async function getParthner(email: string, type: string) {
-    const url = '/user/getParthner'
+async function getPartner(email: string, type: string) {
+    const url = '/user/getPartner'
     const body = {
         email: email,
         type: type
@@ -42,7 +42,7 @@ async function getParthner(email: string, type: string) {
 }
 
 async function removeFromMatch(email: string, deleted: string) {
-    const url = '/user/removeParthner'
+    const url = '/user/removePartner'
     const body = {
         email: email,
         remove: deleted
@@ -61,8 +61,20 @@ async function addToMatch(email: string, add: string) {
     const data = (await result.json()).match;
 }
 
+async function swipe(to: string, type: string) {
+    const url = '/user/swipe'
+    const body = {
+        to,
+        type
+    }
+    const result = await createRequestWithToken(url, body)
+    if(result.ok){
+        return await result.text() === 'match'
+    }
+    throw new Error("Error swiping")
+}
 
 
 export default function UserService() {
-    return { updateUserData, getUserMatchOption, getParthner, removeFromMatch, addToMatch }
+    return { updateUserData, getUserMatchOption, getPartner, removeFromMatch, addToMatch, swipe }
 }
