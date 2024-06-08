@@ -36,7 +36,7 @@ async function getPartnerList(req: AuthRequest, res: Response) {
         if (type == "match") {
             parthner = userData.match
         } else if (type == "requested") {
-            parthner = userData.request
+            parthner = userData.likedBy
         } else { 
             res.status(400).json({ message: 'Unknown request type' });
             return;
@@ -135,7 +135,7 @@ async function addToMatch(req: AuthRequest, res: Response) {
     try {
         await userRef.update({
             match: firebaseAdmin.admin.firestore.FieldValue.arrayUnion(addedEmail),
-            request: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(addedEmail)
+            likedBy: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(addedEmail)
         });
         res.status(200).send('Added email to match field successfully');
     } catch (error) {
@@ -151,7 +151,7 @@ async function removeParthner(req: AuthRequest, res: Response) {
     try {
         await userRef.update({
             match: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(remove),
-            request: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(remove)
+            likedBy: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(remove)
         });
         res.status(200).send('Email remove successfuly');
     } catch (error) {

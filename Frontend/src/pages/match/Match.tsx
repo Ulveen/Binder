@@ -1,13 +1,15 @@
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Button, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View , Image} from "react-native";
 import ProfileCards from "./components/ProfileCards";
 import useCustomTheme from "../../hooks/useCustomTheme";
 import CustomTheme from "../../models/CustomTheme";
 import LoadingComponent from "./components/LoadingCards";
 import useAuth from "../../hooks/useAuth";
 import UserService from "../../services/userService";
-import { useEffect, useState } from "react";
-import { ALERT_TYPE, AlertNotificationRoot, Dialog, Toast } from 'react-native-alert-notification';
-import ProfileModal from "./components/ProfileModal";
+import { useEffect, useRef, useState } from "react";
+import { ALERT_TYPE, AlertNotificationRoot, Dialog } from 'react-native-alert-notification';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import MessageService from "../../services/messageService";
+
 
 interface MatchData {
     email: string;
@@ -22,23 +24,36 @@ export default function Match({ navigation }: any) {
     const [show, setShow] = useState<string>("match")
     const [loading, setLoading] = useState(true)
     const [refresh, setRefresh] = useState(false)
+    const [close, setClose] = useState(false)
+    const [currentData, setCurrentData] = useState({
+        name: "",
+        email: "",
+        picture: "",
+        age: 0,
+        campus: "",
+        binusian: ""
+    })
     const [data, setData] = useState<MatchData[]>([])
+    const [selectedProfile, setSelectedProfile] = useState(false); 
     const { user } = useAuth()
     const {theme} = useCustomTheme()
     const styles = getStyles(theme)
     const userService = UserService()
+    const message = MessageService()
+    const refRBSheet = useRef(null);
+    
     if (!user) {
         throw new Error('User data is not available');
     } 
     const { email, premium } = user; 
     const toggleShow = () => {
+        setLoading(true)
         if (show == "match") {
             setShow('requested')
-            setLoading(true)
-            // if (premium == true) {
-            // } else {
-            //     return false
-            // }
+            if (premium == true) {
+            } else {
+                return false
+            }
         } else if (show == "requested") {
             setShow('match')
         }
@@ -57,70 +72,129 @@ export default function Match({ navigation }: any) {
         }
       fetchData(show)
     }, [show, refresh])
-    
+
+
     return (
         <AlertNotificationRoot>
-            <ScrollView contentContainerStyle={styles.scrollAblePage}>
-                <View style={styles.page}>
-                    <Text style={styles.pageTitle}>Matches</Text>
-                    <View style={styles.optionContainer}>
-                        <TouchableOpacity style={[styles.option, {
-                            backgroundColor : show === "match" ? "#E94057" : "#757575"
-                        }]} activeOpacity={1} onPress={toggleShow}>
-                            <Text style={styles.optionTitle}>Match</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.option, {
-                            backgroundColor: show === "match" ? "#ADAFBB" : "#E94057",
-                        }]} activeOpacity={1} onPress={() => {
-                            const toggledSuccessfully = toggleShow();
-                            if (!toggledSuccessfully) {
-                                Dialog.show({
-                                    type: ALERT_TYPE.WARNING,
-                                    title: 'You need to have premium account to use this feature',
-                                });
-                            }
-                        }}>
-                            <Text style={styles.optionTitle}>Like You</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={data.length > 0 ? styles.container : {
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: "100%",
-                        height: "100%",
-                    }}>
-                        {loading ? (
-                            <>
-                                <LoadingComponent />
-                                <LoadingComponent />
-                                <LoadingComponent />
-                                <LoadingComponent />
-                                <LoadingComponent />
-                                <LoadingComponent />
-                            </>
-                        ) : (
-                            data && data.length > 0 ? (
-                                data.map((item, index) => (
-                                    <ProfileCards
-                                    key={index}
-                                    imageLink={item.profilePict}
-                                    name={item.name}
-                                    navigation={navigation}
-                                    show={show}    
-                                    userService = {userService}   
-                                    useEmail={email}
-                                    targetEmail={item.email}  
-                                    refresh={setRefresh}    
-                                    />
-                                ))
+                <View style={{
+                    width: "100%",
+                    height: "100%",
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    zIndex: 100,
+                    backgroundColor: selectedProfile ? 'rgba(0, 0, 0, 0.5)' : 'transparent',
+                    pointerEvents: 'none'
+                }}/>
+                <ScrollView contentContainerStyle={styles.scrollAblePage}>
+                    <View style={styles.page}>
+                        <Text style={styles.pageTitle}>Matches</Text>
+                        <View style={styles.optionContainer}>
+                            <TouchableOpacity style={[styles.option, {
+                                backgroundColor : show === "match" ? "#E94057" : "#757575"
+                                }]} activeOpacity={1} onPress={toggleShow}>
+                                <Text style={styles.optionTitle}>Match</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.option, {
+                                backgroundColor: show === "match" ? "#ADAFBB" : "#E94057",
+                                }]} activeOpacity={1} onPress={() => {
+                                    const toggledSuccessfully = toggleShow();
+                                    if (!toggledSuccessfully) {
+                                        Dialog.show({
+                                            type: ALERT_TYPE.WARNING,
+                                            title: 'You need to have premium account to use this feature',
+                                            });
+                                            }
+                                            }}>
+                                <Text style={styles.optionTitle}>Like You</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.container}>
+                            {loading ? (
+                                <>
+                                    <LoadingComponent />
+                                    <LoadingComponent />
+                                    <LoadingComponent />
+                                    <LoadingComponent />
+                                    <LoadingComponent />
+                                    <LoadingComponent />
+                                </>
                             ) : (
-                                <Text>No match yet</Text>
-                            )
-                        )}
+                                data && data.length > 0 ? (
+                                    data.map((item, index) => (
+                                        <ProfileCards
+                                            closeController={{
+                                                close : close,
+                                                setClose : setClose
+                                            }}
+                                            item = {item}
+                                            key={index}
+                                            navigation={navigation}
+                                            show={show}
+                                            userService={userService}
+                                            useEmail={email}
+                                            refresh={setRefresh}
+                                            refrence={refRBSheet}
+                                            dataController={setCurrentData}
+                                            message={message}
+                                        />
+                                        ))
+                                        ) : (
+                                            <Text style={{
+                                                alignSelf: "center"
+                                                }}>No match yet</Text>
+                                                )
+                                                )}
                     </View>
                 </View>
             </ScrollView>
-            <ProfileModal/>
+            <RBSheet
+                ref={refRBSheet}
+                height={650}
+                draggable={true}
+                onOpen={() => {
+                    setSelectedProfile(true)
+                }}
+                onClose={() => {
+                    setSelectedProfile(false)
+                }}
+                customStyles={{
+                                wrapper: {
+                                    backgroundColor: 'transparent',
+                                    },
+                                draggableIcon: {
+                                    backgroundColor: '#000',
+                                },
+                                 container: {
+                                    backgroundColor: '#fff', 
+                                    borderRadius: 40, 
+                                },
+                            }}
+                            customModalProps={{
+                                animationType: 'slide',
+                                statusBarTranslucent: true,
+                            }}>
+                <View style={styles.detailContainer}>
+                    <Text style={[styles.detailTitle, { fontSize: 33,marginLeft: "5%"}]}>{currentData.name}</Text>
+                    <Image style={styles.profilePict} source={{ uri: currentData.picture }}/>
+                    <Text style={[styles.detailTitle, { fontSize: 25}]}>{`${currentData.name.substring(0, 10)}, ${currentData.age}`}</Text>
+                    <Text style={[styles.detailTitle, { fontSize: 17}]}>{`${currentData.campus}, Binnusian ${currentData.binusian}`}</Text>
+                    <TouchableOpacity style={styles.button} activeOpacity={1} onPress={() => {
+                         setClose(true)
+                         if (show == "requested") {
+                            userService.addToMatch(email, currentData.email)
+                            setRefresh(true)
+                        } else {
+                            message.createMessageChannel(currentData.email)
+                            navigation.navigate("Messages")
+                        }
+                    }}>
+                        <Text style={styles.buttonTitle}>{ show == "match" ? "Chat now !" : "Add to match" }</Text>
+                    </TouchableOpacity>
+                </View>
+            </RBSheet>
         </AlertNotificationRoot>
     )
 }
@@ -129,8 +203,8 @@ const screenWidth = Dimensions.get('window').width
 const getStyles = (theme: CustomTheme) => StyleSheet.create({
     scrollAblePage: {
         flexGrow: 1,
-    },
-    page: {
+        },
+        page: {
         flex: 1,
         backgroundColor: theme.background,
         alignItems: "center",
@@ -160,12 +234,61 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         marginTop: 4,
         justifyContent: 'space-between'
     },
+    contentContainer: {
+        flex: 1,
+        alignItems: 'center',
+  },
     pageTitle: {
         alignSelf: 'flex-start',
-        marginLeft : '10%',
         color: theme.text,
         fontSize: 37,
         fontFamily: "ABeeZee",
-        marginTop: 15
+        marginTop: 15,
+        marginLeft:"10%"
+    },
+    detailTitle: {
+        alignSelf: 'flex-start',
+        color: theme.text,
+        fontFamily: "ABeeZee",
+        marginTop: 10,
+    },
+    bottomSheetContainer: {
+        width: "100%",
+        height: "20%",
+        backgroundColor: "red"
+    },
+    detailContainer: {
+        display: "flex",
+        flexDirection: 'column',
+        alignSelf: 'center',
+        alignContent: 'center',
+        width: '85%',
+        height: '100%',
+    },
+    imageContainer: {
+        width: 100,
+        height: 100
+    },
+    profilePict: {
+        marginTop: 15,
+        width: "100%",
+        height: "60%",
+        resizeMode: 'cover',
+        alignSelf: 'center',
+        borderRadius: 10
+    },
+    button: {
+        width: "100%",
+        height: 55,
+        marginTop: 6,
+        backgroundColor: "#E94057",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius : 20
+    },
+    buttonTitle: {
+        color: "white",
+        fontFamily: "ABeeZee",
+        fontSize: 16,
     }
 })

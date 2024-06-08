@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export async function createRequest(url: string, body: Object, method?: string) {
+    //  const to = `${process.env.BACKEND_URL}${url}`
     const to = `http://192.168.68.105:4001${url}`
     const headers = { 'Content-Type': 'application/json' }
 

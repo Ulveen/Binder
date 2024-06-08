@@ -1,27 +1,48 @@
 import { BlurView } from "@react-native-community/blur";
 import { Dimensions, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import MessageService from "../../../services/messageService";
+import { useEffect } from "react";
 
-export default function profileCards({ imageLink , name, navigation, show, userService,useEmail,targetEmail, refresh}: any) {
+export default function profileCards({ closeController,message,item, navigation, show, userService, useEmail, refresh , refrence, dataController}: any) {
+    useEffect(() => {
+        if (closeController.close == true) {
+            closeController.setClose(false)
+            refrence.current.close()
+        }
+    }, [closeController.close])
+
     return (
         <TouchableOpacity style={styles.container} activeOpacity={1} onPress={() => {
-            // Function Sementara
-            console.log("Bro memencet jodohnya")
+            dataController({
+                name: item.name,
+                picture: item.profilePict,
+                email : item.email,
+                age: item.age,
+                campus: item.kampus,
+                binusian: item.binusian
+            })
+            refrence.current.open()
         }}>
             <ImageBackground
-                source={{ uri: imageLink }}
+                source={{ uri: item.profilePict }}
                 style={styles.card}>
-                <Text style={styles.nameTitle}>{name}</Text>
+                <Text style={styles.nameTitle}>{item.name}</Text>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={[styles.toggleContainer, styles.borderRight]} activeOpacity={1} onPress={() => {
-                        userService.removeFromMatch(useEmail, targetEmail)
+                        userService.removeFromMatch(useEmail, item.email)
                         refresh(true)
                     }}>
                         <Image style={[styles.icon, styles.crossStyle]} source={require('../../../assets/Cross.png')}/>
                         <BlurView style={styles.blur} blurType="dark" blurAmount={10}/>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.toggleContainer, styles.borderLeft]} activeOpacity={1} onPress={() => {
-                        userService.addToMatch(useEmail, targetEmail)
-                        refresh(true)
+                        if (show == "requested") {
+                            userService.addToMatch(useEmail, item.email)
+                            refresh(true)
+                        } else {
+                            message.createMessageChannel(item.email)
+                            navigation.navigate("Messages")
+                        }
                     }}>
                         <Image style={[styles.icon, styles.starStyle]} source={show === "match" ? require('../../../assets/chatIcon.png') :require('../../../assets/check.png') }/>
                         <BlurView style={styles.blur} blurType="dark" blurAmount={10}/>

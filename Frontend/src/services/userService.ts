@@ -49,7 +49,6 @@ async function removeFromMatch(email: string, deleted: string) {
     }
     const result = await createRequestWithToken(url, body)
     const data = (await result.json()).match;
-    return data
 }
 
 async function addToMatch(email: string, add: string) {
@@ -60,7 +59,6 @@ async function addToMatch(email: string, add: string) {
     }
     const result = await createRequestWithToken(url, body)
     const data = (await result.json()).match;
-    return data
 }
 
 
