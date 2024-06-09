@@ -7,6 +7,7 @@ import VideoCall from "../pages/videoCall";
 import Messages from "../pages/messages";
 import EditProfile from "../pages/editprofile";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Premium from "../pages/premium/Premium";
 
 const BottomTab = createBottomTabNavigator();
 const ProfileNativeStack = createNativeStackNavigator();
@@ -16,6 +17,7 @@ function ProfileStack() {
         <ProfileNativeStack.Navigator initialRouteName="Profile">
             <ProfileNativeStack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
             <ProfileNativeStack.Screen name="EditProfile" component={EditProfile} options={{ headerShown: false }} />
+            <ProfileNativeStack.Screen name="Premium" component={Premium} options={{ headerShown: false }} />
         </ProfileNativeStack.Navigator>
     )
 }

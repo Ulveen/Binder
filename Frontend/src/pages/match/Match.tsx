@@ -10,7 +10,6 @@ import { ALERT_TYPE, AlertNotificationRoot, Dialog } from 'react-native-alert-no
 import RBSheet from 'react-native-raw-bottom-sheet';
 import MessageService from "../../services/messageService";
 
-
 interface MatchData {
     email: string;
     profilePict: string;
@@ -47,16 +46,16 @@ export default function Match({ navigation }: any) {
     } 
     const { email, premium } = user; 
     const toggleShow = () => {
-        setLoading(true)
         if (show == "match") {
-            setShow('requested')
             if (premium == true) {
+                setShow('requested')
             } else {
                 return false
             }
         } else if (show == "requested") {
             setShow('match')
         }
+        setLoading(true)
         return true
     }
     useEffect(() => {

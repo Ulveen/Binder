@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { BackHandler, View, TouchableOpacity, Image, Text, StyleSheet } from "react-native";
+import { View, TouchableOpacity, Image, Text, StyleSheet } from "react-native";
 import CustomButton from "../../components/CustomButton";
 import useAuth from "../../hooks/useAuth";
 import useCustomTheme from "../../hooks/useCustomTheme";
@@ -22,6 +21,10 @@ export default function Profile({ navigation }: Props) {
         navigation.navigate('EditProfile');
     };
 
+    const upgradeAccount = () => {
+        navigation.navigate('Premium');
+    };
+
     return (
         <View style={styles.container}>
             <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
@@ -36,7 +39,7 @@ export default function Profile({ navigation }: Props) {
             <CustomButton style={[styles.button]} onPress={logout}>
                 <Text style={[styles.buttonText, { color: 'white' }]}>Logout</Text>
             </CustomButton>
-            <TouchableOpacity style={styles.upgradeButton}>
+            <TouchableOpacity style={styles.upgradeButton} onPress={upgradeAccount}>
                 <Text style={styles.upgradeText}>Upgrade to Premium</Text>
             </TouchableOpacity>
         </View>

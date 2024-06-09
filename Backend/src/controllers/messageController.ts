@@ -4,7 +4,7 @@ import firebaseAdmin from "../firebase/firebase";
 import { addNotification } from "../utils/notificationUtils";
 
 async function createMessageChannel(req: AuthRequest, res: Response) {
-    const { to }: { to: string } = req.body()
+    const { to }: { to: string } = req.body
     const user = req.user
 
     const collectionRef = firebaseAdmin.db.collection('messages')

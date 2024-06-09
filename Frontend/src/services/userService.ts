@@ -74,7 +74,6 @@ async function swipe(to: string, type: string) {
     throw new Error("Error swiping")
 }
 
-
 export default function UserService() {
     return { updateUserData, getUserMatchOption, getPartner, removeFromMatch, addToMatch, swipe }
 }

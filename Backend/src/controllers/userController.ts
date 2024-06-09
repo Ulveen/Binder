@@ -310,6 +310,30 @@ async function swipe(req: AuthRequest, res: Response) {
     }
 }
 
+// async function getUserData(req: AuthRequest, res: Response) {
+//     const user = req.user as User;
+//     const { to, type } = req.body
+
+//     if (!to || !type) return res.status(400).send('Invalid request')
+
+//     try {
+//         const userDoc = await firebaseAdmin.db.collection('users').doc(user.email).get();
+
+//         if (!userDoc.exists) {
+//             res.status(404).send('User not found');
+//             return;
+//         }
+
+//         const userData = userDoc.data() as User;
+
+//         res.status(200).json({
+//             user: userData
+//         });
+//     } catch (error: any) {
+//         res.status(500).send(error.message);
+//     }
+// }
+
 const userController = { getPartnerList, getUserMatchOption, updateUserData, addToMatch, removePartner, swipe }
 
 export default userController;
