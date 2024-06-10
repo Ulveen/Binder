@@ -5,6 +5,7 @@ import User from '../models/User';
 import { comparePassword, encryptPassword } from '../utils/bcryptUtils';
 import { getImageDownloadUrl, uploadImage } from '../utils/imageUtils';
 import { decodeJWTToken, generateJWTToken } from '../utils/jwtUtils';
+import { filterUserData } from '../utils/userUtils';
 
 async function sendEmailOTP(req: Request, res: Response) {
     const { email }: { email: string } = req.body
@@ -110,11 +111,12 @@ async function register(req: Request, res: Response) {
             profileImage: profileImageUrl,
             match: [],
             request: [],
-            swipe: new Map<string, boolean>(),
+            likedBy: [],
+            swipe: {},
             premium: false,
             favorite: [],
-            swipeAmount: 0,
-            swipeDate: new Date()
+            swipeCount: 0,
+            swipeDate: new Date().toISOString()
         }
 
         await firebaseAdmin.db.collection('users').doc(email).set(userData)
@@ -153,7 +155,7 @@ async function login(req: Request, res: Response) {
         }
 
         const token = generateJWTToken(email)
-        const { likedBy, match, request, swipe,  ...temp } = user
+        const temp = filterUserData(user)
 
         res.status(200).json({ data: { user: temp, token: token } })
 
@@ -183,7 +185,7 @@ async function verifyToken(req: Request, res: Response) {
             ...userSnapshot.data(),
             email: email
         } as User
-        const { likedBy, match, request, swipe,  ...temp } = user
+        const temp = filterUserData(user)
         res.status(200).json({ data: temp })
     } catch (error: any) {
         res.status(401).send(error.message)
