@@ -2,7 +2,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export async function createRequest(url: string, body: Object, method?: string) {
     const baseUrl = process.env.BACKEND_URL
-    const to = `${baseUrl}${url}`
     const headers = { 'Content-Type': 'application/json' }
 
     const result = await fetch(to, {
@@ -20,7 +19,6 @@ export async function createRequest(url: string, body: Object, method?: string) 
 
 export async function createRequestWithToken(url: string, body: Object, method?: string) {
     const baseUrl = process.env.BACKEND_URL
-    const to = `${baseUrl}${url}`
     const token = await AsyncStorage.getItem('authorization') as string
     const headers = {
         'Content-Type': 'application/json',

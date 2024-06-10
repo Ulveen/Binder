@@ -323,8 +323,16 @@ async function swipe(req: AuthRequest, res: Response) {
 //             res.status(404).send('User not found');
 //             return;
 //         }
+async function getPremium(req: AuthRequest, res: Response) {
+    const user = req.user as User;
+    const {email} = req.body
+    try {
 
 //         const userData = userDoc.data() as User;
+        if (!userDoc.exists) {
+            res.status(404).send('User not found');
+            return;
+        }
 
 //         res.status(200).json({
 //             user: userData
@@ -333,7 +341,17 @@ async function swipe(req: AuthRequest, res: Response) {
 //         res.status(500).send(error.message);
 //     }
 // }
+        const userData = userDoc.data() as User;
+    
+        res.status(200).json({
+            premiumStatus: userData.premium
+        });
+    } catch (error: any) {
+        res.status(500).send(error.message);
+    }
+}
 
 const userController = { getPartnerList, getUserMatchOption, updateUserData, addToMatch, removePartner, swipe }
+const userController = { getPartnerList, getUserMatchOption, updateUserData, addToMatch, removePartner, swipe, getPremium }
 
 export default userController;

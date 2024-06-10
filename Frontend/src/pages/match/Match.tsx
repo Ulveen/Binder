@@ -45,9 +45,23 @@ export default function Match({ navigation }: any) {
         throw new Error('User data is not available');
     } 
     const { email, premium } = user; 
+
+    const { email } = user; 
+    const [premium, setPremium] = useState(false)
+    useEffect(() => {
+        const getPremium = async () => {
+            try {
+                setPremium(await userService.getPremium(email)) 
+          } catch (error) {
+                
+            }
+        }
+
+        getPremium()
+    },[])
+
     const toggleShow = () => {
         if (show == "match") {
-            if (premium == true) {
                 setShow('requested')
             } else {
                 return false
