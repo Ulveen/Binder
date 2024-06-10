@@ -46,22 +46,10 @@ export default function Match({ navigation }: any) {
     }
 
     const { email } = user;
-    const [premium, setPremium] = useState(false)
-    useEffect(() => {
-        const getPremium = async () => {
-            try {
-                setPremium(await userService.getPremium(email))
-            } catch (error) {
-
-            }
-        }
-
-        getPremium()
-    }, [])
 
     const toggleShow = () => {
         if (show == "match") {
-            if (premium == true) {
+            if (user.premium == true) {
                 setShow('requested')
             } else {
                 return false

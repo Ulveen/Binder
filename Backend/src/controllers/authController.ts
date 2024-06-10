@@ -19,8 +19,8 @@ async function sendEmailOTP(req: Request, res: Response) {
     }
 
     try {
-        const userSnapshot  = await firebaseAdmin.db.collection('users').doc(email).get()
-        if(userSnapshot.exists) {
+        const userSnapshot = await firebaseAdmin.db.collection('users').doc(email).get()
+        if (userSnapshot.exists) {
             res.status(400).send('Email already registered')
             return
         }
@@ -123,7 +123,7 @@ async function register(req: Request, res: Response) {
 
     } catch (error: any) {
         console.log(error);
-        
+
         res.status(500).send(error.message)
     }
 }
@@ -147,14 +147,15 @@ async function login(req: Request, res: Response) {
         let user = userSnapshot.data()! as User
         user.email = email
 
-        if(!comparePassword(password, user.password)) {
+        if (!comparePassword(password, user.password)) {
             res.status(401).send('Invalid password')
             return
         }
 
         const token = generateJWTToken(email)
+        const { likedBy, match, request, swipe,  ...temp } = user
 
-        res.status(200).json({ data: { user: user, token: token } })
+        res.status(200).json({ data: { user: temp, token: token } })
 
     } catch (error: any) {
         if (error.code === 'auth/user-not-found') {
@@ -181,8 +182,9 @@ async function verifyToken(req: Request, res: Response) {
         const user = {
             ...userSnapshot.data(),
             email: email
-        }
-        res.status(200).json({ data: user })
+        } as User
+        const { likedBy, match, request, swipe,  ...temp } = user
+        res.status(200).json({ data: temp })
     } catch (error: any) {
         res.status(401).send(error.message)
     }

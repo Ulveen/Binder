@@ -7,6 +7,7 @@ interface AuthContextProps {
     user: User | undefined | null
     login: (data: { user: User, token: string }) => void
     logout: () => void
+    setUser: React.Dispatch<React.SetStateAction<User | null | undefined>>
 }
 
 export const AuthContext = createContext({} as AuthContextProps)
@@ -44,7 +45,7 @@ export default function AuthProvider({ children }: { children: JSX.Element }) {
     }, [])
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, login, logout, setUser }}>
             {children}
         </AuthContext.Provider>
     )

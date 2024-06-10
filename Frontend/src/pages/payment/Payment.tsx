@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import useCustomTheme from "../../hooks/useCustomTheme";
 import CustomTheme from "../../models/CustomTheme";
 import UserService from "../../services/userService";
+import useAuth from "../../hooks/useAuth";
+import User from "../../models/User";
 
 interface Props {
     navigation: any;
@@ -11,6 +13,7 @@ interface Props {
 const userService = UserService()
 
 export default function Payment({ navigation }: Props) {
+    const { setUser } = useAuth()
     const { theme } = useCustomTheme();
     const styles = getStyles(theme);
 
@@ -29,10 +32,17 @@ export default function Payment({ navigation }: Props) {
             Alert.alert("Error", "Please select a payment method before confirming.");
             return;
         }
-        
+
         await userService.updateUserData({
             premium: true
         })
+
+        setUser(
+            (user) => ({
+                ...user,
+                premium: true
+            } as User)
+        )
 
         Alert.alert("Success", "Upgrade confirmed", [
             {
