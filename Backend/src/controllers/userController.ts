@@ -6,7 +6,7 @@ import { encryptPassword } from "../utils/bcryptUtils";
 import { getImageDownloadUrl, uploadImage } from "../utils/imageUtils";
 import { generateJWTToken } from "../utils/jwtUtils";
 import { differenceInYears, parseISO } from "date-fns";
-import { addNotification } from "../utils/notificationUtils";
+import NotificationController from "./notificationController";
 
 async function getPartnerList(req: AuthRequest, res: Response) {
 
@@ -200,7 +200,7 @@ async function handleLike(user: User, to: User) {
         await to.ref.update({
             match: firebaseAdmin.admin.firestore.FieldValue.arrayUnion(user.email)
         })
-        await addNotification(to.email, `Congrats! You matched with ${user.name}`!)
+        await NotificationController.addNotification(to.email, `Congrats! You matched with ${user.name}`!)
         return true
     }
     await to.ref.update({
@@ -232,7 +232,7 @@ async function handleSwipeRight(user: User, to: User) {
         await to.ref.update({
             match: firebaseAdmin.admin.firestore.FieldValue.arrayUnion(user.email)
         })
-        await addNotification(to.email, `Congrats! You matched with ${user.name}!`)
+        await NotificationController.addNotification(to.email, `Congrats! You matched with ${user.name}!`)
         return true
     }
     await to.ref.update({

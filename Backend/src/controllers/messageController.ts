@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/authMiddleware";
 import firebaseAdmin from "../firebase/firebase";
-import { addNotification } from "../utils/notificationUtils";
+import NotificationController from "./notificationController";
 
 async function createMessageChannel(req: AuthRequest, res: Response) {
     const { to }: { to: string } = req.body
@@ -63,7 +63,7 @@ async function sendMessage(req: AuthRequest, res: Response) {
         })
 
         await Promise.all([sendMessagePromise, updateLastMessagePromise])
-        await addNotification(email, `New message from ${req.user?.name}`)
+        await NotificationController.addNotification(email, `New message from ${req.user?.name}`)
 
         res.status(200).send('Message sent')
     } catch (error: any) {
