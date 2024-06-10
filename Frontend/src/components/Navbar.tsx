@@ -8,7 +8,9 @@ import Messages from "../pages/messages";
 import EditProfile from "../pages/editprofile";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Premium from "../pages/premium/Premium";
+import Payment from "../pages/payment/Payment";
 
+const WrapperStack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
 const ProfileNativeStack = createNativeStackNavigator();
 
@@ -17,12 +19,11 @@ function ProfileStack() {
         <ProfileNativeStack.Navigator initialRouteName="Profile">
             <ProfileNativeStack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
             <ProfileNativeStack.Screen name="EditProfile" component={EditProfile} options={{ headerShown: false }} />
-            <ProfileNativeStack.Screen name="Premium" component={Premium} options={{ headerShown: false }} />
         </ProfileNativeStack.Navigator>
     )
 }
 
-export default function Navbar() {
+function TabNav() {
     return (
         <BottomTab.Navigator
             screenOptions={({ route }) => ({
@@ -68,5 +69,15 @@ export default function Navbar() {
                 ProfileStack
             } options={{ headerShown: false }} />
         </BottomTab.Navigator>
+    )
+}
+
+export default function Navbar () {
+    return (
+        <WrapperStack.Navigator initialRouteName="Tab">
+            <WrapperStack.Screen name="Tab" component={TabNav} options={{headerShown: false}} />
+            <WrapperStack.Screen name="Premium" component={Premium} options={{ headerShown: false }} />
+            <WrapperStack.Screen name="Payment" component={Payment} options={{ headerShown: false }} />
+        </WrapperStack.Navigator>
     );
 }

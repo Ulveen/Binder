@@ -40,6 +40,8 @@ export default function profileCards({ closeController,message,item, navigation,
                             userService.addToMatch(useEmail, item.email)
                             refresh(true)
                         } else {
+                            console.log(item.email);
+                            
                             message.createMessageChannel(item.email)
                             navigation.navigate("Messages")
                         }

@@ -23,7 +23,7 @@ async function createMessageChannel(to: string) {
         to
     }
 
-    const response = await createRequestWithToken(url, body)
+    await createRequestWithToken(url, body)
 }
 
 export default function MessageService() {

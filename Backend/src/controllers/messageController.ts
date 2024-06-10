@@ -11,10 +11,11 @@ async function createMessageChannel(req: AuthRequest, res: Response) {
 
     const checkDoc = await collectionRef
         .where('users', 'array-contains', req.user?.email)
-        .where('users', 'array-contains', to)
         .get()
 
-    if(!checkDoc.empty) {
+    const filteredCheckoc = checkDoc.docs.filter(doc => doc.data().users.includes(to))
+
+    if(filteredCheckoc.length > 0) {
         res.status(200).json({data: 'Chat already exists'})
         return
     }

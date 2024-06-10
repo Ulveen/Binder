@@ -117,7 +117,6 @@ async function register(req: Request, res: Response) {
             swipeDate: new Date()
         }
 
-
         await firebaseAdmin.db.collection('users').doc(email).set(userData)
 
         res.status(200).json({ data: 'User registered' })
@@ -145,7 +144,7 @@ async function login(req: Request, res: Response) {
             return
         }
 
-        const user = userSnapshot.data()! as User
+        let user = userSnapshot.data()! as User
         user.email = email
 
         if(!comparePassword(password, user.password)) {
@@ -153,7 +152,7 @@ async function login(req: Request, res: Response) {
             return
         }
 
-        const token = generateJWTToken(user)
+        const token = generateJWTToken(email)
 
         res.status(200).json({ data: { user: user, token: token } })
 
@@ -177,7 +176,12 @@ async function verifyToken(req: Request, res: Response) {
     }
 
     try {
-        const user = decodeJWTToken(token)
+        const email = decodeJWTToken(token)
+        const userSnapshot = await firebaseAdmin.db.collection('users').doc(email).get()
+        const user = {
+            ...userSnapshot.data(),
+            email: email
+        }
         res.status(200).json({ data: user })
     } catch (error: any) {
         res.status(401).send(error.message)

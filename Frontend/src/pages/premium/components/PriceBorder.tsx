@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import CustomTheme from "../../../models/CustomTheme";
 import useCustomTheme from "../../../hooks/useCustomTheme";
 
-export default function PriceBorder({Int, Price}: any){
+export default function PriceBorder({Int, Price, navigation}: any){
     const { theme } = useCustomTheme();
     const styles = getStyles(theme);
 
@@ -14,7 +14,7 @@ export default function PriceBorder({Int, Price}: any){
                 <Text style={styles.text}><Text style={styles.bullet}>●</Text> Rewind feature</Text>
                 <Text style={styles.text}><Text style={styles.bullet}>●</Text> Add to favorites feature</Text>
                 <Text style={styles.text}><Text style={styles.bullet}>●</Text> Cancel anytime</Text>
-                <TouchableOpacity style={styles.borderMoney}>
+                <TouchableOpacity style={styles.borderMoney} onPress={() => navigation.navigate('Payment')}>
                     <Text style={styles.money}>IDR{Price}.000</Text>
                 </TouchableOpacity>
             </View>

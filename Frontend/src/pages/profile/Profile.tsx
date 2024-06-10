@@ -39,9 +39,11 @@ export default function Profile({ navigation }: Props) {
             <CustomButton style={[styles.button]} onPress={logout}>
                 <Text style={[styles.buttonText, { color: 'white' }]}>Logout</Text>
             </CustomButton>
-            <TouchableOpacity style={styles.upgradeButton} onPress={upgradeAccount}>
-                <Text style={styles.upgradeText}>Upgrade to Premium</Text>
-            </TouchableOpacity>
+            {!user?.premium &&
+                <TouchableOpacity style={styles.upgradeButton} onPress={upgradeAccount}>
+                    <Text style={styles.upgradeText}>Upgrade to Premium</Text>
+                </TouchableOpacity>
+            }
         </View>
     );
 }
