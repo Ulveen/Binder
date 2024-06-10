@@ -8,18 +8,21 @@ import NotificationModal from "./components/NotificationModal";
 import CustomTheme from "../../models/CustomTheme";
 import useCustomTheme from "../../hooks/useCustomTheme";
 import FilterModal from "./components/FilterModal";
-import SubscribePopup from "./components/SubscribePopup";
+import SubscribeModal from "../../components/SubscribeModal";
 import useAsyncHandler from "../../hooks/useAsyncHandler";
 import MatchLoadingSkeleton from "./components/MatchLoadingSkeleton";
 import MatchProfileCard from "./components/MatchProfileCard";
 import User from "../../models/User";
 import EmptyProfileCard from "./components/EmptyProfileCard";
+import ToastService from "../../services/toastService";
+import SwipeLimitModal from "../../components/SwipeLimitModal";
 
 interface Props {
     navigation: any;
 }
 
 const userService = UserService();
+const toastService = ToastService();
 
 export default function Home({ navigation }: Props) {
     const { user } = useAuth();
@@ -40,7 +43,8 @@ export default function Home({ navigation }: Props) {
     })
 
     const [matchOptions, setMatchOptions] = useState<User[]>([])
-    const [subscribePopupOpen, setSubscribePopupOpen] = useState(false);
+    const [swipeLimitModalOpen, setSwipeLimitModalOpen] = useState(false);
+    const [subscribeModalOpen, setSubscribeModalOpen] = useState(false);
 
     const { executeAsync: getUserMatchOption,
         loading: isUserMatchOptionsLoading
@@ -56,15 +60,31 @@ export default function Home({ navigation }: Props) {
 
     const { executeAsync: handleSwipeLeft } = useAsyncHandler(
         async function () {
-            await userService.swipe(matchOptions[0].email, 'left');
+            if (matchOptions.length === 0) {
+                toastService.info('There are currently no users available');
+                return
+            }
+            const result = await userService.swipe(matchOptions[0].email, 'left');
+            if (result === 'limit') {
+                setSwipeLimitModalOpen(true);
+                return
+            }
             setMatchOptions(prev => prev.slice(1));
         }
     )
 
     const { executeAsync: handleSwipeRight } = useAsyncHandler(
         async function () {
-            const isMatch = await userService.swipe(matchOptions[0].email, 'right');
-            if (isMatch) {
+            if (matchOptions.length === 0) {
+                toastService.info('There are currently no users available');
+                return
+            }
+            const result = await userService.swipe(matchOptions[0].email, 'right');
+            if (result === 'limit') {
+                setSwipeLimitModalOpen(true);
+                return;
+            }
+            if (result === 'match') {
 
             }
             setMatchOptions(prev => prev.slice(1));
@@ -73,9 +93,17 @@ export default function Home({ navigation }: Props) {
 
     const { executeAsync: handleLike } = useAsyncHandler(
         async function () {
-            const isMatch = await userService.swipe(matchOptions[0].email, 'like');
-            if (isMatch) {
-                
+            if (matchOptions.length === 0) {
+                toastService.info('There are currently no users available');
+                return
+            }
+            const result = await userService.swipe(matchOptions[0].email, 'like');
+            if (result === 'limit') {
+                setSwipeLimitModalOpen(true);
+                return
+            }
+            if (result === 'match') {
+
             }
             setMatchOptions(prev => prev.slice(1));
         }
@@ -91,8 +119,8 @@ export default function Home({ navigation }: Props) {
         setNotificationModelOpen(true);
     }
 
-    function handleShowSubscribePopup() {
-        setSubscribePopupOpen(true);
+    function handleShowSubscribeModal() {
+        setSubscribeModalOpen(true);
     }
 
     useEffect(() => {
@@ -128,8 +156,11 @@ export default function Home({ navigation }: Props) {
 
     return (
         <View style={styles.container}>
-            {subscribePopupOpen &&
-                <SubscribePopup />
+            {swipeLimitModalOpen &&
+                <SwipeLimitModal setSwipeLimitModalOpen={setSwipeLimitModalOpen} />
+            }
+            {subscribeModalOpen &&
+                <SubscribeModal setSubscribeModalOpen={setSubscribeModalOpen} />
             }
             {filterModalOpen &&
                 <FilterModal setFilterModalOpen={setFilterModelOpen} filter={filter} setFilter={setFilter} />

@@ -69,7 +69,7 @@ async function swipe(to: string, type: string) {
     }
     const result = await createRequestWithToken(url, body)
     if(result.ok){
-        return await result.text() === 'match'
+        return await result.text()
     }
     throw new Error("Error swiping")
 }

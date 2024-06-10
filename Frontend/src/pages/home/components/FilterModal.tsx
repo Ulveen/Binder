@@ -7,6 +7,7 @@ import CustomButton from "../../../components/CustomButton";
 import DropDownPicker from "react-native-dropdown-picker";
 import { campusOptions } from "../../../models/Campus";
 import MultiSlider from "@ptomasroos/react-native-multi-slider";
+import ModalWrapper from "../../../components/ModalWrapper";
 
 interface Props {
     setFilterModalOpen: (val: boolean) => void
@@ -48,88 +49,78 @@ export default function FilterModal({ setFilterModalOpen, filter, setFilter }: P
     }
 
     return (
-        <Modal animationType="slide"
-            transparent={true}
-            visible={true}
-            onRequestClose={handleCloseModal}>
-            <TouchableWithoutFeedback onPress={handleCloseModal}>
-                <View style={styles.modalContainer}>
-                    <TouchableWithoutFeedback>
-                        <View style={styles.modalContent}>
+        <ModalWrapper handleCloseModal={handleCloseModal}>
+            <>
+                <Text style={styles.titleText}>
+                    Filter
+                </Text>
 
-                            <Text style={styles.titleText}>
-                                Filter
-                            </Text>
-
-                            <Text style={styles.subtitleText}>
-                                Interested in
-                            </Text>
-                            <View style={styles.genderToggleContainer}>
-                                {['Male', 'Female'].map((genderOption, index) => {
-                                    return genderOption.toLowerCase() === gender.toLowerCase() ?
-                                        <CustomButton key={index}
-                                            onPress={() => setGender(genderOption)}
-                                            style={[styles.genderToggleButton, styles.genderToggleButtonActive]}>
-                                            <Text style={[styles.genderToggleText, styles.genderToggleTextActive]}>
-                                                {genderOption}
-                                            </Text>
-                                        </CustomButton> :
-                                        <CustomButton key={index}
-                                            onPress={() => setGender(genderOption)}
-                                            style={styles.genderToggleButton}>
-                                            <Text style={styles.genderToggleText}>
-                                                {genderOption}
-                                            </Text>
-                                        </CustomButton>
-                                })}
-                            </View>
-                            <Text style={styles.subtitleText}>
-                                Campus Area
-                            </Text>
-                            <DropDownPicker style={styles.dropDownPicker}
-                                textStyle={styles.dropDownPickerText}
-                                containerStyle={{ width: '95%' }}
-                                value={campus}
-                                setValue={setCampus}
-                                items={campusOptions}
-                                open={isOpenCampusPicker}
-                                setOpen={setIsOpenCampusPicker} />
-                            <Text style={styles.subtitleText}>
-                                Binusian
-                            </Text>
-                            <TextInput style={styles.input} placeholder="Binusian" value={binusian} onChangeText={setBinusian} />
-                            <View style={styles.ageTextContainer}>
-                                <Text style={styles.subtitleText}>
-                                    Age
+                <Text style={styles.subtitleText}>
+                    Interested in
+                </Text>
+                <View style={styles.genderToggleContainer}>
+                    {['Male', 'Female'].map((genderOption, index) => {
+                        return genderOption.toLowerCase() === gender.toLowerCase() ?
+                            <CustomButton key={index}
+                                onPress={() => setGender(genderOption)}
+                                style={[styles.genderToggleButton, styles.genderToggleButtonActive]}>
+                                <Text style={[styles.genderToggleText, styles.genderToggleTextActive]}>
+                                    {genderOption}
                                 </Text>
-                                <Text style={styles.subtitleText}>
-                                    {minAge} - {maxAge}
-                                </Text>
-                            </View>
-                            <View style={styles.sliderContainer}>
-                                <MultiSlider
-                                    trackStyle={styles.track}
-                                    selectedStyle={styles.selectedTrack}
-                                    markerStyle={styles.marker}
-                                    min={17} max={118} step={1}
-                                    allowOverlap={true}
-                                    values={[minAge, maxAge]}
-                                    onValuesChange={(values) => {
-                                        setMinAge(values[0])
-                                        setMaxAge(values[1])
-                                    }}
-                                />
-                            </View>
-                            <CustomButton style={styles.confirmButton} onPress={handleConfirmUpdateFilter}>
-                                <Text style={styles.confirmButtonText}>
-                                    Continue
+                            </CustomButton> :
+                            <CustomButton key={index}
+                                onPress={() => setGender(genderOption)}
+                                style={styles.genderToggleButton}>
+                                <Text style={styles.genderToggleText}>
+                                    {genderOption}
                                 </Text>
                             </CustomButton>
-                        </View>
-                    </TouchableWithoutFeedback>
+                    })}
                 </View>
-            </TouchableWithoutFeedback>
-        </Modal>
+                <Text style={styles.subtitleText}>
+                    Campus Area
+                </Text>
+                <DropDownPicker style={styles.dropDownPicker}
+                    textStyle={styles.dropDownPickerText}
+                    containerStyle={{ width: '95%' }}
+                    value={campus}
+                    setValue={setCampus}
+                    items={campusOptions}
+                    open={isOpenCampusPicker}
+                    setOpen={setIsOpenCampusPicker} />
+                <Text style={styles.subtitleText}>
+                    Binusian
+                </Text>
+                <TextInput style={styles.input} placeholder="Binusian" value={binusian} onChangeText={setBinusian} />
+                <View style={styles.ageTextContainer}>
+                    <Text style={styles.subtitleText}>
+                        Age
+                    </Text>
+                    <Text style={styles.subtitleText}>
+                        {minAge} - {maxAge}
+                    </Text>
+                </View>
+                <View style={styles.sliderContainer}>
+                    <MultiSlider
+                        trackStyle={styles.track}
+                        selectedStyle={styles.selectedTrack}
+                        markerStyle={styles.marker}
+                        min={17} max={118} step={1}
+                        allowOverlap={true}
+                        values={[minAge, maxAge]}
+                        onValuesChange={(values) => {
+                            setMinAge(values[0])
+                            setMaxAge(values[1])
+                        }}
+                    />
+                </View>
+                <CustomButton style={styles.confirmButton} onPress={handleConfirmUpdateFilter}>
+                    <Text style={styles.confirmButtonText}>
+                        Continue
+                    </Text>
+                </CustomButton>
+            </>
+        </ModalWrapper >
     )
 }
 

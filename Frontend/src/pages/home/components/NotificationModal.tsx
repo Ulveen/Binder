@@ -6,6 +6,7 @@ import NotificationCard from "./NotificationCard";
 import useAsyncHandler from "../../../hooks/useAsyncHandler";
 import NotificationService from "../../../services/notificationService";
 import CustomButton from "../../../components/CustomButton";
+import ModalWrapper from "../../../components/ModalWrapper";
 
 interface Props {
     setNotificationModelOpen: (val: boolean) => void
@@ -28,42 +29,33 @@ export default function NotificationModal({ setNotificationModelOpen, notificati
     })
 
     return (
-        <Modal animationType="slide"
-            transparent={true}
-            visible={true}
-            onRequestClose={handleCloseModal}>
-            <TouchableWithoutFeedback onPress={handleCloseModal}>
-                <View style={styles.modalContainer}>
-                    <TouchableWithoutFeedback>
-                        <View style={styles.modalContent}>
-                            <View style={styles.notificationHeaderContainer}>
-                                <Text style={styles.notificationTitle}>
-                                    Notifications
-                                </Text>
-                                <CustomButton style={styles.markAllAsReadButton} onPress={handleMarkAllAsRead}>
-                                    <Text style={styles.markAllAsReadText}>
-                                        Mark as read
-                                    </Text>
-                                </CustomButton>
-                            </View>
-                            <View style={styles.line} />
-                            {notifications.length > 0 ?
-                                notifications.map(
-                                    (notification, idx) => {
-                                        return (
-                                            <NotificationCard key={`notification${idx}`} notification={notification} />
-                                        )
-                                    })
-                                :
-                                <Text style={styles.notificationNoticeText}>
-                                    - There are no notifications -
-                                </Text>
-                            }
-                        </View>
-                    </TouchableWithoutFeedback>
+        <ModalWrapper handleCloseModal={handleCloseModal}>
+            <>
+                <View style={styles.notificationHeaderContainer}>
+                    <Text style={styles.notificationTitle}>
+                        Notifications
+                    </Text>
+                    <CustomButton style={styles.markAllAsReadButton} onPress={handleMarkAllAsRead}>
+                        <Text style={styles.markAllAsReadText}>
+                            Mark as read
+                        </Text>
+                    </CustomButton>
                 </View>
-            </TouchableWithoutFeedback>
-        </Modal>
+                <View style={styles.line} />
+                {notifications.length > 0 ?
+                    notifications.map(
+                        (notification, idx) => {
+                            return (
+                                <NotificationCard key={`notification${idx}`} notification={notification} />
+                            )
+                        })
+                    :
+                    <Text style={styles.notificationNoticeText}>
+                        - There are no notifications -
+                    </Text>
+                }
+            </>
+        </ModalWrapper>
     )
 }
 

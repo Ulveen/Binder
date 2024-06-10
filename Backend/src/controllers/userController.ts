@@ -211,7 +211,7 @@ async function handleLike(user: User, to: User) {
         await user.ref.update({
             likedBy: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(to.email),
             request: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(to.email),
-            match: firebaseAdmin.admin.firestore.FieldValue.arrayUnion(to.email)
+            match: firebaseAdmin.admin.firestore.FieldValue.arrayUnion(to.email),
         })
         await to.ref.update({
             match: firebaseAdmin.admin.firestore.FieldValue.arrayUnion(user.email)
@@ -228,7 +228,7 @@ async function handleLike(user: User, to: User) {
 async function handleSwipeLeft(user: User, to: User) {
     if (user.request.includes(to.email)) {
         await user.ref.update({
-            request: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(to.email)
+            request: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(to.email),
         })
     }
     else if (user.likedBy.includes(to.email)) {
@@ -243,7 +243,7 @@ async function handleSwipeRight(user: User, to: User) {
         await user.ref.update({
             likedBy: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(to.email),
             request: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(to.email),
-            match: firebaseAdmin.admin.firestore.FieldValue.arrayUnion(to.email)
+            match: firebaseAdmin.admin.firestore.FieldValue.arrayUnion(to.email),
         })
         await to.ref.update({
             match: firebaseAdmin.admin.firestore.FieldValue.arrayUnion(user.email)
@@ -268,8 +268,17 @@ async function swipe(req: AuthRequest, res: Response) {
         const userData = {
             ...userDoc.data(),
             ref: userDoc.ref,
-            email: user.email
+            email: user.email,
+            swipeDate: userDoc.data()?.swipeDate.toDate()
         } as User
+
+        if(new Date().getTime() - userData.swipeDate.getTime() > 86400000) {
+            userData.swipeCount = 1
+            userData.swipeDate = new Date()
+        }
+        else if(userData.swipeCount >= 10) {
+            return res.status(200).send('limit')
+        }
 
         const toDoc = await firebaseAdmin.db.collection('users').doc(to).get()
         const toData = {
@@ -278,12 +287,6 @@ async function swipe(req: AuthRequest, res: Response) {
             email: to
         } as User
 
-        await userData.ref.update({
-            swipe: {
-                ...userData.swipe,
-                [to]: true
-            }
-        })
         switch (type) {
             case 'like':
                 const isMatchLike = await handleLike(userData, toData)
@@ -304,6 +307,14 @@ async function swipe(req: AuthRequest, res: Response) {
                 res.status(400).send('Invalid swipe type')
                 break;
         }
+
+        await userData.ref.update({
+            swipe: {
+                ...userData.swipe,
+                [to]: true
+            },
+            swipeCount: firebaseAdmin.admin.firestore.FieldValue.increment(1)
+        })
     }
     catch (error: any) {
         res.status(500).send(error.message)

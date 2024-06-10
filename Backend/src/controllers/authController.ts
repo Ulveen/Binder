@@ -113,6 +113,8 @@ async function register(req: Request, res: Response) {
             swipe: new Map<string, boolean>(),
             premium: false,
             favorite: [],
+            swipeAmount: 0,
+            swipeDate: new Date()
         }
 
 
