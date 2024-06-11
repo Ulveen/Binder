@@ -13,6 +13,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
+        alignItems: 'center',
         width: '100%',
         borderRadius: 15,
         padding: 20,

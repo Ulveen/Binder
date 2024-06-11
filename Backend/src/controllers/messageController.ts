@@ -16,7 +16,7 @@ async function createMessageChannel(req: AuthRequest, res: Response) {
     const filteredCheckoc = checkDoc.docs.filter(doc => doc.data().users.includes(to))
 
     if(filteredCheckoc.length > 0) {
-        res.status(200).json({data: 'Chat already exists'})
+        res.status(200).json({data: filteredCheckoc[0].id})
         return
     }
 
@@ -25,7 +25,7 @@ async function createMessageChannel(req: AuthRequest, res: Response) {
         lastMessage: {
             from: user?.email,
             message: '',
-            timeStamp: new Date()
+            timestamp: Date.now()
         },
     })
 
@@ -34,7 +34,7 @@ async function createMessageChannel(req: AuthRequest, res: Response) {
         .doc('init')
         .set({})
 
-    res.status(200).json({data: 'Chat created'})
+    res.status(200).json({data: result.id})
 }
 
 async function sendMessage(req: AuthRequest, res: Response) {

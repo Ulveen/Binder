@@ -15,6 +15,7 @@ import User from "../../models/User";
 import EmptyProfileCard from "./components/EmptyProfileCard";
 import ToastService from "../../services/toastService";
 import SwipeLimitModal from "../../components/SwipeLimitModal";
+import MatchModal from "../../components/MatchModal";
 
 interface Props {
     navigation: any;
@@ -26,12 +27,15 @@ const toastService = ToastService();
 export default function Home({ navigation }: Props) {
     const { user } = useAuth();
     const { theme } = useCustomTheme()
-
-    const [notificationModalOpen, setNotificationModelOpen] = useState(false);
-    const [notifications, setNotifications] = useState<Notification[]>([]);
     const [styles, setStyles] = useState(getStyles(theme));
 
     const [filterModalOpen, setFilterModelOpen] = useState(false);
+    const [swipeLimitModalOpen, setSwipeLimitModalOpen] = useState(false);
+    const [notificationModalOpen, setNotificationModelOpen] = useState(false);
+    const [matchModalOpen, setMatchModalOpen] = useState(true);
+
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+
     const [filter, setFilter] = useState({
         gender: user?.gender === 'Male' ? 'Female' : 'Male',
         campus: user?.campus ? user.campus : 'Kemanggisan',
@@ -41,8 +45,7 @@ export default function Home({ navigation }: Props) {
         offset: 0
     })
 
-    const [matchOptions, setMatchOptions] = useState<User[]>([])
-    const [swipeLimitModalOpen, setSwipeLimitModalOpen] = useState(false);
+    const [matchOptions, setMatchOptions] = useState<User[]>([])    
 
     const { executeAsync: getUserMatchOption,
         loading: isUserMatchOptionsLoading
@@ -150,6 +153,8 @@ export default function Home({ navigation }: Props) {
 
     return (
         <View style={styles.container}>
+            {matchModalOpen && matchOptions.length > 0 &&
+                <MatchModal match={matchOptions[0]} navigation={navigation} setMatchModalOpen={setMatchModalOpen} />}
             {swipeLimitModalOpen &&
                 <SwipeLimitModal navigation={navigation} setSwipeLimitModalOpen={setSwipeLimitModalOpen} />
             }

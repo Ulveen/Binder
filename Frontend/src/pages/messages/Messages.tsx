@@ -9,7 +9,13 @@ import useAuth from "../../hooks/useAuth";
 import useCustomTheme from "../../hooks/useCustomTheme";
 import CustomTheme from "../../models/CustomTheme";
 
-export default function Messages() {
+interface Props {
+    route: any
+}
+
+export default function Messages({ route }: Props) {
+    const chatIdParam = route.params?.chatId
+
     const { theme } = useCustomTheme()
     const styles = getStyles(theme)
 
@@ -17,14 +23,10 @@ export default function Messages() {
 
     const [search, setSearch] = useState('')
     const [chatDocs, setChatDocs] = useState<Chat[]>([])
-    const [currChatDoc, setCurrChatDoc] = useState<Chat | null>(null)
+    const [currChatId, setCurrChatId] = useState(chatIdParam ?? '')
 
     function handleSelectChat(chatId: string) {
-        if (chatId === '') {
-            setCurrChatDoc(null)
-            return
-        }
-        setCurrChatDoc(chatDocs.filter(cd => cd.chatId === chatId)[0])
+        setCurrChatId(chatId)
     }
 
     useEffect(() => {
@@ -60,7 +62,7 @@ export default function Messages() {
                     });
                     const resolvedChatDocs = await Promise.all(promises);
                     const chats = resolvedChatDocs.filter((chatDoc) => chatDoc !== undefined) as Chat[];
-                    setChatDocs(chats.sort((a, b) => a.lastMessage.timestamp.getTime() - b.lastMessage.timestamp.getTime()));
+                    setChatDocs(chats.sort((a, b) => b.lastMessage.timestamp.getTime() - a.lastMessage.timestamp.getTime()));
                 }
             )
         return () => subscriber();
@@ -70,9 +72,7 @@ export default function Messages() {
         <View style={styles.container}>
 
             <View style={styles.topBar}>
-                <TextInput placeholder="Search" value={search} onChangeText={setSearch} style={styles.searchBar}>
-
-                </TextInput>
+                <TextInput placeholder="Search" value={search} onChangeText={setSearch} style={styles.searchBar} />
             </View>
             <View style={styles.chatList}>
                 <Text style={styles.subtitle}>Messages</Text>
@@ -84,8 +84,8 @@ export default function Messages() {
                     })}
                 </ScrollView>
             </View>
-            {currChatDoc &&
-                <ChatModal chatDoc={currChatDoc!} handleSelectChat={handleSelectChat} />
+            {chatDocs.filter(cd => cd.chatId === currChatId).length > 0 &&
+                <ChatModal chatDoc={chatDocs.filter(cd => cd.chatId === currChatId)[0]} handleSelectChat={handleSelectChat} />
             }
         </View>
     )
