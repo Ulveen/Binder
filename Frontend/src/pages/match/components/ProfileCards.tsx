@@ -37,7 +37,7 @@ export default function profileCards({ closeController,message,item, navigation,
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.toggleContainer, styles.borderLeft]} activeOpacity={1} onPress={() => {
                         if (show == "requested") {
-                            userService.addToMatch(useEmail, item.email)
+                            userService.swipe( item.email, 'like')
                             refresh(true)
                         } else {
                             console.log(item.email);
