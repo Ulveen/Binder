@@ -92,6 +92,8 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
     },
     loginBtnText: {
         color: 'white',
+        fontSize: 18,
+        fontFamily: 'ABeeZee',
     },
     redirectText: {
         color: theme.text,

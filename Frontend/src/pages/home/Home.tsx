@@ -249,7 +249,7 @@ function getStyles(theme: CustomTheme) {
         buttonRow: {
             flexDirection: 'row',
             justifyContent: 'space-around',
-            marginBottom: 30,
+            marginBottom: 10,
         },
         circleImage: {
             width: 80,

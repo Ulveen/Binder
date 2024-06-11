@@ -47,12 +47,16 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         backgroundColor: theme.primary
     },
     navBtnLoginText: {
-        color: 'white'
+        color: 'white',
+        fontFamily: 'ABeeZee',
+        fontSize: 18
     },
     navBtnRegister: {
         backgroundColor: theme.background
     },
     navBtnRegisterText: {
-        color: theme.primary
+        color: theme.primary,
+        fontFamily: 'ABeeZee',
+        fontSize: 18
     }
 })

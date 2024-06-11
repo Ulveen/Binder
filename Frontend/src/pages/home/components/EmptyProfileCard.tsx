@@ -33,7 +33,7 @@ function getStyles(theme: CustomTheme) {
         },
         emptyProfileImage: {
             width: 340,
-            height: 470,
+            height: 450,
             borderTopLeftRadius: 10,
             borderTopRightRadius: 10,
             alignItems: 'center',

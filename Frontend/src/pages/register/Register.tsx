@@ -231,6 +231,8 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
     },
     continueBtnText: {
         color: 'white',
+        fontSize: 18,
+        fontFamily: 'ABeeZee',
     },
     resendBtn: {
         backgroundColor: theme.background,

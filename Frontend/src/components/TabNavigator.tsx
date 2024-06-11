@@ -48,7 +48,10 @@ function TabNav() {
                     }
                     return <Image source={iconName} style={{ width: 50, height: 50 }} />;
                 },
-                tabBarLabel: () => null
+                tabBarLabel: () => null,
+                tabBarStyle: {
+                    height: 80
+                }
             })}
             initialRouteName="Home">
             <BottomTab.Screen name="Home" component={Home} options={{ headerShown: false }} />
