@@ -32,7 +32,7 @@ export default function Home({ navigation }: Props) {
     const [filterModalOpen, setFilterModelOpen] = useState(false);
     const [swipeLimitModalOpen, setSwipeLimitModalOpen] = useState(false);
     const [notificationModalOpen, setNotificationModelOpen] = useState(false);
-    const [matchModalOpen, setMatchModalOpen] = useState(true);
+    const [matchModalOpen, setMatchModalOpen] = useState(false);
 
     const [notifications, setNotifications] = useState<Notification[]>([]);
 
@@ -86,7 +86,7 @@ export default function Home({ navigation }: Props) {
                 return;
             }
             if (result === 'match') {
-
+                setMatchModalOpen(true);
             }
             setMatchOptions(prev => prev.slice(1));
         }
@@ -104,7 +104,7 @@ export default function Home({ navigation }: Props) {
                 return
             }
             if (result === 'match') {
-
+                setMatchModalOpen(true);
             }
             setMatchOptions(prev => prev.slice(1));
         }
