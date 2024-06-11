@@ -5,7 +5,7 @@ import Register from "../pages/register";
 
 const NativeStack = createNativeStackNavigator()
 
-export default function Stack() {
+export default function StackNavigator() {
     return (
         <NativeStack.Navigator initialRouteName="Splash">
             <NativeStack.Screen name="Splash" component={Splash} options={{ headerShown: false }} />

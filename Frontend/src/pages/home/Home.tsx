@@ -8,7 +8,6 @@ import NotificationModal from "./components/NotificationModal";
 import CustomTheme from "../../models/CustomTheme";
 import useCustomTheme from "../../hooks/useCustomTheme";
 import FilterModal from "./components/FilterModal";
-import SubscribeModal from "../../components/SubscribeModal";
 import useAsyncHandler from "../../hooks/useAsyncHandler";
 import MatchLoadingSkeleton from "./components/MatchLoadingSkeleton";
 import MatchProfileCard from "./components/MatchProfileCard";
@@ -44,7 +43,6 @@ export default function Home({ navigation }: Props) {
 
     const [matchOptions, setMatchOptions] = useState<User[]>([])
     const [swipeLimitModalOpen, setSwipeLimitModalOpen] = useState(false);
-    const [subscribeModalOpen, setSubscribeModalOpen] = useState(false);
 
     const { executeAsync: getUserMatchOption,
         loading: isUserMatchOptionsLoading
@@ -119,10 +117,6 @@ export default function Home({ navigation }: Props) {
         setNotificationModelOpen(true);
     }
 
-    function handleShowSubscribeModal() {
-        setSubscribeModalOpen(true);
-    }
-
     useEffect(() => {
         const subscriber = firebase
             .firestore()
@@ -157,10 +151,7 @@ export default function Home({ navigation }: Props) {
     return (
         <View style={styles.container}>
             {swipeLimitModalOpen &&
-                <SwipeLimitModal setSwipeLimitModalOpen={setSwipeLimitModalOpen} />
-            }
-            {subscribeModalOpen &&
-                <SubscribeModal setSubscribeModalOpen={setSubscribeModalOpen} />
+                <SwipeLimitModal navigation={navigation} setSwipeLimitModalOpen={setSwipeLimitModalOpen} />
             }
             {filterModalOpen &&
                 <FilterModal setFilterModalOpen={setFilterModelOpen} filter={filter} setFilter={setFilter} />

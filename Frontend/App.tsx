@@ -4,8 +4,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import AuthProvider from "./src/contexts/AuthContext";
 import ThemeProvider from "./src/contexts/ThemeContext";
 import useAuth from "./src/hooks/useAuth";
-import Navbar from "./src/components/Navbar";
-import Stack from "./src/components/Stack";
+import TabNavigator from "./src/components/TabNavigator";
+import StackNavigator from "./src/components/StackNavigator";
 
 function Routes() {
   const { user } = useAuth()
@@ -17,11 +17,11 @@ function Routes() {
 
   if (user === null)
     return (
-      <Stack />
+      <StackNavigator />
     )
 
   return (
-    <Navbar />
+    <TabNavigator />
   )
 
 }

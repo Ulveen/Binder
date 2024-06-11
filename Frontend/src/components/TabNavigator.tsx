@@ -12,16 +12,6 @@ import Payment from "../pages/payment/Payment";
 
 const WrapperStack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
-const ProfileNativeStack = createNativeStackNavigator();
-
-function ProfileStack() {
-    return (
-        <ProfileNativeStack.Navigator initialRouteName="Profile">
-            <ProfileNativeStack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
-            <ProfileNativeStack.Screen name="EditProfile" component={EditProfile} options={{ headerShown: false }} />
-        </ProfileNativeStack.Navigator>
-    )
-}
 
 function TabNav() {
     return (
@@ -50,7 +40,7 @@ function TabNav() {
                                 ? require('./../assets/chat-focus.png')
                                 : require('./../assets/chat.png');
                             break;
-                        case 'UserProfile':
+                        case 'Profile':
                             iconName = focused
                                 ? require('./../assets/profiles-focus.png')
                                 : require('./../assets/profiles.png');
@@ -65,19 +55,18 @@ function TabNav() {
             <BottomTab.Screen name="Match" component={Match} options={{ headerShown: false }} />
             <BottomTab.Screen name="Video" component={VideoCall} options={{ headerShown: false }} />
             <BottomTab.Screen name="Messages" component={Messages} options={{ headerShown: false }} />
-            <BottomTab.Screen name="UserProfile" component={
-                ProfileStack
-            } options={{ headerShown: false }} />
+            <BottomTab.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
         </BottomTab.Navigator>
     )
 }
 
-export default function Navbar () {
+export default function TabNavigator () {
     return (
         <WrapperStack.Navigator initialRouteName="Tab">
             <WrapperStack.Screen name="Tab" component={TabNav} options={{headerShown: false}} />
             <WrapperStack.Screen name="Premium" component={Premium} options={{ headerShown: false }} />
             <WrapperStack.Screen name="Payment" component={Payment} options={{ headerShown: false }} />
+            <WrapperStack.Screen name="EditProfile" component={EditProfile} options={{ headerShown: false }} />
         </WrapperStack.Navigator>
     );
 }

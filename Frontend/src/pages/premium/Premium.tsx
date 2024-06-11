@@ -13,7 +13,7 @@ export default function Premium({ navigation }: Props) {
     const styles = getStyles(theme);
 
     const handleBackImgPress = () => {
-        navigation.navigate('Profile');
+        navigation.goBack()
     };
 
     return (
