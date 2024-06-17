@@ -2,13 +2,15 @@ import http from 'http';
 import WebSocket from 'ws';
 
 const clients = new Map();
-const inQueue: string[] = [];
+const callQueue: string[] = [];
 const rules = new Map<string, Map<string, number>>();
 const calls: string[] = [] 
 
 function findCallPair(email: string) {
     const now = Date.now();
-    for (const client of inQueue) {
+    console.log('call queue', callQueue);
+    
+    for (const client of callQueue) {
         const rule = rules.get(client);
         if (client !== email && (!rule?.get(email) || (now - rule.get(email)! > 86400000))) {
             return client;
@@ -28,63 +30,82 @@ function updateRules(email: string, client: string, now: number) {
     rules.get(client)!.set(email, now);
 }
 
+function handleMakeCall(email: string, ws: WebSocket) {
+    const pair = findCallPair(email);
+    if (!pair) {
+        callQueue.push(email);
+        return true;
+    }
+
+    console.log('flag');
+    
+
+    const newCallId = `${email}-${pair}`;
+    const payload = JSON.stringify({ newCallId });
+
+    clients.get(pair)?.send(payload);
+    ws.send(payload);
+
+    callQueue.splice(callQueue.indexOf(pair), 1);
+
+    const now = Date.now();
+    updateRules(email, pair, now);
+    calls.push(newCallId);
+}
+
 function handleOnMessage(message: WebSocket.RawData, ws: WebSocket) {
     const parsed = JSON.parse(message.toString());
     const email = parsed.email;
 
-    console.log(parsed);
-    
-
     switch (parsed.type) {
         case 'init':
             clients.set(email, ws);
-            const client = findCallPair(email);
-            if (!client) {
-                inQueue.push(email);
-                return;
-            }
-            const newCallId = `${email}-${client}`;
-            const payload = JSON.stringify({ newCallId });
-
-            clients.get(client)?.send(payload);
-            ws.send(payload);
-
-            inQueue.splice(inQueue.indexOf(client), 1);
-
-            const now = Date.now();
-            updateRules(email, client, now);
-            calls.push(newCallId);
+            handleMakeCall(email, ws);
             break;
 
         case 'next':
             const callId = calls.find(call => call.includes(email));
+            calls.splice(calls.indexOf(callId!), 1);
+
             const pair = callId?.split('-').find(call => call !== email);
 
             if (pair) {
-                const payload = JSON.stringify({ type: 'next'});
-                clients.get(pair)?.send(payload);
-                ws.send(payload);
+                const inQueuePair = handleMakeCall(pair, clients.get(pair));
+                if (inQueuePair) {
+                    clients.get(pair).send(JSON.stringify({ type: 'next' }));
+                }
             }
-            calls.splice(calls.indexOf(callId!), 1);
+
+            const inQueueCurr = handleMakeCall(email, ws);
+            if (inQueueCurr) {
+                ws.send(JSON.stringify({ type: 'next' }));
+            }
+
             break;
     }
 }
 
 function handleOnClose(ws: WebSocket) {
-    for(const [email, client] of clients) {
-        if (client === ws) {
+    for(const [email, socket] of clients) {
+        if (socket === ws) {
             clients.delete(email);
-            inQueue.splice(inQueue.indexOf(ws.toString()), 1);
+            callQueue.splice(callQueue.indexOf(email), 1);
+
             const callId = calls.find(call => call.includes(email));
             const pair = callId?.split('-').find(call => call !== email);
+
+            calls.splice(calls.indexOf(callId!), 1);
             if (pair) {
-                const payload = JSON.stringify({ type: 'next'});
-                clients.get(pair)?.send(payload);
+                const inQueuePair = handleMakeCall(pair, clients.get(pair));
+                
+                if (inQueuePair) {
+                    const payload = JSON.stringify({ type: 'next'});
+                    clients.get(pair)?.send(payload);
+                }
             }
             break;
         }
     };
-    inQueue.splice(inQueue.indexOf(ws.toString()), 1);
 }
 
 function initializeWebSocket(server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>) {
