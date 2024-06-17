@@ -9,11 +9,13 @@ import EditProfile from "../pages/editprofile";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Premium from "../pages/premium/Premium";
 import Payment from "../pages/payment/Payment";
+import { useState } from "react";
 
 const WrapperStack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
 
 function TabNav() {
+    const [showNavbar, setShowNavbar] = useState(true)
     return (
         <BottomTab.Navigator
             screenOptions={({ route }) => ({
@@ -50,13 +52,14 @@ function TabNav() {
                 },
                 tabBarLabel: () => null,
                 tabBarStyle: {
+                    display: showNavbar ? "flex" : "none",
                     height: 80
                 }
             })}
             initialRouteName="Home">
             <BottomTab.Screen name="Home" component={Home} options={{ headerShown: false }} />
             <BottomTab.Screen name="Match" component={Match} options={{ headerShown: false }} />
-            <BottomTab.Screen name="Video" component={VideoCall} options={{ headerShown: false }} />
+            <BottomTab.Screen name="Video" component={VideoCall}  initialParams={{ setShowNavbar }}  options={{ headerShown: false }} />
             <BottomTab.Screen name="Messages" component={Messages} options={{ headerShown: false }} />
             <BottomTab.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
         </BottomTab.Navigator>
@@ -65,7 +68,7 @@ function TabNav() {
 
 export default function TabNavigator () {
     return (
-        <WrapperStack.Navigator initialRouteName="Tab">
+        <WrapperStack.Navigator initialRouteName="Tab" >
             <WrapperStack.Screen name="Tab" component={TabNav} options={{headerShown: false}} />
             <WrapperStack.Screen name="Premium" component={Premium} options={{ headerShown: false }} />
             <WrapperStack.Screen name="Payment" component={Payment} options={{ headerShown: false }} />

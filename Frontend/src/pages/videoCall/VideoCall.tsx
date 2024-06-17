@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Button, PermissionsAndroid, Platform, Text, ActivityIndicator, Touchable, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, PermissionsAndroid, Platform, TouchableOpacity, Image, ActivityIndicator, Text } from 'react-native';
 import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import useCustomTheme from "../../hooks/useCustomTheme";
 import CustomTheme from "../../models/CustomTheme";
-import { ZegoUIKitPrebuiltCall, ONE_ON_ONE_VIDEO_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn';
-import CustomButton from '../../components/CustomButton';
+import  { ZegoUIKitPrebuiltCall ,ZegoMenuBarButtonName, ONE_ON_ONE_VIDEO_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 import useAuth from '../../hooks/useAuth';
+import CustomButton from '../../components/CustomButton';
 
 let ws: WebSocket | null = null;
 
-export default function VideoCall() {
+export default function VideoCall({ route, navigation  }: any) {
     const { user } = useAuth()
     const { theme } = useCustomTheme();
     const [styles, setStyles] = useState(getStyles(theme));
     const [permissionsGranted, setPermissionsGranted] = useState(false);
     const [callId, setCallId] = useState('');
     const [isCallActive, setIsCallActive] = useState(false);
-
+    const { setShowNavbar } = route.params;
     useEffect(() => {
         const requestPermissions = async () => {
             if (Platform.OS === 'ios') {
@@ -45,6 +45,14 @@ export default function VideoCall() {
         };
         requestPermissions();
     }, []);
+    
+    useEffect(() => {
+        if (isCallActive) {
+            setShowNavbar(false)
+        } else {
+            setShowNavbar(true)
+        }
+    }, [isCallActive])
 
     useEffect(() => {
         setStyles(getStyles(theme));
@@ -105,7 +113,6 @@ export default function VideoCall() {
         })
         ws?.send(paylosd);
     }
-
     return (
         <View style={styles.container}>
             {!permissionsGranted ? (
@@ -136,15 +143,43 @@ export default function VideoCall() {
                                 userName={user!.name}
                                 callID={callId}
                                 config={{
-                                    ...ONE_ON_ONE_VIDEO_CALL_CONFIG,
-                                    onHangUp: handleHangUp
+                                      ...ONE_ON_ONE_VIDEO_CALL_CONFIG,
+                                        onOnlySelfInRoom: () => {
+                                            console.log("sendiri")
+                                        },
+                                        bottomMenuBarConfig: {
+                                            maxCount: 5,
+                                            buttons: [
+                                                ZegoMenuBarButtonName.hangUpButton,
+                                                ZegoMenuBarButtonName.toggleCameraButton,
+                                                ZegoMenuBarButtonName.toggleMicrophoneButton,
+                                            ],
+                                            extendButtons: [
+                                                <>
+                                                    <TouchableOpacity style={styles.nextButton} onPress={() => {
+                                                        
+                                                    }}>
+                                                        <Image style={styles.arrow} source={require("../../assets/arrow.png")} resizeMode="cover" />
+                                                    </TouchableOpacity>
+                                                </>,
+                                                <>
+                                                    <TouchableOpacity onPress={() => {
+
+                                                    }}>
+                                                        <Image source={require("../../assets/like.png")} style={styles.circleImage} />
+                                                    </TouchableOpacity>
+                                                </>
+                                            ]
+                                        },
+                                        onButtonPress: (buttonName : any) => {
+                                            if (buttonName === ZegoMenuBarButtonName.hangUpButton) {
+                                                navigation.navigate('Home');
+                                            }
+                                        }
+                                        ///\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
                                 }}
+                                
                             />
-                            <View style={styles.buttonContainer}>
-                                <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-                                    <Text>Next</Text>
-                                </TouchableOpacity>
-                            </View>
                         </View>
                     )
             )}
@@ -159,6 +194,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: theme.background,
+        zIndex : 1000
     },
     startCallButton: {
         width: '50%'
@@ -207,8 +243,23 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         zIndex: 1000,
     },
     nextButton: {
-        backgroundColor: theme.primary,
-        padding: 10,
-        borderRadius: 5,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        borderRadius: 100,
+        width: 48,
+        height: 48,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent : "center"
+    },
+    arrow: {
+        tintColor: "white",
+        height: 42,
+        marginTop: 8,
+    },
+    circleImage: {
+        width: 48,
+        height: 48,
+        borderRadius: 100,
     },
 });
