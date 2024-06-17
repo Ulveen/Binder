@@ -6,7 +6,6 @@ import useAsyncHandler from "../../../hooks/useAsyncHandler";
 import MessageService from "../../../services/messageService";
 import { useEffect, useRef, useState } from "react";
 import Message from "../../../models/Message";
-import Feather from 'react-native-vector-icons/Feather';
 import CustomButton from "../../../components/CustomButton";
 import ChatBubble from "./ChatBubble";
 import { renderProfileImage } from "../../../utils/imageUtils";
@@ -102,7 +101,7 @@ export default function ChatModal({ chatDoc, handleSelectChat }: Props) {
                                 <View style={styles.messageControlContent}>
                                     <TextInput value={textMessage} onChangeText={setTextMessage} style={styles.textMessageInputBox} placeholder="Your Message" multiline={true} ref={textInputRef} />
                                     <CustomButton style={styles.sendBtn} onPress={handleSendMessage}>
-                                        <Feather name="send" size={30} />
+                                        <Image source={require('../../../assets/sendbtn.png')} />
                                     </CustomButton>
                                 </View>
                             </View>
@@ -198,10 +197,13 @@ function getStyles(theme: CustomTheme) {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: 'lightgrey',
+            backgroundColor: theme.background,
             width: 50,
             height: 50,
-            padding: 5
+            padding: 5,
+            borderWidth: 0.3,
+            borderColor: 'gray',
+            borderRadius: 10
         },
     })
 }
