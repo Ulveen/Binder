@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { ALERT_TYPE, AlertNotificationRoot, Dialog } from 'react-native-alert-notification';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import MessageService from "../../services/messageService";
+import match from ".";
 
 interface MatchData {
     email: string;
@@ -95,12 +96,19 @@ export default function Match({ navigation }: any) {
                     <View style={styles.optionContainer}>
                         <TouchableOpacity style={[styles.option, {
                             backgroundColor: show === "match" ? "#E94057" : "#757575"
-                        }]} activeOpacity={1} onPress={toggleShow}>
+                        }]} activeOpacity={1} onPress={() => {
+                            if (show != "match") {
+                                toggleShow()
+                            }
+                        }}>
                             <Text style={styles.optionTitle}>Match</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={[styles.option, {
                             backgroundColor: show === "match" ? "#ADAFBB" : "#E94057",
                         }]} activeOpacity={1} onPress={() => {
+                            if (show != "match") {
+                                return
+                            }
                             const toggledSuccessfully = toggleShow();
                             if (!toggledSuccessfully) {
                                 Dialog.show({
