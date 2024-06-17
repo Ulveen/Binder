@@ -7,13 +7,14 @@ import UserRouter from './routes/user';
 import MessageRouter from './routes/message';
 import NotificationRouter from './routes/notification';
 import initializeWebSocket from './callWebsocket';
+import bodyParser from 'body-parser';
 
 const app = express();
 const port = 4001;
 const server = http.createServer(app);
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 
 app.use((req, res, next) => {

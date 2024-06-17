@@ -28,7 +28,8 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         borderRadius: screenWidth * 0.025, // Menggunakan 2.5% dari lebar layar untuk border radius
         marginVertical: screenWidth * 0.042, // Menggunakan 4.2% dari lebar layar untuk margin vertikal
         textAlign: 'left',
-        marginBottom: screenWidth * 0.063, // Menggunakan 6.3% dari lebar layar untuk margin bawah
+        marginBottom: screenWidth * 0.063, // Menggunakan 6.3% dari lebar layar untuk margin bawah,
+        fontFamily: 'ABeeZee'
     },
     viewHolder: {
         width: '80%',
@@ -39,6 +40,8 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         textAlign: 'left',
         marginBottom: screenWidth *-0.05,
         paddingLeft: screenWidth *0.017,
+        color: 'gray',
+        fontFamily: 'ABeeZee'
     },
 
 })

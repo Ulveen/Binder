@@ -115,5 +115,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
     },
     upgradeText: {
         fontStyle: "italic",
+        color: 'gray',
+        fontFamily: 'ABeeZee'
     },
 });

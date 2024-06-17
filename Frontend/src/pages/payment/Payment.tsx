@@ -149,6 +149,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
     text: {
         fontFamily: "ABeeZee",
         fontSize: 20,
+        color: 'gray'
     },
     image: {
         display: 'flex',

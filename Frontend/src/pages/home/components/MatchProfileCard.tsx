@@ -56,6 +56,7 @@ function getStyles(theme: CustomTheme) {
             paddingLeft: 20,
             color: 'white',
             fontWeight: 'bold',
+            fontFamily: 'ABeeZee'
         },
         botText: {
             paddingTop: 5,

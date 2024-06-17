@@ -114,15 +114,11 @@ async function updateUserData(req: AuthRequest, res: Response) {
         ...userWithoutExpIat,
         ...updatedData,
     };
-
-    const expString = ((exp * 1000 - Date.now()) / 3600000).toPrecision(6).toString() + 'h';
-
-    const token = generateJWTToken({ ...updatedUser }, expString);
+    
 
     return res.status(200).json({
         data: {
             user: updatedUser,
-            token: token
         }
     })
 }

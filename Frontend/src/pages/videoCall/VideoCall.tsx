@@ -3,20 +3,25 @@ import { StyleSheet, View, PermissionsAndroid, Platform, TouchableOpacity, Image
 import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import useCustomTheme from "../../hooks/useCustomTheme";
 import CustomTheme from "../../models/CustomTheme";
-import  { ZegoUIKitPrebuiltCall ,ZegoMenuBarButtonName, ONE_ON_ONE_VIDEO_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import { ZegoUIKitPrebuiltCall, ZegoMenuBarButtonName, ONE_ON_ONE_VIDEO_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 import useAuth from '../../hooks/useAuth';
 import CustomButton from '../../components/CustomButton';
+import UserService from '../../services/userService';
 
 let ws: WebSocket | null = null;
 
-export default function VideoCall({ route, navigation  }: any) {
+const userService = UserService()
+
+export default function VideoCall({ route }: any) {
+    const { setShowNavbar } = route.params;
     const { user } = useAuth()
     const { theme } = useCustomTheme();
     const [styles, setStyles] = useState(getStyles(theme));
     const [permissionsGranted, setPermissionsGranted] = useState(false);
     const [callId, setCallId] = useState('');
     const [isCallActive, setIsCallActive] = useState(false);
-    const { setShowNavbar } = route.params;
+    const [toEmail, setToEmail] = useState('')
+
     useEffect(() => {
         const requestPermissions = async () => {
             if (Platform.OS === 'ios') {
@@ -45,14 +50,10 @@ export default function VideoCall({ route, navigation  }: any) {
         };
         requestPermissions();
     }, []);
-    
+
     useEffect(() => {
-        if (isCallActive) {
-            setShowNavbar(false)
-        } else {
-            setShowNavbar(true)
-        }
-    }, [isCallActive])
+        setShowNavbar(!isCallActive)
+    }, [isCallActive]);
 
     useEffect(() => {
         setStyles(getStyles(theme));
@@ -77,6 +78,7 @@ export default function VideoCall({ route, navigation  }: any) {
 
         if (parsed.newCallId) {
             setCallId(parsed.newCallId);
+            setToEmail(parsed.to)
         }
         else if (parsed.type === 'next') {
             setCallId('');
@@ -88,9 +90,15 @@ export default function VideoCall({ route, navigation  }: any) {
         setCallId('');
     }
 
+    async function handleLike() {
+        if (toEmail.length > 0) {
+            await userService.swipe(toEmail, 'like');
+        }
+    }
+
     async function makeConnection() {
-        ws = new WebSocket(process.env.WEBSOCKET_URL!);
-        console.log(process.env.WEBSOCKET_URL!);
+        // ws = new WebSocket(process.env.WEBSOCKET_URL!);
+        ws = new WebSocket('ws://192.168.203.250:4001')
 
         ws.onopen = () => handleOnOpenWebSocket(ws!);
         ws.onmessage = (event) => handleOnMessageWebSocket(event);
@@ -128,7 +136,7 @@ export default function VideoCall({ route, navigation  }: any) {
                         <View style={styles.loadingContainer}>
                             <View style={styles.loadingIndicatorContainer}>
                                 <ActivityIndicator size="large" color="#E94057" />
-                                <Text>Searching for matches...</Text>
+                                <Text style={styles.loadingText}>Searching for matches...</Text>
                             </View>
                             <CustomButton style={styles.cancelButton} onPress={handleHangUp}>
                                 <Text style={styles.cancelButtonText}>Cancel</Text>
@@ -143,42 +151,32 @@ export default function VideoCall({ route, navigation  }: any) {
                                 userName={user!.name}
                                 callID={callId}
                                 config={{
-                                      ...ONE_ON_ONE_VIDEO_CALL_CONFIG,
-                                        onOnlySelfInRoom: () => {
-                                            console.log("sendiri")
-                                        },
-                                        bottomMenuBarConfig: {
-                                            maxCount: 5,
-                                            buttons: [
-                                                ZegoMenuBarButtonName.hangUpButton,
-                                                ZegoMenuBarButtonName.toggleCameraButton,
-                                                ZegoMenuBarButtonName.toggleMicrophoneButton,
-                                            ],
-                                            extendButtons: [
-                                                <>
-                                                    <TouchableOpacity style={styles.nextButton} onPress={() => {
-                                                        
-                                                    }}>
-                                                        <Image style={styles.arrow} source={require("../../assets/arrow.png")} resizeMode="cover" />
-                                                    </TouchableOpacity>
-                                                </>,
-                                                <>
-                                                    <TouchableOpacity onPress={() => {
-
-                                                    }}>
-                                                        <Image source={require("../../assets/like.png")} style={styles.circleImage} />
-                                                    </TouchableOpacity>
-                                                </>
-                                            ]
-                                        },
-                                        onButtonPress: (buttonName : any) => {
-                                            if (buttonName === ZegoMenuBarButtonName.hangUpButton) {
-                                                navigation.navigate('Home');
-                                            }
-                                        }
-                                        ///\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+                                    ...ONE_ON_ONE_VIDEO_CALL_CONFIG,
+                                    onOnlySelfInRoom: () => {
+                                    },
+                                    bottomMenuBarConfig: {
+                                        maxCount: 5,
+                                        buttons: [
+                                            ZegoMenuBarButtonName.hangUpButton,
+                                            ZegoMenuBarButtonName.toggleCameraButton,
+                                            ZegoMenuBarButtonName.toggleMicrophoneButton,
+                                        ],
+                                        extendButtons: [
+                                            <>
+                                                <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+                                                    <Image style={styles.arrow} source={require("../../assets/arrow.png")} resizeMode="cover" />
+                                                </TouchableOpacity>
+                                            </>,
+                                            <>
+                                                <TouchableOpacity onPress={handleLike}>
+                                                    <Image source={require("../../assets/like.png")} style={styles.circleImage} />
+                                                </TouchableOpacity>
+                                            </>
+                                        ]
+                                    },
+                                    onHangUp: () => handleHangUp()
                                 }}
-                                
+
                             />
                         </View>
                     )
@@ -194,7 +192,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: theme.background,
-        zIndex : 1000
+        zIndex: 1000
     },
     startCallButton: {
         width: '50%'
@@ -216,15 +214,19 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         alignItems: 'center',
         gap: 10,
     },
+    loadingText: {
+        color: theme.text
+    },
     cancelButton: {
         width: '50%',
         backgroundColor: theme.primary,
         textAlign: 'center',
+        padding: 20
     },
     cancelButtonText: {
         color: 'white',
         fontSize: 20,
-        fontFamily: 'ABeeZee'
+        fontFamily: 'ABeeZee',
     },
     localVideo: {
         width: '100%',
@@ -250,7 +252,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent : "center"
+        justifyContent: "center"
     },
     arrow: {
         tintColor: "white",

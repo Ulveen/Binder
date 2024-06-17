@@ -52,7 +52,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         fontSize: 18
     },
     navBtnRegister: {
-        backgroundColor: theme.background
+        backgroundColor: 'rgba(233, 64, 87, 0.2)',
     },
     navBtnRegisterText: {
         color: theme.primary,

@@ -152,7 +152,8 @@ export default function Match({ navigation }: any) {
                                 ))
                             ) : (
                                 <Text style={{
-                                    alignSelf: "center"
+                                    alignSelf: "center",
+                                    color: 'black'
                                 }}>No match yet</Text>
                             )
                         )}

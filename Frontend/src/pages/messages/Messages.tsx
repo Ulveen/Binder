@@ -72,7 +72,7 @@ export default function Messages({ route }: Props) {
         <View style={styles.container}>
 
             <View style={styles.topBar}>
-                <TextInput placeholder="Search" value={search} onChangeText={setSearch} style={styles.searchBar} />
+                <TextInput placeholder="Search" value={search} onChangeText={setSearch} style={styles.searchBar} placeholderTextColor={'gray'} />
             </View>
             <View style={styles.chatList}>
                 <Text style={styles.subtitle}>Messages</Text>
@@ -110,6 +110,8 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         borderRadius: 15,
         paddingHorizontal: 10,
         paddingVertical: 10,
+        color: theme.text,
+        fontFamily: 'ABeeZee'
     },
     subtitle: {
         fontSize: 24,

@@ -20,7 +20,9 @@ export default function AuthProvider({ children }: { children: JSX.Element }) {
         let tempUser = data.user
         tempUser.dob = new Date(tempUser.dob)
         setUser(tempUser)
-        await AsyncStorage.setItem("authorization", data.token)
+        if(data.token) {
+            await AsyncStorage.setItem("authorization", data.token)
+        }
     }
 
     async function logout() {
@@ -32,6 +34,8 @@ export default function AuthProvider({ children }: { children: JSX.Element }) {
         const authService = AuthService()
         try {
             let user = await authService.verifyToken()
+            console.log(user);
+            
             if (!user) return logout()
             user.dob = new Date(user?.dob)
             setUser(user)

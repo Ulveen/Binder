@@ -5,13 +5,14 @@ import useCustomTheme from "../../hooks/useCustomTheme";
 import CustomButton from "../../components/CustomButton";
 import CustomTheme from "../../models/CustomTheme";
 import EditBox from './components/EditBox';
-import { openImageGallery, renderProfileImage } from "../../utils/imageUtils";
+import { openImageGallery, renderProfileImage, uriToBase64 } from "../../utils/imageUtils";
 import { isSameDate } from '../../utils/dateUtils';
 import ToastService from '../../services/toastService';
 import useAsyncHandler from '../../hooks/useAsyncHandler';
 import UserService from '../../services/userService';
 import User from '../../models/User';
 import DatePicker from 'react-native-date-picker';
+import ImageResizer from 'react-native-image-resizer';
 
 
 interface Props {
@@ -61,9 +62,18 @@ export default function Profile({ navigation }: Props) {
 
     async function handlePickImage() {
         const assets = await openImageGallery('photo')
+        const uri = assets![0].uri!
+        const resizedImage = await ImageResizer.createResizedImage(
+            uri,
+            600,
+            600,
+            'PNG',
+            80
+        )
+        const base64 = await uriToBase64(resizedImage.uri)
         if (assets) {
-            setProfileUri(assets![0].uri!)
-            setProfileImage(assets![0].base64!)
+            setProfileUri(uri)
+            setProfileImage(base64)
         }
     }
 

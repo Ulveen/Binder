@@ -35,6 +35,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         marginVertical: screenWidth * 0.042,
         textAlign: 'left',
         marginBottom: screenWidth * 0.063,
+        fontFamily: 'ABeeZee'
     },
     viewHolder: {
         width: '80%',
@@ -44,6 +45,8 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         textAlign: 'left',
         marginBottom: screenWidth * -0.03,
         paddingLeft: screenWidth * 0.017,
+        color: 'gray',
+        fontFamily: 'ABeeZee'
     },
 
 })

@@ -4,12 +4,11 @@ import WebSocket from 'ws';
 const clients = new Map();
 const callQueue: string[] = [];
 const rules = new Map<string, Map<string, number>>();
-const calls: string[] = [] 
+const calls: string[] = []
 
 function findCallPair(email: string) {
     const now = Date.now();
-    console.log('call queue', callQueue);
-    
+
     for (const client of callQueue) {
         const rule = rules.get(client);
         if (client !== email && (!rule?.get(email) || (now - rule.get(email)! > 86400000))) {
@@ -37,14 +36,20 @@ function handleMakeCall(email: string, ws: WebSocket) {
         return true;
     }
 
-    console.log('flag');
-    
-
     const newCallId = `${email}-${pair}`;
-    const payload = JSON.stringify({ newCallId });
 
-    clients.get(pair)?.send(payload);
-    ws.send(payload);
+    clients.get(pair)?.send(
+        JSON.stringify({
+            newCallId: newCallId,
+            to: email
+        })
+    );
+    ws.send(
+        JSON.stringify({
+            newCallId: newCallId,
+            to: pair
+        })
+    );
 
     callQueue.splice(callQueue.indexOf(pair), 1);
 
@@ -86,7 +91,7 @@ function handleOnMessage(message: WebSocket.RawData, ws: WebSocket) {
 }
 
 function handleOnClose(ws: WebSocket) {
-    for(const [email, socket] of clients) {
+    for (const [email, socket] of clients) {
         if (socket === ws) {
             clients.delete(email);
             callQueue.splice(callQueue.indexOf(email), 1);
@@ -97,9 +102,9 @@ function handleOnClose(ws: WebSocket) {
             calls.splice(calls.indexOf(callId!), 1);
             if (pair) {
                 const inQueuePair = handleMakeCall(pair, clients.get(pair));
-                
+
                 if (inQueuePair) {
-                    const payload = JSON.stringify({ type: 'next'});
+                    const payload = JSON.stringify({ type: 'next' });
                     clients.get(pair)?.send(payload);
                 }
             }

@@ -8,9 +8,10 @@ import DropDownPicker from "react-native-dropdown-picker";
 import useCustomTheme from "../../hooks/useCustomTheme";
 import useAsyncHandler from "../../hooks/useAsyncHandler";
 import CustomTheme from "../../models/CustomTheme";
-import { openImageGallery, renderProfileImage } from "../../utils/imageUtils";
+import { openImageGallery, renderProfileImage, uriToBase64 } from "../../utils/imageUtils";
 import { genderOptions } from "../../models/Gender";
 import { campusOptions } from "../../models/Campus";
+import ImageResizer from 'react-native-image-resizer';
 
 interface Props {
     navigation: any;
@@ -91,9 +92,18 @@ export default function Register({ navigation: { navigate } }: Props) {
 
     async function handlePickImage() {
         const assets = await openImageGallery('photo')
+        const uri = assets![0].uri!
+        const resizedImage = await ImageResizer.createResizedImage(
+            uri,
+            600,
+            600,
+            'PNG',
+            80
+        )
+        const base64 = await uriToBase64(resizedImage.uri)
         if (assets) {
-            setProfileUri(assets![0].uri!)
-            setProfileImage(assets![0].base64!)
+            setProfileUri(uri)
+            setProfileImage(base64)
         }
     }
 
@@ -104,7 +114,7 @@ export default function Register({ navigation: { navigate } }: Props) {
                 <Text style={styles.description}>
                     Please enter your valid email. We will send you a 4-digit code to verify your account.
                 </Text>
-                <TextInput style={styles.input} value={email} onChangeText={setEmail} />
+                <TextInput style={styles.input} placeholder="example@binus.ac.id" value={email} onChangeText={setEmail} placeholderTextColor={'gray'} />
                 <CustomButton style={styles.continueBtn} onPress={handleSendEmailOTP}>
                     <Text style={styles.continueBtnText}>Continue</Text>
                 </CustomButton>
@@ -142,9 +152,9 @@ export default function Register({ navigation: { navigate } }: Props) {
             <TouchableOpacity onPress={handlePickImage}>
                 <Image style={styles.profileImage} source={renderProfileImage(profileUri)} />
             </TouchableOpacity>
-            <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
-            <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry={true} />
-            <TextInput style={styles.input} placeholder="Binusian" value={binusian} onChangeText={setBinusian} />
+            <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} placeholderTextColor={'gray'} />
+            <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry={true} placeholderTextColor={'gray'} />
+            <TextInput style={styles.input} placeholder="Binusian" value={binusian} onChangeText={setBinusian} placeholderTextColor={'gray'} />
             <DropDownPicker style={styles.dropDownPicker}
                 textStyle={styles.dropDownPickerText}
                 containerStyle={{ width: '80%' }}
@@ -218,7 +228,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         fontFamily: 'ABeeZee',
         padding: 10,
         color: theme.text,
-        backgroundColor: theme.background
+        backgroundColor: theme.background,
     },
     redirectText: {
         color: theme.text,

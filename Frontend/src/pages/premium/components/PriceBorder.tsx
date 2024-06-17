@@ -42,11 +42,13 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         paddingLeft: 40,
         fontSize: 28,
         fontStyle: 'italic',
+        color: 'gray'
     },
     text:{
         fontSize: 20,
         paddingLeft: 40,
         fontStyle: 'italic',
+        color: 'gray'
     },
     borderMoney:{
         display: 'flex',

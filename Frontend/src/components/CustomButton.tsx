@@ -11,7 +11,6 @@ interface Props {
 const getStyles = (theme: CustomTheme) => StyleSheet.create({
     defaultStyle: {
         display: 'flex',
-        flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',

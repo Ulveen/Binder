@@ -62,12 +62,14 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
     },
     time: {
         color: theme.text,
+        fontFamily: 'ABeeZee'
     },
     chatDetail: {
         flex: 1,
         flexDirection: 'row',
     },
     message: {
-        color: theme.text
+        color: theme.text,
+        fontFamily: 'ABeeZee'
     }
 })

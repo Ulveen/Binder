@@ -99,7 +99,7 @@ export default function ChatModal({ chatDoc, handleSelectChat }: Props) {
 
                             <View style={styles.messageControlContainer}>
                                 <View style={styles.messageControlContent}>
-                                    <TextInput value={textMessage} onChangeText={setTextMessage} style={styles.textMessageInputBox} placeholder="Your Message" multiline={true} ref={textInputRef} />
+                                    <TextInput value={textMessage} onChangeText={setTextMessage} style={styles.textMessageInputBox} placeholder="Your Message" placeholderTextColor={'gray'} multiline={true} ref={textInputRef} />
                                     <CustomButton style={styles.sendBtn} onPress={handleSendMessage}>
                                         <Image source={require('../../../assets/sendbtn.png')} />
                                     </CustomButton>
