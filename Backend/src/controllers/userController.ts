@@ -36,7 +36,7 @@ async function getPartnerList(req: AuthRequest, res: Response) {
             partner = userData.match
         } else if (type == "requested") {
             partner = userData.likedBy
-        } else { 
+        } else {
             res.status(400).json({ message: 'Unknown request type' });
             return;
         }
@@ -181,6 +181,13 @@ async function getUserMatchOption(req: AuthRequest, res: Response) {
             }
         })
 
+        for (var i = filteredMatchOptions.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = filteredMatchOptions[i];
+            filteredMatchOptions[i] = filteredMatchOptions[j];
+            filteredMatchOptions[j] = temp;
+        }
+
         res.status(200).json({
             userMatchOptions: filteredMatchOptions
         })
@@ -263,11 +270,11 @@ async function swipe(req: AuthRequest, res: Response) {
         } as any
 
 
-        if(!userData.premium) {
-            if(Date.now() - new Date(userData.swipeDate).getTime() < 86400000) {
+        if (!userData.premium) {
+            if (Date.now() - new Date(userData.swipeDate).getTime() < 86400000) {
                 console.log('swipeCount', userData.swipeCount);
-                
-                if(userData.swipeCount >= 10 ) {
+
+                if (userData.swipeCount >= 10) {
                     return res.status(200).send('limit')
                 }
                 updatedData.swipeCount = userData.swipeCount + 1
@@ -309,14 +316,14 @@ async function swipe(req: AuthRequest, res: Response) {
     }
     catch (error: any) {
         console.log(error);
-        
+
         res.status(500).send(error.message)
     }
 }
 
 async function getPremium(req: AuthRequest, res: Response) {
     const user = req.user as User;
-    const {email} = req.body
+    const { email } = req.body
     try {
         const userDoc = await firebaseAdmin.db.collection('users').doc(email).get();
 
@@ -326,7 +333,7 @@ async function getPremium(req: AuthRequest, res: Response) {
         }
 
         const userData = userDoc.data() as User;
-    
+
         res.status(200).json({
             premiumStatus: userData.premium
         });
