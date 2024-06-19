@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Image, StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
+import { Image, StyleSheet, Text, View, TouchableOpacity, Alert, Dimensions } from 'react-native';
 import useAuth from "../../hooks/useAuth";
 import useCustomTheme from "../../hooks/useCustomTheme";
 import CustomButton from "../../components/CustomButton";
@@ -12,7 +12,9 @@ import useAsyncHandler from '../../hooks/useAsyncHandler';
 import UserService from '../../services/userService';
 import User from '../../models/User';
 import DatePicker from 'react-native-date-picker';
-import ImageResizer from 'react-native-image-resizer';
+import { genderOptions } from "../../models/Gender";
+import { campusOptions } from "../../models/Campus";
+import DropDownPicker from 'react-native-dropdown-picker';
 
 
 interface Props {
@@ -24,7 +26,7 @@ const toastService = ToastService()
 
 export default function Profile({ navigation }: Props) {
     const { user, login } = useAuth();
-    const { theme,  userTheme } = useCustomTheme();
+    const { theme, userTheme } = useCustomTheme();
 
     const styles = getStyles(theme);
     const [datePickerVisible, setDatePickerVisible] = useState(false);
@@ -32,9 +34,14 @@ export default function Profile({ navigation }: Props) {
     const [name, setName] = useState(user?.name || '');
     const [dob, setDob] = useState(user?.dob ? user.dob : new Date());
     const [binusian, setBinusian] = useState(user?.binusian || '');
-    const [campus, setCampus] = useState(user?.campus || '');
     const [profileUri, setProfileUri] = useState('');
     const [profileImage, setProfileImage] = useState('');
+    const [extension, setExtension] = useState('');
+
+    const [isOpenCampusPicker, setIsOpenCampusPicker] = useState(false)
+    const [campus, setCampus] = useState(user?.campus ?? 'Kemanggisan')
+    const [isOpenGenderPicker, setIsOpenGenderPicker] = useState(false)
+    const [gender, setGender] = useState(user?.gender ?? 'Male')
 
     const { executeAsync: updateData } = useAsyncHandler(
         async function () {
@@ -51,10 +58,10 @@ export default function Profile({ navigation }: Props) {
                 return
             }
 
-            const data = await userService.updateUserData(updatedData)
+            const data = await userService.updateUserData(updatedData, extension)
 
             login(data)
-            
+
             toastService.success('Profile updated')
             navigation.navigate('Profile')
         }
@@ -62,18 +69,13 @@ export default function Profile({ navigation }: Props) {
 
     async function handlePickImage() {
         const assets = await openImageGallery('photo')
-        const uri = assets![0].uri!
-        const resizedImage = await ImageResizer.createResizedImage(
-            uri,
-            600,
-            600,
-            'PNG',
-            80
-        )
-        const base64 = await uriToBase64(resizedImage.uri)
         if (assets) {
+            const uri = assets![0].uri!
+            const base64 = assets![0].base64!
+            const imgExtension = uri.split('.').pop()!
             setProfileUri(uri)
             setProfileImage(base64)
+            setExtension(imgExtension)
         }
     }
 
@@ -94,9 +96,26 @@ export default function Profile({ navigation }: Props) {
             <TouchableOpacity onPress={handlePickImage}>
                 <Image style={styles.profileImage} source={renderProfileImage(profileUri !== '' ? profileUri : user?.profileImage)} />
             </TouchableOpacity>
-            <EditBox label="Name" state={name} setState={setName}/>
-            <EditBox label="Binusian" state={binusian} setState={setBinusian}/>
-            <EditBox label="Campus Area" state={campus} setState={setCampus} />
+            <EditBox label="Name" state={name} setState={setName} />
+            <EditBox label="Binusian" state={binusian} setState={setBinusian} />
+            <EditBox label="Gender" />
+            <DropDownPicker style={styles.dropDownPicker}
+                textStyle={styles.dropDownPickerText}
+                containerStyle={{ width: '80%' }}
+                value={gender}
+                setValue={setGender}
+                items={genderOptions}
+                open={isOpenGenderPicker}
+                setOpen={setIsOpenGenderPicker} />
+            <EditBox label="Campus Area" />
+            <DropDownPicker style={styles.dropDownPicker}
+                textStyle={styles.dropDownPickerText}
+                containerStyle={{ width: '80%' }}
+                value={campus}
+                setValue={setCampus}
+                items={campusOptions}
+                open={isOpenCampusPicker}
+                setOpen={setIsOpenCampusPicker} />
             {!datePickerVisible &&
                 <TouchableOpacity style={styles.chooseDOBButtonContainer} onPress={toggleDatePicker}>
                     <Text style={styles.DOBButtonContent}>
@@ -112,7 +131,7 @@ export default function Profile({ navigation }: Props) {
                 title={'Date of Birth'}
                 minimumDate={new Date(1900, 0, 1)}
                 theme={userTheme === 'dark' ? 'dark' : 'light'}
-                />
+            />
             }
             <CustomButton style={styles.button} onPress={updateData}>
                 <Text style={[styles.buttonText, { color: 'white' }]}>Done</Text>
@@ -120,6 +139,9 @@ export default function Profile({ navigation }: Props) {
         </View>
     );
 }
+
+const screenWidth = Dimensions.get('window').width
+const screenHeight = Dimensions.get('window').height
 
 const getStyles = (theme: CustomTheme) => StyleSheet.create({
     container: {
@@ -131,7 +153,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         paddingTop: 20,
     },
     title: {
-        marginTop: 30,
+        marginTop: screenHeight * 0.03,
         fontSize: 36,
         fontStyle: "italic",
         color: theme.text,
@@ -139,10 +161,10 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         marginBottom: 15,
     },
     profileImage: {
-        width: 100,
-        height: 100,
+        width: screenHeight * 0.125,
+        height: screenHeight * 0.125,
         borderRadius: 20,
-        marginBottom: 20,
+        marginBottom: screenHeight * 0.01,
     },
     button: {
         width: '80%',
@@ -152,10 +174,9 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         borderWidth: 1,
         padding: 15,
         borderRadius: 10,
-        marginVertical: 3,
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 40,
+        marginTop: 20,
     },
     buttonText: {
         color: theme.text,
@@ -168,12 +189,6 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
     },
     backImg: {
 
-    },
-    upgradeButton: {
-        marginTop: 10,
-    },
-    upgradeText: {
-        fontStyle: "italic",
     },
     chooseDOBButtonContainer: {
         width: '80%',
@@ -190,5 +205,18 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
     },
     datePicker: {
         height: 110,
-    }
+    },
+    dropDownPicker: {
+        alignSelf: 'center',
+        zIndex: 1000,
+        padding: screenWidth * 0.025,
+        paddingLeft: screenWidth * 0.037,
+        borderRadius: screenWidth * 0.025,
+        marginVertical: screenWidth * 0.042,
+        marginBottom: screenWidth * 0.063,
+    },
+    dropDownPickerText: {
+        fontSize: 18,
+        fontFamily: 'ABeeZee',
+    },
 });

@@ -5,8 +5,8 @@ import CustomTheme from "../../../models/CustomTheme";
 
 interface Props {
     label: string
-    state: string,
-    setState: (text: string) => void
+    state?: string
+    setState?: (text: string) => void
 }
 
 export default function editBox({ label, state, setState }: Props) {
@@ -16,26 +16,27 @@ export default function editBox({ label, state, setState }: Props) {
     return (
         <View style={styles.viewHolder}>
             <Text style={styles.label}>{label}</Text>
-            <TextInput value={state} onChangeText={setState} style={styles.profileDetail} />
+            {state && <TextInput value={state} onChangeText={setState} style={styles.profileDetail} /> }
         </View>
     )
 }
 
 const screenWidth = Dimensions.get('window').width
+const screenHeight = Dimensions.get('window').height
+
 const getStyles = (theme: CustomTheme) => StyleSheet.create({
     profileDetail: {
-        width: '100%',
+        fontFamily: 'ABeeZee',
         fontSize: screenWidth * 0.045,
         color: theme.text,
         borderColor: '#B0B0B0',
         borderWidth: 1,
+        textAlign: 'left',
+        width: '100%',
         padding: screenWidth * 0.025,
         paddingLeft: screenWidth * 0.037,
         borderRadius: screenWidth * 0.025,
-        marginVertical: screenWidth * 0.042,
-        textAlign: 'left',
-        marginBottom: screenWidth * 0.063,
-        fontFamily: 'ABeeZee'
+        marginVertical: screenWidth * 0.04,
     },
     viewHolder: {
         width: '80%',

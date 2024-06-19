@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { Dimensions, StyleSheet, View } from "react-native";
 import User from "../../../models/User";
 import CustomTheme from "../../../models/CustomTheme";
 import useCustomTheme from "../../../hooks/useCustomTheme";
@@ -31,6 +31,9 @@ export default function MatchProfileCard({ match }: Props) {
     )
 }
 
+const screenWidth = Dimensions.get('window').width
+const screenHeight = Dimensions.get('window').height
+
 function getStyles(theme: CustomTheme) {
     return StyleSheet.create({
         listUser: {
@@ -39,28 +42,28 @@ function getStyles(theme: CustomTheme) {
             marginBottom: 5
         },
         profileImage: {
-            width: 340,
-            height: 450,
+            width: screenWidth * 0.8,
+            height: screenHeight * 0.55,
             borderTopLeftRadius: 10,
             borderTopRightRadius: 10,
         },
         textContainer: {
-            width: 340,
-            height: 80,
+            width: screenWidth * 0.8,
+            height: screenHeight * 0.1,
             backgroundColor: 'black',
             borderBottomLeftRadius: 10,
             borderBottomRightRadius: 10,
         },
         topText: {
-            paddingTop: 15,
-            paddingLeft: 20,
+            marginTop: screenHeight * 0.01,
+            marginLeft: screenHeight * 0.01,
             color: 'white',
             fontWeight: 'bold',
             fontFamily: 'ABeeZee'
         },
         botText: {
-            paddingTop: 5,
-            paddingLeft: 20,
+            marginTop: screenHeight * 0.01,
+            marginLeft: screenHeight * 0.01,
             color: 'white',
             fontSize: 14,
         },

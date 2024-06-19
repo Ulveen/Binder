@@ -1,4 +1,4 @@
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Dimensions, StyleSheet, View } from "react-native";
 import useCustomTheme from "../../../hooks/useCustomTheme";
 import CustomTheme from "../../../models/CustomTheme";
 import { useEffect, useState } from "react";
@@ -25,6 +25,9 @@ export default function MatchLoadingSkeleton() {
     )
 }
 
+const screenWidth = Dimensions.get('window').width
+const screenHeight = Dimensions.get('window').height
+
 function getStyles(theme: CustomTheme) {
     return StyleSheet.create({
         listUserLoading: {
@@ -33,8 +36,8 @@ function getStyles(theme: CustomTheme) {
             marginBottom: 5
         },
         profileImageLoading: {
-            width: 340,
-            height: 450,
+            width: screenWidth * 0.8,
+            height: screenHeight * 0.55,
             borderTopLeftRadius: 10,
             borderTopRightRadius: 10,
             alignItems: 'center',
@@ -42,25 +45,25 @@ function getStyles(theme: CustomTheme) {
             backgroundColor: '#ededed'
         },
         textContainerLoading: {
-            width: 340,
-            height: 80,
+            width: screenWidth * 0.8,
+            height: screenHeight * 0.1,
             backgroundColor: 'black',
             borderBottomLeftRadius: 10,
             borderBottomRightRadius: 10,
         },
         topTextLoading: {
-            marginTop: 10,
-            marginLeft: 10,
+            marginTop: screenHeight * 0.01,
+            marginLeft: screenHeight * 0.01,
             backgroundColor: '#ededed',
             width: '50%',
-            height: 30
+            height: screenHeight * 0.03
         },
         botTextLoading: {
-            marginTop: 10,
-            marginLeft: 10,
+            marginTop: screenHeight * 0.01,
+            marginLeft: screenHeight * 0.01,
             backgroundColor: '#ededed',
             width: '40%',
-            height: 20
+            height: screenHeight * 0.03
         },
     })
 }

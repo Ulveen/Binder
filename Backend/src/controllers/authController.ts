@@ -77,10 +77,15 @@ async function verifyEmailOTP(req: Request, res: Response) {
 }
 
 async function register(req: Request, res: Response) {
-    const { email, password, dob, binusian, name, campus, gender, profileImage }: User = req.body
+    const { email, password, dob, binusian, name, campus, gender, profileImage, extension } = req.body
 
-    if (!email || !password || !dob || !binusian || !campus || !gender || !profileImage) {
+    if (!email || !password || !dob || !binusian || !campus || !gender || !profileImage || !extension) {
         res.status(400).send('All fields must not be empty')
+        return
+    }
+
+    if(!binusian.match('^[0-9]{2}$')) {
+        res.status(400).send('Binusian must be 2 digits')
         return
     }
 
@@ -97,9 +102,10 @@ async function register(req: Request, res: Response) {
     const encryted_password = encryptPassword(password)
 
     try {
-        const profileImageRef = await uploadImage(`profileImages/${email}.jpg`, profileImage)
-
-        const profileImageUrl = (await getImageDownloadUrl(profileImageRef))[0]
+        const timestamp = new Date().toISOString();
+        const newPath = `profileImages/${email}_${timestamp}.${extension}`;
+        const profileImageRef = await uploadImage(newPath, profileImage);
+        const profileImageUrl = (await getImageDownloadUrl(profileImageRef))[0];
 
         const userData = {
             dob: dob,
@@ -156,6 +162,9 @@ async function login(req: Request, res: Response) {
 
         const token = generateJWTToken(email)
         const temp = filterUserData(user)
+
+        console.log(temp.profileImage);
+        
 
         res.status(200).json({ data: { user: temp, token: token } })
 

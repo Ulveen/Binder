@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Image, Text, StyleSheet } from "react-native";
+import { View, TouchableOpacity, Image, Text, StyleSheet, Dimensions } from "react-native";
 import CustomButton from "../../components/CustomButton";
 import useAuth from "../../hooks/useAuth";
 import useCustomTheme from "../../hooks/useCustomTheme";
@@ -6,6 +6,7 @@ import CustomTheme from "../../models/CustomTheme";
 import TextHolder from "./components/TextHolder";
 import { renderProfileImage } from "../../utils/imageUtils";
 import { formatDate } from "../../utils/dateUtils";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Props {
     navigation: any;
@@ -26,7 +27,7 @@ export default function Profile({ navigation }: Props) {
     };
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
                 <Text style={styles.editButtonText}>Edit</Text>
             </TouchableOpacity>
@@ -34,6 +35,7 @@ export default function Profile({ navigation }: Props) {
             <Image style={styles.profileImage} source={renderProfileImage(user?.profileImage)} />
             <TextHolder UserInfo={user?.name} TextLabel={"Name"}></TextHolder>
             <TextHolder UserInfo={user?.binusian} TextLabel={"Binusian"}></TextHolder>
+            <TextHolder UserInfo={user?.gender} TextLabel={"Gender"} />
             <TextHolder UserInfo={user?.campus} TextLabel={"Campus Area"}></TextHolder>
             <TextHolder UserInfo={formatDate(user?.dob!)} TextLabel={"Date of Birth"} />
             <CustomButton style={[styles.button]} onPress={logout}>
@@ -44,9 +46,12 @@ export default function Profile({ navigation }: Props) {
                     <Text style={styles.upgradeText}>Upgrade to Premium</Text>
                 </TouchableOpacity>
             }
-        </View>
+        </SafeAreaView>
     );
 }
+
+const screenWidth = Dimensions.get('window').width
+const screenHeight = Dimensions.get('window').height
 
 const getStyles = (theme: CustomTheme) => StyleSheet.create({
     container: {
@@ -58,7 +63,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         paddingTop: 20,
     },
     title: {
-        marginTop: 30,
+        marginTop: screenHeight * 0.03,
         fontSize: 36,
         fontStyle: "italic",
         color: theme.text,
@@ -66,8 +71,8 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
         marginBottom: 15,
     },
     profileImage: {
-        width: 100,
-        height: 100,
+        width: screenHeight * 0.125,
+        height: screenHeight * 0.125,
         borderRadius: 20,
         marginBottom: 20,
     },

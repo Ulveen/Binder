@@ -40,6 +40,7 @@ export default function Register({ navigation: { navigate } }: Props) {
     const [campus, setCampus] = useState('Kemanggisan')
     const [isOpenGenderPicker, setIsOpenGenderPicker] = useState(false)
     const [gender, setGender] = useState('Male')
+    const [extension, setExtension] = useState('')
 
     const { executeAsync: handleSendEmailOTP } = useAsyncHandler(
         async function () {
@@ -58,7 +59,7 @@ export default function Register({ navigation: { navigate } }: Props) {
 
     const { executeAsync: handleRegister } = useAsyncHandler(
         async function () {
-            await authService.register(email, password, name, dob, binusian, campus, gender, profileImage)
+            await authService.register(email, password, name, dob, binusian, campus, gender, profileImage, extension)
             setStep(0);
             setEmail('');
             setOtp('');
@@ -92,18 +93,13 @@ export default function Register({ navigation: { navigate } }: Props) {
 
     async function handlePickImage() {
         const assets = await openImageGallery('photo')
-        const uri = assets![0].uri!
-        const resizedImage = await ImageResizer.createResizedImage(
-            uri,
-            600,
-            600,
-            'PNG',
-            80
-        )
-        const base64 = await uriToBase64(resizedImage.uri)
         if (assets) {
+            const uri = assets![0].uri!
+            const base64 = assets![0].base64!
+            const imgExtension = uri.split('.').pop()!
             setProfileUri(uri)
             setProfileImage(base64)
+            setExtension(imgExtension)
         }
     }
 
@@ -154,7 +150,7 @@ export default function Register({ navigation: { navigate } }: Props) {
             </TouchableOpacity>
             <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} placeholderTextColor={'gray'} />
             <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry={true} placeholderTextColor={'gray'} />
-            <TextInput style={styles.input} placeholder="Binusian" value={binusian} onChangeText={setBinusian} placeholderTextColor={'gray'} />
+            <TextInput style={styles.input} placeholder="Binusian (ex. 26)" value={binusian} onChangeText={setBinusian} placeholderTextColor={'gray'} />
             <DropDownPicker style={styles.dropDownPicker}
                 textStyle={styles.dropDownPickerText}
                 containerStyle={{ width: '80%' }}
@@ -264,6 +260,7 @@ const getStyles = (theme: CustomTheme) => StyleSheet.create({
     },
     dropDownPicker: {
         alignSelf: 'center',
+        zIndex: 1000
     },
     dropDownPickerText: {
         fontSize: 18,

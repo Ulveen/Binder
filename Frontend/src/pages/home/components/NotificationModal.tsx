@@ -104,7 +104,7 @@ function getStyles(theme: CustomTheme) {
         },
         markAllAsReadText: {
             color: 'white',
-            fontSize: 15,
+            fontSize: 13,
             fontFamily: 'ABeeZee'
         },
         notificationNoticeText: {

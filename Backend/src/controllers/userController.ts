@@ -73,7 +73,7 @@ async function updateUserData(req: AuthRequest, res: Response) {
         { exp: number, iat: number } ? User :
         User & { exp: number, iat: number }
 
-    const { name, dob, binusian, campus, gender, profileImage, premium, password } = req.body
+    const { name, dob, binusian, campus, gender, profileImage, premium, password, extension } = req.body
     const updatedData = {} as any
 
     if (name) {
@@ -98,7 +98,9 @@ async function updateUserData(req: AuthRequest, res: Response) {
         updatedData['password'] = encryptPassword(password)
     }
     if (profileImage) {
-        const profileImageUrl = await uploadImage(`profileImages/${user.email}`, profileImage)
+        const timestamp = new Date().toISOString();
+        const newPath = `profileImages/${user.email}_${timestamp}.${extension}`;
+        const profileImageUrl = await uploadImage(newPath, profileImage)
         updatedData['profileImage'] = (await getImageDownloadUrl(profileImageUrl))[0]
     }
 
@@ -114,7 +116,6 @@ async function updateUserData(req: AuthRequest, res: Response) {
         ...userWithoutExpIat,
         ...updatedData,
     };
-    
 
     return res.status(200).json({
         data: {

@@ -17,7 +17,7 @@ async function verifyEmailOTP(email: string, otp: string) {
     await createRequest(url, body)
 }
 
-async function register(email: string, password: string, name: string, dob: Date, binusian: string, campus: string, gender: string, profileImage: string) {
+async function register(email: string, password: string, name: string, dob: Date, binusian: string, campus: string, gender: string, profileImage: string, extension: string) {
     const url = '/auth/register'
     const body = {
         email: email,
@@ -27,7 +27,8 @@ async function register(email: string, password: string, name: string, dob: Date
         binusian: binusian,
         campus: campus,
         gender: gender,
-        profileImage: profileImage
+        profileImage: profileImage,
+        extension: extension
     }
     await createRequest(url, body)
 }

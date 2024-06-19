@@ -1,10 +1,10 @@
 import MatchFilter from "../models/MatchFilter";
 import User from "../models/User"
-import { createRequest, createRequestWithToken } from "../utils/requestUtils";
+import { createRequestWithToken } from "../utils/requestUtils";
 
-async function updateUserData(params: Partial<User>) {
+async function updateUserData(params: Partial<User>, extension: string) {
     const to = "/user/updateUserData";
-    const body = { ...params };
+    const body = { ...params, extension };
 
     const response = await createRequestWithToken(to, body);
 

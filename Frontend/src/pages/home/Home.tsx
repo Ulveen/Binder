@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, Dimensions } from "react-native";
 import useAuth from "../../hooks/useAuth";
 import UserService from "../../services/userService";
 import { useEffect, useState } from "react";
@@ -41,7 +41,7 @@ export default function Home({ navigation }: Props) {
         campus: user?.campus ? user.campus : 'Kemanggisan',
         binusian: user?.binusian ? user.binusian : '26',
         minAge: 17,
-        maxAge: 21,
+        maxAge: 50,
         offset: 0
     })
 
@@ -197,6 +197,9 @@ export default function Home({ navigation }: Props) {
     );
 }
 
+const screenHeight = Dimensions.get('window').height
+const screenWidth = Dimensions.get('window').width
+
 function getStyles(theme: CustomTheme) {
     return StyleSheet.create({
         container: {
@@ -206,8 +209,8 @@ function getStyles(theme: CustomTheme) {
         header: {
             flexDirection: 'row',
             justifyContent: 'space-between',
-            paddingHorizontal: 35,
-            paddingVertical: 30,
+            paddingHorizontal: screenWidth * 0.075,
+            paddingVertical: screenHeight * 0.02,
         },
         notifContainer: {
             position: 'relative',
@@ -249,7 +252,7 @@ function getStyles(theme: CustomTheme) {
         buttonRow: {
             flexDirection: 'row',
             justifyContent: 'space-around',
-            marginBottom: 10,
+            marginBottom: screenHeight * 0.02,
         },
         circleImage: {
             width: 80,
