@@ -16,7 +16,7 @@ export default function editBox({ label, state, setState }: Props) {
     return (
         <View style={styles.viewHolder}>
             <Text style={styles.label}>{label}</Text>
-            {state && <TextInput value={state} onChangeText={setState} style={styles.profileDetail} /> }
+            {setState && <TextInput value={state} onChangeText={setState} style={styles.profileDetail} /> }
         </View>
     )
 }

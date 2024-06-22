@@ -4,7 +4,6 @@ import firebaseAdmin from "../firebase/firebase";
 import { AuthRequest } from "../middlewares/authMiddleware";
 import { encryptPassword } from "../utils/bcryptUtils";
 import { getImageDownloadUrl, uploadImage } from "../utils/imageUtils";
-import { generateJWTToken } from "../utils/jwtUtils";
 import { differenceInYears, parseISO } from "date-fns";
 import NotificationController from "./notificationController";
 
@@ -76,25 +75,44 @@ async function updateUserData(req: AuthRequest, res: Response) {
     const { name, dob, binusian, campus, gender, profileImage, premium, password, extension } = req.body
     const updatedData = {} as any
 
-    if (name) {
+    console.log(req.body);
+    
+
+    if (name !== undefined) {
+        if (name.length === 0) {
+            res.status(400).send('Name cannot be empty')
+            return
+        }
         updatedData['name'] = name
     }
-    if (dob) {
+    if (dob !== undefined) {
+        if ((new Date()).getFullYear() - (new Date(dob).getFullYear()) < 17) {
+            res.status(400).send('You must be at least 17 years old')
+            return
+        }
         updatedData['dob'] = dob
     }
-    if (binusian) {
+    if (binusian !== undefined) {
+        if (binusian.length === 0 || !binusian.match('^[0-9]{2}$')) {
+            res.status(400).send('Binusian must be 2 digits')
+            return
+        }
         updatedData['binusian'] = binusian
     }
-    if (campus) {
+    if (campus !== undefined) {
         updatedData['campus'] = campus
     }
-    if (gender) {
+    if (gender !== undefined) {
         updatedData['gender'] = gender
     }
-    if (premium) {
+    if (premium !== undefined) {
         updatedData['premium'] = premium
     }
-    if (password) {
+    if (password !== undefined) {
+        if (password.length < 6) {
+            res.status(400).send('Password must be at least 6 characters')
+            return
+        }
         updatedData['password'] = encryptPassword(password)
     }
     if (profileImage) {
@@ -133,6 +151,15 @@ async function removePartner(req: AuthRequest, res: Response) {
             match: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(remove),
             likedBy: firebaseAdmin.admin.firestore.FieldValue.arrayRemove(remove)
         });
+        const messageRef = await firebaseAdmin.db.collection('messages').where('users', 'array-contains', email).get();
+
+        messageRef.docs.forEach(async doc => {
+            const data = doc.data();
+            if (data.users.includes(remove)) {
+                await doc.ref.delete();
+            }
+        });
+
         res.status(200).send('Email remove successfuly');
     } catch (error) {
         console.error('Error updating match field:', error);

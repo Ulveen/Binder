@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity } from "react-native";
 import AuthService from "../../services/authService";
 import CustomButton from "../../components/CustomButton";
 import OtpPlaceholder from "./components/OtpPlaceholder";
@@ -8,10 +8,9 @@ import DropDownPicker from "react-native-dropdown-picker";
 import useCustomTheme from "../../hooks/useCustomTheme";
 import useAsyncHandler from "../../hooks/useAsyncHandler";
 import CustomTheme from "../../models/CustomTheme";
-import { openImageGallery, renderProfileImage, uriToBase64 } from "../../utils/imageUtils";
+import { openImageGallery, renderProfileImage } from "../../utils/imageUtils";
 import { genderOptions } from "../../models/Gender";
 import { campusOptions } from "../../models/Campus";
-import ImageResizer from 'react-native-image-resizer';
 
 interface Props {
     navigation: any;
@@ -78,7 +77,11 @@ export default function Register({ navigation: { navigate } }: Props) {
     )
 
     function openOtpInput() {
-        otpInputRef.current?.focus()
+        if (otpInputRef.current?.isFocused()) {
+            otpInputRef.current?.blur()
+        } else {
+            otpInputRef.current?.focus()
+        }
     }
 
     function toggleDatePicker() {
@@ -86,8 +89,11 @@ export default function Register({ navigation: { navigate } }: Props) {
     }
 
     function handleOtpChange(text: string) {
-        if (text.length > 4) return
-        const otp = text.replace(/[^0-9]/g, '')
+        const newString = text
+        if (newString.length > 4) {
+            return
+        }
+        const otp = newString.replace(/[^0-9]/g, '')
         setOtp(otp)
     }
 

@@ -9,7 +9,6 @@ interface Props {
 
 export default function OtpPlaceholder({ code, openInput }: Props) {
     const { theme } = useCustomTheme()
-
     const styles = getStyles(theme)
 
     return (

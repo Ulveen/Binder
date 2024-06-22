@@ -52,6 +52,7 @@ export default function Profile({ navigation }: Props) {
             if (binusian !== user?.binusian) updatedData.binusian = binusian
             if (campus !== user?.campus) updatedData.campus = campus
             if (profileImage !== '') updatedData.profileImage = profileImage
+            if (gender !== user?.gender) updatedData.gender = gender
 
             if (Object.keys(updatedData).length === 0) {
                 toastService.info('No changes detected')

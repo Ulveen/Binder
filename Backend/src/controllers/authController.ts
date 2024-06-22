@@ -99,6 +99,11 @@ async function register(req: Request, res: Response) {
         return
     }
 
+    if((new Date()).getFullYear() - (new Date(dob).getFullYear()) < 17) {
+        res.status(400).send('You must be at least 17 years old')
+        return
+    }
+
     const encryted_password = encryptPassword(password)
 
     try {

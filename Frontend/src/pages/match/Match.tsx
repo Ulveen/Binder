@@ -5,11 +5,12 @@ import CustomTheme from "../../models/CustomTheme";
 import LoadingComponent from "./components/LoadingCards";
 import useAuth from "../../hooks/useAuth";
 import UserService from "../../services/userService";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ALERT_TYPE, AlertNotificationRoot, Dialog } from 'react-native-alert-notification';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import MessageService from "../../services/messageService";
 import match from ".";
+import { useFocusEffect } from "@react-navigation/native";
 
 interface MatchData {
     email: string;
@@ -61,20 +62,28 @@ export default function Match({ navigation }: any) {
         setLoading(true)
         return true
     }
-    useEffect(() => {
-        async function fetchData(type: string) {
-            try {
-                const parthnerData = await userService.getPartner(email, type);
-                setData(parthnerData)
-                setLoading(false)
-                setRefresh(false)
-            } catch (error) {
-                console.error('Error fetching parthner data:', error);
-            }
+
+    async function fetchData(type: string) {
+        try {
+            const parthnerData = await userService.getPartner(email, type);
+            setData(parthnerData)
+            setLoading(false)
+            setRefresh(false)
+        } catch (error) {
+            console.error('Error fetching parthner data:', error);
         }
+    }
+    
+
+    useEffect(() => {
         fetchData(show)
     }, [show, refresh])
 
+    useFocusEffect(
+        useCallback(() => {
+          fetchData(show);
+        }, [show])
+      );
 
     return (
         <AlertNotificationRoot>
